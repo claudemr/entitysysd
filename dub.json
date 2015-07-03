@@ -1,0 +1,16 @@
+{
+    "name": "entitysysd",
+    "description": "Entity/Component System engine",
+    "homepage": "https://github.com/claudemr/entitysysd",
+    "license": "LGPL3",
+    "authors": [
+        "Claude M"
+    ],
+    "configurations": [
+        {
+            "name": "library",
+            "targetType": "library",
+            "sourcePaths": ["entitysysd"]
+        }
+    ]
+}
