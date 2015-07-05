@@ -9,6 +9,11 @@ alias EventSignalWeakPtr = void*;//std::weak_ptr<EventSignal>;
 /// Used internally by the EventManager.
 class BaseEvent
 {
+public:
+    alias Family = size_t;
+
+protected:
+    static Family mFamilyCounter = 0;
 };
 
 
@@ -46,6 +51,7 @@ public:
 
 private:
     //std::unordered_map<BaseEvent::Family, std::pair<EventSignalWeakPtr, std::size_t>> mConnections;
+    EventSignalWeakPtr[BaseEvent.Family] mConnections;
 };
 
 
@@ -136,7 +142,7 @@ public:
 
     size_t nbConnectedReceivers()
     {
-        return mHandlers.lenth();
+        return mHandlers.data.length;
     }
 
 private:

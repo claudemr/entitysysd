@@ -34,7 +34,7 @@ public:
 
     size_t chunks() @property
     {
-        return mBlocks.length();
+        return mBlocks.data.length;
     }
 
     /// Ensure at least n elements will fit in the pool.
@@ -58,13 +58,13 @@ public:
     void *get(size_t n)
     {
         assert(n < mSize);
-        return mBlocks.data[n / mChunkSize] + (n % mChunkSize) * mElementSize;
+        return cast(void*)mBlocks.data[n / mChunkSize] + (n % mChunkSize) * mElementSize;
     }
 
-    const void *get(size_t n)
+    const(void*) get(size_t n)
     {
         assert(n < mSize);
-        return mBlocks.data[n / mChunkSize] + (n % mChunkSize) * mElementSize;
+        return cast(const(void*))mBlocks.data[n / mChunkSize] + (n % mChunkSize) * mElementSize;
     }
 
     void destroy(size_t n)

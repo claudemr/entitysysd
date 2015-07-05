@@ -65,7 +65,7 @@ public:
     this(BaseEntityManager entityManager,
          EventManager eventManager)
     {
-        mEntityManager = BaseEntityManager;
+        mEntityManager = entityManager;
         mEventManager  = eventManager;
     }
 
@@ -138,7 +138,7 @@ public:
      */
     void updateAll(TimeDelta dt)
     {
-        enforce(mInitialized, "SystemManager.configure() not called");
+        assert(mInitialized, "SystemManager.configure() not called");
         foreach (s; mSystems.data)
             s.update(mEntityManager, mEventManager, dt);
     }

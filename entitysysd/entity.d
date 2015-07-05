@@ -152,11 +152,6 @@ public:
         mManager.hasComponent!(C, Args)(mId, args);
     }
 
-    auto componentMask()
-    {
-        return mManager.componentMask(mId);
-    }
-
 private:
     BaseEntityManager mManager;
     Id                mId = invalid;
@@ -208,9 +203,6 @@ interface BaseEntityManager
      * Emits EntityDestroyedEvent.
      */
     void destroy(Entity.Id entityId);
-
-    auto componentMask(Entity.Id id);
-    auto componentMask(C)();
 
     size_t size() @property;
     size_t capacity() @property;
