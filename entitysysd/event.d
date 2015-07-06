@@ -1,12 +1,10 @@
 module entitysysd.event;
 
-import std.array;
 
-alias EventSignal = void*;//Simple::Signal<void (const void*)>;
-alias EventSignalPtr = void*;//std::shared_ptr<EventSignal>;
-alias EventSignalWeakPtr = void*;//std::weak_ptr<EventSignal>;
+private alias ReceiverDelegate = void delegate(BaseEvent);
 
-/// Used internally by the EventManager.
+
+// Used internally by the EventManager.
 class BaseEvent
 {
 public:
@@ -27,6 +25,19 @@ protected:
  */
 class Event(Derived) : BaseEvent
 {
+public:
+    /// Create a family id for each derived event
+    static Family family()
+    {
+        static Family family = -1;
+        if (family == -1)
+        {
+            family = mFamilyCounter;
+            mFamilyCounter++;
+        }
+
+        return family;
+    }
 };
 
 
@@ -44,14 +55,32 @@ public:
     }
 
     // Return number of signals connected to this receiver.
-    size_t nbConnectedSignals()
+    size_t nbConnection()
     {
         return mConnections.length;
     }
 
+    void connect(ReceiverDelegate *pReceive)
+    {
+        foreach (pRcv; mConnections)
+            // already subscribed
+            if (*pRcv == *pReceive)
+                return;
+
+        mConnections ~= pReceive;
+    }
+
+    void disconnect(ReceiverDelegate *pReceive)
+    {
+        foreach (pRcv; mConnections)
+            // already subscribed
+            if (*pRcv == *pReceive)
+                pRcv = null;
+    }
+
 private:
     //std::unordered_map<BaseEvent::Family, std::pair<EventSignalWeakPtr, std::size_t>> mConnections;
-    EventSignalWeakPtr[BaseEvent.Family] mConnections;
+    ReceiverDelegate*[] mConnections;
 };
 
 
@@ -83,14 +112,16 @@ public:
      *     ExplosionReceiver receiver;
      *     em.subscribe<Explosion>(receiver);
      */
-    void subscribe(E, Receiver)(Receiver receiver)
+    void subscribe(E, R)(R receiver)
     {
-        /*void (Receiver::*receive)(const E &) = &Receiver::receive;
-        auto sig = signal_for(Event<E>::family());
-        auto wrapper = EventCallbackWrapper<E>(std::bind(receive, &receiver, std::placeholders::_1));
-        auto connection = sig->connect(wrapper);
-        BaseReceiver &base = receiver;
-        base.connections_.insert(std::make_pair(Event<E>::family(), std::make_pair(EventSignalWeakPtr(sig), connection)));*/
+        ReceiverDelegate receive = cast(ReceiverDelegate)&receiver.receive;
+        auto eventFamily = E.family();
+
+        if (!(eventFamily in mHandlers))
+            mHandlers[eventFamily] = [];
+
+        mHandlers[eventFamily] ~= receive;
+        receiver.connect(&mHandlers[eventFamily][$-1]);
     }
 
     /**
@@ -101,16 +132,22 @@ public:
      */
     void unsubscribe(E, Receiver)(Receiver receiver)
     {
-        BaseReceiver base = receiver;
-        // Assert that it has been subscribed before
-        /*assert(base.connections_.find(Event<E>::family()) != base.connections_.end());
-        auto pair = base.connections_[Event<E>::family()];
-        auto connection = pair.second;
-        auto &ptr = pair.first;
-        if (!ptr.expired())
-          ptr.lock()->disconnect(connection);
+        ReceiverDelegate receive = &receiver.receive;
+        auto eventFamily = E.family();
 
-        base.connections_.erase(Event<E>::family());*/
+        if (!(eventFamily in mHandlers))
+            return;
+
+        foreach (ref rcv; mHandlers[eventFamily])
+            rcv = null;
+
+        foreach (ref rcv; mHandlers.data[eventFamily])
+            // already subscribed
+            if (rcv == receive)
+            {
+                receiver.disconnect(&rcv);
+                rcv = null;
+            }
     }
 
     /**
@@ -118,8 +155,12 @@ public:
      */
     void emit(E)(E event)
     {
-        /*auto sig = signal_for(Event<E>::family());
-        sig->emit(event.get());*/
+        auto eventFamily = E.family();
+
+        foreach (rcv; mHandlers[eventFamily])
+            // already subscribed
+            if (rcv !is null)
+                rcv(event);
     }
 
     /**
@@ -136,32 +177,133 @@ public:
     void emit(E, Args...)(Args args)
     {
         auto event = new E(args);
-        /*auto sig = signal_for(std::size_t(Event<E>::family()));
-        sig->emit(&event);*/
+        emit(event);
     }
 
     size_t nbConnectedReceivers()
     {
-        return mHandlers.data.length;
+        return mHandlers.length;
     }
 
 private:
-    /*EventSignalPtr &signal_for(std::size_t id)
+
+    // For each family of event, we have a set of receiver-delegates
+    ReceiverDelegate[][BaseEvent.Family] mHandlers;
+}
+
+
+import std.conv;
+import std.stdio;
+
+unittest
+{
+    //dmd -main -unittest entitysysd/event.d
+    static class TestEvent : Event!(TestEvent)
     {
-      if (id >= handlers_.size())
-        handlers_.resize(id + 1);
-      if (!handlers_[id])
-        handlers_[id] = std::make_shared<EventSignal>();
-      return handlers_[id];
+        this(string str)
+        {
+            data = str.idup;
+        }
+
+        string data;
     }
 
-    // Functor used as an event signal callback that casts to E.
-    struct EventCallbackWrapper(E)
+    static class IntEvent : Event!(IntEvent)
     {
-      explicit EventCallbackWrapper(std::function<void(const E &)> callback) : callback(callback) {}
-      void operator()(const void *event) { callback(*(static_cast<const E*>(event))); }
-      std::function<void(const E &)> callback;
-    };*/
+        this(int n)
+        {
+            data = n;
+        }
 
-    Appender!(EventSignalPtr[]) mHandlers;
+        int data;
+    }
+
+    auto strEvt0 = new TestEvent("hello");
+    auto strEvt1 = new TestEvent("world");
+    auto intEvt0 = new IntEvent(123);
+    auto intEvt1 = new IntEvent(456);
+
+    //*** Check event family works fine ***
+    assert(strEvt0.family == 0);
+    assert(intEvt1.family == 1);
+    assert(strEvt0.family == 0);
+    assert(strEvt1.family == 0);
+    assert(intEvt0.family == 1);
+    assert(intEvt1.family == 1);
+
+    static class TestReceiver0 : Receiver!(TestReceiver0)
+    {
+        string str;
+
+        this(EventManager evtManager)
+        {
+            evtManager.subscribe!(TestEvent)(this);
+        }
+
+        void receive(TestEvent event)
+        {
+            str ~= event.data;
+        }
+    }
+
+    //*** create a new event manager ***
+    auto evtManager = new EventManager;
+
+    //*** test with one receiver ***
+    auto testRcv0 = new TestReceiver0(evtManager);
+
+    evtManager.emit!(TestEvent)("goodbye ");
+    evtManager.emit(strEvt1);
+
+    assert(testRcv0.str == "goodbye world");
+
+    //*** test with multiple receiver and multiple events ***
+    static class TestReceiver1 : Receiver!(TestReceiver1)
+    {
+        string str;
+
+        this(EventManager evtManager)
+        {
+            evtManager.subscribe!(IntEvent)(this);
+        }
+
+        void receive(IntEvent event)
+        {
+            str ~= event.data.to!(string)();
+        }
+    }
+
+    static class TestReceiver2 : Receiver!(TestReceiver2)
+    {
+        string str;
+
+        this(EventManager evtManager)
+        {
+            evtManager.subscribe!(TestEvent)(this);
+            evtManager.subscribe!(IntEvent)(this);
+        }
+
+        void receive(TestEvent event)
+        {
+            str ~= event.data;
+        }
+        void receive(IntEvent event)
+        {
+            str ~= event.data.to!(string)();
+        }
+    }
+
+    auto testRcv1 = new TestReceiver1(evtManager);
+    auto testRcv2 = new TestReceiver2(evtManager);
+    testRcv0.str = ""; // reset string
+
+    /*evtManager.emit(intEvt0);
+    evtManager.emit(strEvt1);
+    evtManager.emit(strEvt0);
+    evtManager.emit(intEvt1);
+    evtManager.emit(strEvt0);
+    evtManager.emit(intEvt0);
+    evtManager.emit(intEvt1);
+
+    assert(testRcv2.str == "123worldhello456hello123456");*/
 }
