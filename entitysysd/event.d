@@ -3,7 +3,6 @@ module entitysysd.event;
 
 private alias ReceiverDelegate = void delegate(BaseEvent);
 
-
 // Used internally by the EventManager.
 class BaseEvent
 {
@@ -40,52 +39,13 @@ public:
     }
 };
 
-
-class BaseReceiver
+interface BaseReceiver
 {
-public:
-    ~this()
-    {
-        foreach (connection; mConnections)
-        {
-           /*auto &ptr = connection.second.first;
-           if (!ptr.expired())
-               ptr.lock()->disconnect(connection.second.second);*/
-        }
-    }
+}
 
-    // Return number of signals connected to this receiver.
-    size_t nbConnection()
-    {
-        return mConnections.length;
-    }
-
-    void connect(ReceiverDelegate *pReceive)
-    {
-        foreach (pRcv; mConnections)
-            // already subscribed
-            if (*pRcv == *pReceive)
-                return;
-
-        mConnections ~= pReceive;
-    }
-
-    void disconnect(ReceiverDelegate *pReceive)
-    {
-        foreach (pRcv; mConnections)
-            // already subscribed
-            if (*pRcv == *pReceive)
-                pRcv = null;
-    }
-
-private:
-    //std::unordered_map<BaseEvent::Family, std::pair<EventSignalWeakPtr, std::size_t>> mConnections;
-    ReceiverDelegate*[] mConnections;
-};
-
-
-class Receiver(Derived) : BaseReceiver
+interface Receiver(E) : BaseReceiver
 {
+    void receive(E event);
 };
 
 
@@ -112,17 +72,35 @@ public:
      *     ExplosionReceiver receiver;
      *     em.subscribe<Explosion>(receiver);
      */
-    void subscribe(E, R)(R receiver)
+    void subscribe(E)(Receiver!E receiver)
     {
         ReceiverDelegate receive = cast(ReceiverDelegate)&receiver.receive;
         auto eventFamily = E.family();
 
+        // no subscriber for the event family, so create one, and we're done
         if (!(eventFamily in mHandlers))
+        {
             mHandlers[eventFamily] = [];
+            mHandlers[eventFamily] ~= receive;
+            return;
+        }
 
+        // already subscribed?
+        foreach (ref rcv; mHandlers[eventFamily])
+            assert(!(rcv == receive));
+
+        // look for empty spots
+        foreach (ref rcv; mHandlers[eventFamily])
+            if (rcv is null)
+            {
+                rcv = receive;
+                return;
+            }
+
+        // else append the subscriber callback to the array
         mHandlers[eventFamily] ~= receive;
-        receiver.connect(&mHandlers[eventFamily][$-1]);
     }
+
 
     /**
      * Unsubscribe an object in order to not receive events of type E anymore.
@@ -130,24 +108,16 @@ public:
      * Receivers must have subscribed for event E before unsubscribing from event E.
      *
      */
-    void unsubscribe(E, Receiver)(Receiver receiver)
+    void unsubscribe(E)(Receiver!E receiver)
     {
-        ReceiverDelegate receive = &receiver.receive;
+        ReceiverDelegate receive = cast(ReceiverDelegate)&receiver.receive;
         auto eventFamily = E.family();
 
-        if (!(eventFamily in mHandlers))
-            return;
+        assert(eventFamily in mHandlers);
 
         foreach (ref rcv; mHandlers[eventFamily])
-            rcv = null;
-
-        foreach (ref rcv; mHandlers.data[eventFamily])
-            // already subscribed
             if (rcv == receive)
-            {
-                receiver.disconnect(&rcv);
                 rcv = null;
-            }
     }
 
     /**
@@ -158,9 +128,11 @@ public:
         auto eventFamily = E.family();
 
         foreach (rcv; mHandlers[eventFamily])
+        {
             // already subscribed
             if (rcv !is null)
                 rcv(event);
+        }
     }
 
     /**
@@ -178,11 +150,6 @@ public:
     {
         auto event = new E(args);
         emit(event);
-    }
-
-    size_t nbConnectedReceivers()
-    {
-        return mHandlers.length;
     }
 
 private:
@@ -231,13 +198,13 @@ unittest
     assert(intEvt0.family == 1);
     assert(intEvt1.family == 1);
 
-    static class TestReceiver0 : Receiver!(TestReceiver0)
+    static class TestReceiver0 : Receiver!TestEvent
     {
         string str;
 
         this(EventManager evtManager)
         {
-            evtManager.subscribe!(TestEvent)(this);
+            evtManager.subscribe!TestEvent(this);
         }
 
         void receive(TestEvent event)
@@ -258,29 +225,29 @@ unittest
     assert(testRcv0.str == "goodbye world");
 
     //*** test with multiple receiver and multiple events ***
-    static class TestReceiver1 : Receiver!(TestReceiver1)
+    static class TestReceiver1 : Receiver!IntEvent
     {
         string str;
 
         this(EventManager evtManager)
         {
-            evtManager.subscribe!(IntEvent)(this);
+            evtManager.subscribe!IntEvent(this);
         }
 
         void receive(IntEvent event)
         {
-            str ~= event.data.to!(string)();
+            str ~= to!string(event.data);
         }
     }
 
-    static class TestReceiver2 : Receiver!(TestReceiver2)
+    static class TestReceiver2 : Receiver!TestEvent, Receiver!IntEvent
     {
         string str;
 
         this(EventManager evtManager)
         {
-            evtManager.subscribe!(TestEvent)(this);
-            evtManager.subscribe!(IntEvent)(this);
+            evtManager.subscribe!TestEvent(this);
+            evtManager.subscribe!IntEvent(this);
         }
 
         void receive(TestEvent event)
@@ -297,7 +264,7 @@ unittest
     auto testRcv2 = new TestReceiver2(evtManager);
     testRcv0.str = ""; // reset string
 
-    /*evtManager.emit(intEvt0);
+    evtManager.emit(intEvt0);
     evtManager.emit(strEvt1);
     evtManager.emit(strEvt0);
     evtManager.emit(intEvt1);
@@ -305,5 +272,31 @@ unittest
     evtManager.emit(intEvt0);
     evtManager.emit(intEvt1);
 
-    assert(testRcv2.str == "123worldhello456hello123456");*/
+    assert(testRcv0.str == "worldhellohello");
+    assert(testRcv1.str == "123456123456");
+    assert(testRcv2.str == "123worldhello456hello123456");
+
+    //*** test unsubscribe ***
+    evtManager.unsubscribe!TestEvent(testRcv2);
+    testRcv0.str = ""; // reset string
+    testRcv1.str = ""; // reset string
+    testRcv2.str = ""; // reset string
+
+    evtManager.emit(intEvt0);
+    evtManager.emit(strEvt0);
+
+    assert(testRcv0.str == "hello");
+    assert(testRcv1.str == "123");
+    assert(testRcv2.str == "123");
+
+    evtManager.unsubscribe!TestEvent(testRcv0);
+    evtManager.unsubscribe!IntEvent(testRcv2);
+    evtManager.subscribe!TestEvent(testRcv2);
+
+    evtManager.emit(strEvt1);
+    evtManager.emit(intEvt1);
+
+    assert(testRcv0.str == "hello");
+    assert(testRcv1.str == "123456");
+    assert(testRcv2.str == "123world");
 }

@@ -117,8 +117,13 @@ public:
 private:
     static Family family()
     {
-        static Family family = mFamilyCounter;
-        mFamilyCounter++;
+        static Family family = -1;
+        if (family == -1)
+        {
+            family = mFamilyCounter;
+            mFamilyCounter++;
+        }
+
         //todo assert(family < entityx::MAX_COMPONENTS);
         return family;
     }
