@@ -1,6 +1,6 @@
 module entitysysd.entity;
 
-import std.array;
+import std.container;
 
 import entitysysd.bitarray;
 import entitysysd.component;
@@ -15,9 +15,9 @@ public:
     static struct Id
     {
     public:
-        this(uint index, uint page)
+        this(uint uniqueId, uint versionId)
         {
-            mId = index + cast(ulong)page << 32;
+            mId = uniqueId + cast(ulong)versionId << 32;
         }
 
         /*bool operator == (const Id &other) const { return id_ == other.id_; }
@@ -28,11 +28,11 @@ public:
         {
             return mId;
         }
-        uint index() @property
+        uint uniqueId() @property
         {
             return mId & 0xffffffffUL;
         }
-        uint page() @property
+        uint versionId() @property
         {
             return mId >> 32;
         }
@@ -99,7 +99,7 @@ public:
     }
 
 
-    ComponentHandle!(C) assign(C, Args...)(Args args)
+    /+ComponentHandle!(C) assign(C, Args...)(Args args)
     {
         assert(valid);
         return mManager.assign!(C, Args)(mId, args);
@@ -117,7 +117,7 @@ public:
         else
             handle = mManager.assign!(C)(mId, args);
         return handle;
-    }
+    }+/
 
     void remove(C, Args...)(Args args)
     {
@@ -125,11 +125,11 @@ public:
         mManager.remove!(C, Args)(mId, args);
     }
 
-    ComponentHandle!(C) component(C)()
+    /+ComponentHandle!(C) component(C)()
     {
         assert(valid());
         return mManager.component!(C)(mId);
-    }
+    }+/
 
     /*template <typename C, typename = typename std::enable_if<std::is_const<C>::value>::type>
     const ComponentHandle<C, const EntityManager> component() const;*/
@@ -146,11 +146,11 @@ public:
         return mManager.hasComponent!(C, Args)(mId, args);
     }
 
-    void unpack(A, Args...)(ComponentHandle!(A) a, Args args)
+    /+void unpack(A, Args...)(ComponentHandle!(A) a, Args args)
     {
         assert(valid);
         mManager.hasComponent!(C, Args)(mId, args);
-    }
+    }+/
 
 private:
     BaseEntityManager mManager;
@@ -158,7 +158,7 @@ private:
 }
 
 
-
+/+
 /**
  * Emitted when an entity is added to the system.
  */
@@ -191,22 +191,16 @@ struct EntityDestroyedEvent
     Entity entity;
     Event!(EntityDestroyedEvent) event;
 }
-
++/
 
 interface BaseEntityManager
 {
     Entity create();
-
-    /**
-     * Destroy an existing Entity.Id and its associated Components.
-     *
-     * Emits EntityDestroyedEvent.
-     */
     void destroy(Entity.Id entityId);
 
     size_t size() @property;
     size_t capacity() @property;
-    bool valid(Entity.Id id);
+    bool   valid(Entity.Id id);
 }
 
 /**
@@ -384,7 +378,7 @@ public:
      */
     size_t size() @property
     {
-        return mEntityComponentMask.length - mFreeList.length;
+        return mEntityComponentMask.length - mFreeIds.length;
     }
 
     /**
@@ -392,7 +386,7 @@ public:
      */
     size_t capacity() @property
     {
-        return mEntityComponentMask.length();
+        return mEntityComponentMask.length;
     }
 
     /**
@@ -400,8 +394,8 @@ public:
      */
     bool valid(Entity.Id id)
     {
-        return id.index < mEntityPage.length &&
-               mEntityPage.data[id.index] == id.page;
+        return id.index < mEntityVersions.length &&
+               mEntityVersions[id.index] == id.versionId;
     }
 
     /**
@@ -411,24 +405,24 @@ public:
      */
     Entity create()
     {
-        uint index, page;
+        uint index, versionId;
 
-        if (mFreeList.empty())
+        if (mFreeList.empty)
         {
             index = mIndexCounter;
             mIndexCounter++;
             accomodateEntity(index);
-            page = mEntityPage[index] = 1;
+            versionId = mEntityVersions[index] = 1;
         }
         else
         {
-            //todo
-            index = mFreeList.back();
-            mFreeList.pop_back();
-            page = mEntityPage[index];
+            index = mFreeIds.front;
+            mFreeIds.removeFront();
+            versionId = mEntityVersions[index];
         }
-        auto entity = new Entity(this, Entity.Id(index, page));
-        mEventManager.emit!(EntityCreatedEvent)(entity);
+        Entity entity = Entity(this, Entity.Id(index, versionId));
+        //todo ?
+        //mEventManager.emit!(EntityCreatedEvent)(entity);
         return entity;
     }
 
@@ -442,19 +436,24 @@ public:
         assertValid(entityId);
 
         uint index = entityId.index;
-        auto mask = mEntityComponentMask[entityId.index()];
-        mEventManager.emit!(EntityDestroyedEvent)(Entity(this, entityId));
 
-        for (size_t i = 0; i < mComponentPools.size(); i++)
+        //auto mask = mEntityComponentMask[entityId.index()];
+        //todo ?
+        //mEventManager.emit!(EntityDestroyedEvent)(Entity(this, entityId));
+
+        // todo for each component, call component destructors
+        // assuming components are classes, not struct
+        /*foreach (pool; mComponentPools)
         {
-            BasePool *pool = mComponentPools[i];
             if (pool && mask.test(i))
                 pool.destroy(index);
-        }
-        //todo
+        }*/
+
+        // reset all components for that entity
         mEntityComponentMask[index].reset();
-        mEntityPage[index]++;
-        mFreeList.push_back(index);
+        // invalidate its version, incrementing it
+        mEntityVersions[index]++;
+        mFreeList.insertFront(index);
     }
 
     Entity get(Entity.Id id)
@@ -464,28 +463,17 @@ public:
     }
 
     /**
-     * Create an Entity.Id for a slot.
-     *
-     * NOTE: Does *not* check for validity, but the Entity.Id constructor will
-     * fail if the ID is invalid.
-     */
-    Entity.Id createId(uint index)
-    {
-        return Entity.Id(index, mEntityPage[index]);
-    }
-
-    /**
      * Assign a Component to an Entity.Id, passing through Component constructor arguments.
      *
      *     Position &position = em.assign<Position>(e, x, y);
      *
      * @returns Smart pointer to newly created component.
      */
-    ComponentHandle!(C) assign(C, Args...)(Entity.Id id, Args args)
+    C* assign(C, Args...)(Entity entity, Args args)
     {
-        assertValid(id);
+        assertValid(entity.id);
         const BaseComponent.Family family = componentFamily!(C)();
-        assert(!mEntityComponentMask[id.index()].test(family));
+        assert(!mEntityComponentMask[id.uniqueId][family]);
 
         // Placement new into the component pool.
         Pool!(C) *pool = accomodateComponent!(C)();
@@ -552,17 +540,17 @@ public:
     ComponentHandle!(C) component(Entity.Id id)
     {
         assertValid(id);
-        size_t family = componentFamily!(C)();
+        BaseComponent.Family family = componentFamily!(C)();
 
         // We don't bother checking the component mask, as we return a nullptr anyway.
         if (family >= mComponentPools.size())
             return ComponentHandle!(C)();
 
-        BasePool *pool = mComponentPools[family];
-        if (pool !is null || !mEntityComponentMask[id.index()][family])
+        Pool *pool = &mComponentPools[family];
+        if (!mEntityComponentMask[id.index()][family])
             return ComponentHandle!(C)();
 
-        return ComponentHandle!(C)(this, id);
+        return new ComponentHandle!(C)(this, id);
     }
 
     /**
@@ -571,7 +559,7 @@ public:
      * @returns Component instance, or nullptr if the Entity.Id does not have that Component.
      */
     //template <typename C, typename = typename std::enable_if<std::is_const<C>::value>::type>
-    const ComponentHandle!(C, const EntityManager) component(Entity.Id id)
+    /*const ComponentHandle!(C, const EntityManager) component(Entity.Id id)
     {
         assertValid(id);
         size_t family = componentFamily!(C)();
@@ -585,7 +573,7 @@ public:
             return ComponentHandle!(C, const EntityManager)();
 
         return ComponentHandle!(C, const EntityManager)(this, id);
-    }
+    }*/
 
     /* todo use TypeTuple
     template <typename ... Components>
@@ -647,7 +635,7 @@ public:
       return DebugView(this);
     }*/
 
-    void unpack(C)(Entity.Id id, ComponentHandle!(C) a)
+    /+void unpack(C)(Entity.Id id, ComponentHandle!(C) a)
     {
         assertValid(id);
         a = component!(C)(id);
@@ -669,24 +657,18 @@ public:
       assertValid(id);
       a = component!(C)(id);
       unpack!(Args)(id, args);
-    }
+    }+/
 
     /**
      * Destroy all entities and reset the EntityManager.
      */
-    void reset();
-
-    // Retrieve the component family for a type.
-    static BaseComponent.Family componentFamily(C)()
-    {
-        return Component!(C).family();
-    }
+    //void reset();
 
 private:
     void assertValid(Entity.Id id)
     {
-      assert(id.index() < mEntityComponentMask.size() && "Entity.Id ID outside entity vector range");
-      assert(mEntityPage[id.index] == id.page && "Attempt to access Entity via a stale Entity.Id");
+        assert(id.index() < mEntityComponentMask.size(), "Entity.Id ID outside entity vector range");
+        assert(mEntityVersions[id.index] == id.versionId, "Attempt to access Entity via an obsolete Entity.Id");
     }
 
     C *getComponentPtr(C)(Entity.Id id)
@@ -710,6 +692,12 @@ private:
         return mask;
     }
 
+    BaseComponent.Family componentFamily(C)()
+    {
+        return Component!(C).family();
+    }
+
+
 /*    template <typename C1, typename C2, typename ... Components>
     ComponentMask component_mask() {
       return component_mask<C1>() | component_mask<C2, Components ...>();
@@ -720,15 +708,14 @@ private:
       return component_mask<C1, Components ...>();
     }*/
 
-    void accomodateEntity(uint index)
+    void accomodateEntity()
     {
-        if (mEntityComponentMask.size() <= index)
+        if (mEntityComponentMask.length < mIndexCounter)
         {
-            mEntityComponentMask.resize(index + 1);
-            mEntityPage.resize(index + 1);
+            mEntityComponentMask.length = mIndexCounter;
+            mEntityVersions.length = mIndexCounter;
             foreach (pool; mComponentPools.data)
-                if (pool !is null)
-                    pool.expand(index + 1);
+                pool.accomodate(mIndexCounter);
         }
     }
 
@@ -736,28 +723,26 @@ private:
     {
         BaseComponent.Family family = componentFamily!(C)();
 
-        if (mComponentPools.size() <= family)
-            mComponentPools.reserve(family + 1);
+        if (mComponentPools.length <= family)
+            mComponentPools.length = family + 1;
 
-        if (mComponentPools[family] is null)
-        {
-            auto pool = new Pool!(C)();
-            pool.expand(mIndexCounter);
-            mComponentPools[family] = pool;
-        }
+        mComponentPools[family].accomodate = pool;
         return cast(Pool!(C)*)mComponentPools[family];
     }
 
 
-    uint                       mIndexCounter = 0;
-    EventManager               mEventManager;
-    // Each element in mComponentPools corresponds to a Pool for a Component.
-    // The index into the vector is the Component::family().
-    Appender!(BasePool*[])     mComponentPools;
-    // Bitmask of components associated with each entity. Index into the vector is the Entity.Id.
-    Appender!(ComponentMask[]) mEntityComponentMask;
-    // Vector of entity version numbers. Incremented each time an entity is destroyed
-    Appender!(uint[])          mEntityPage;
-    // List of available entity slots.
-    Appender!(uint[])          mFreeList;
+    // Current number of Entities
+    uint            mIndexCounter = 0;
+    // Event Manager
+    EventManager    mEventManager;
+    // Array of pools for each component family
+    Pool[]          mComponentPools;
+    // Bitmask of components for each entities.
+    // Index into the vector is the Entity.Id.
+    ComponentMask[] mEntityComponentMask;
+    // Vector of entity version id's
+    // Incremented each time an entity is destroyed
+    uint[]          mEntityVersions;
+    // List of available entity id's.
+    SList!uint      mFreeIds;
 }

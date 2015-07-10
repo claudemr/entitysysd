@@ -1,9 +1,10 @@
 module entitysysd.component;
 
 import entitysysd.entity;
+import entitysysd.event;
 
 
-class ComponentHandle(C, EM = EntityManager)
+/+class ComponentHandle(C, EM = EntityManager)
 {
 public:
     alias ComponentType = C;
@@ -69,96 +70,60 @@ private:
 
     EM        mManager;
     Entity.Id mId;
-}
+}+/
 
-
-/**
- * Base component class, only used for insertion into collections.
- *
- * Family is used for registration.
- */
 struct BaseComponent
 {
-public:
     alias Family = size_t;
-
-protected:
-    static Family mFamilyCounter = 0;
+    static Family familyCounter = 0;
 }
 
-
-/**
- * Component implementations should inherit from this.
- *
- * Components MUST provide a no-argument constructor.
- * Components SHOULD provide convenience constructors for initializing on assignment to an Entity::Id.
- *
- * This is a struct to imply that components should be data-only.
- *
- * Usage:
- *
- *     struct Position : public Component<Position> {
- *       Position(float x = 0.0f, float y = 0.0f) : x(x), y(y) {}
- *
- *       float x, y;
- *     };
- *
- * family() is used for registration.
- */
 struct Component(Derived)
 {
 public:
-    alias baseComponent this;
+    //alias Handle = ComponentHandle!(Derived);
+    //alias ConstHandle = ComponentHandle!(const Derived, const EntityManager);
 
-    BaseComponent baseComponent;
-    alias Handle = ComponentHandle!(Derived);
-    alias ConstHandle = ComponentHandle!(const Derived, const EntityManager);
-
-private:
-    static Family family()
+    static BaseComponent.Family family()
     {
-        static Family family = -1;
+        static BaseComponent.Family family = -1;
         if (family == -1)
         {
-            family = mFamilyCounter;
-            mFamilyCounter++;
+            family = mBaseComponent.familyCounter;
+            mBaseComponent.familyCounter++;
         }
 
-        //todo assert(family < entityx::MAX_COMPONENTS);
         return family;
     }
+
+private:
+    BaseComponent mBaseComponent;
 };
 
-
+/+
 /**
- * Emitted when any component is added to an entity.
+ * Emitted when any component is inserted to an entity.
  */
-struct ComponentAddedEvent(C)
+class ComponentInsertedEvent : Event!(ComponentInsertedEvent)
 {
-    alias event this;
-
     this(Entity lEntity)
     {
         entity = lEntity;
     }
 
     Entity entity;
-    Event!(ComponentAddedEvent!(C)) event;
 }
 
 /**
  * Emitted when any component is removed from an entity.
  */
-struct ComponentRemovedEvent(C)
+class ComponentRemovedEvent(C) : Event!(ComponentRemovedEvent)
 {
-    alias event this;
-
     this(Entity lEntity)
     {
         entity = lEntity;
     }
 
     Entity entity;
-    Event!(ComponentRemovedEvent!(C)) event;
 }
-
++/
