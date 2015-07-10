@@ -26,6 +26,12 @@ struct BitArray(size_t NbBits = 64)
 
         return b;
     }
+
+    void reset()
+    {
+        foreach (ref elem; data)
+            elem = 0;
+    }
 }
 
 
