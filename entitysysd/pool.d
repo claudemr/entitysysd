@@ -1,46 +1,38 @@
 module entitysysd.pool;
 
-
-struct Pool(T, size_t ChunkSize = 8192)
+struct BasePool
 {
 public:
+    this(size_t elementSize, size_t chunkSize)
+    {
+        mElementSize = elementSize;
+        mChunkSize   = chunkSize;
+    }
+
     void accomodate(in size_t nbElements)
     {
         while (nbElements > mMaxElements)
         {
             mNbChunks++;
-            mMaxElements = (mNbChunks * ChunkSize) / T.sizeof;
+            mMaxElements = (mNbChunks * mChunkSize) / mElementSize;
         }
 
-        if (mData.length != mNbChunks)
-            mData.length = mNbChunks;
+        if (mData.length != mNbChunks * mChunkSize)
+            mData.length = mNbChunks * mChunkSize;
         mNbElements  = nbElements;
     }
 
-    ref T opIndex(size_t n)
-    {
-        assert(n < mNbElements);
-        return *getPtr(n);
-    }
-
-    T opIndexAssign(T t, size_t n)
-    {
-        assert(n < mNbElements);
-        *getPtr(n) = t;
-        return t;
-    }
-
-    T* getPtr(in size_t n)
+    void* getPtr(in size_t n)
     {
         if (n >= mNbElements)
             return null;
-        size_t offset = n * T.sizeof;
-        return cast(T*)&mData[offset / ChunkSize][offset % ChunkSize];
+        size_t offset = n * mElementSize;
+        return cast(void*)&mData[offset];
     }
 
-    T* ptr() @property
+    void* ptr() @property
     {
-        return cast(T*)mData.ptr;
+        return cast(void*)mData.ptr;
     }
 
     size_t nbElements() @property
@@ -54,10 +46,52 @@ public:
     }
 
 private:
-    size_t              mNbChunks;
-    size_t              mMaxElements;
-    size_t              mNbElements;
-    ubyte[ChunkSize][]  mData;
+    size_t  mElementSize;
+    size_t  mChunkSize;
+    size_t  mNbChunks;
+    size_t  mMaxElements;
+    size_t  mNbElements;
+    ubyte[] mData;
+}
+
+struct Pool(T, size_t ChunkSize = 8192)
+{
+public:
+    alias mBase this;
+
+    @disable this();
+
+    this(in size_t n)
+    {
+        mBase = BasePool(T.sizeof, ChunkSize);
+        mBase.accomodate(n);
+    }
+
+    ref T opIndex(size_t n)
+    {
+        assert(n < nbElements);
+        return *getPtr(n);
+    }
+
+    T opIndexAssign(T t, size_t n)
+    {
+        assert(n < nbElements);
+        *getPtr(n) = t;
+        return t;
+    }
+
+    T* getPtr(in size_t n)
+    {
+        return cast(T*)mBase.getPtr(n);
+    }
+
+    T* ptr() @property
+    {
+        return cast(T*)mBase.ptr;
+    }
+
+private:
+    BasePool    mBase;
 }
 
 
@@ -70,13 +104,8 @@ unittest
         string s;
     }
 
-    Pool!TestComponent pool0;
-    Pool!ulong         pool1;
-
-    assert(pool0.nbChunks == 0 && pool1.nbElements == 0);
-
-    pool0.accomodate(5);
-    pool1.accomodate(2000);
+    Pool!TestComponent pool0 = Pool!TestComponent(5);
+    Pool!ulong         pool1 = Pool!ulong(2000);
 
     assert(pool0.nbChunks == 1);
     assert(pool1.nbChunks == (2000 * ulong.sizeof + 8191) / 8192);
