@@ -1,110 +1,98 @@
 module entitysysd.pool;
 
-import std.array;
 
-/**
- * Provides a resizable, semi-contiguous pool of memory for constructing
- * objects in. Pointers into the pool will be invalided only when the pool is
- * destroyed.
- *
- * The semi-contiguous nature aims to provide cache-friendly iteration.
- *
- * Lookups are O(1).
- * Appends are amortized O(1).
- */
-class BasePool
+struct Pool(T, size_t ChunkSize = 8192)
 {
 public:
-    this(size_t elementSize, size_t chunkSize = 8192)
+    void accomodate(in size_t nbElements)
     {
-        mElementSize = elementSize;
-        mChunkSize = chunkSize;
-    }
-    //virtual ~BasePool();
+        while (nbElements > mMaxElements)
+        {
+            mNbChunks++;
+            mMaxElements = (mNbChunks * ChunkSize) / T.sizeof;
+        }
 
-    size_t size() @property
-    {
-        return mSize;
-    }
-
-    size_t capacity() @property
-    {
-        return mCapacity;
+        if (mData.length != mNbChunks)
+            mData.length = mNbChunks;
+        mNbElements  = nbElements;
     }
 
-    size_t chunks() @property
+    ref T opIndex(size_t n)
     {
-        return mBlocks.data.length;
+        assert(n < mNbElements);
+        return *getPtr(n);
     }
 
-    /// Ensure at least n elements will fit in the pool.
-    void expand(size_t n)
+    T opIndexAssign(T t, size_t n)
     {
-        if (n >= mSize)
-            if (n >= mCapacity)
-            {
-                reserve(n);
-                mSize = n;
-            }
+        assert(n < mNbElements);
+        *getPtr(n) = t;
+        return t;
     }
 
-    void reserve(size_t n)
+    T* getPtr(in size_t n)
     {
-        n = ((n  + mChunkSize - 1) / mChunkSize) * mChunkSize;
-        mBlocks.reserve(mCapacity + n);
-        mCapacity += n;
+        if (n >= mNbElements)
+            return null;
+        size_t offset = n * T.sizeof;
+        return cast(T*)&mData[offset / ChunkSize][offset % ChunkSize];
     }
 
-    void *get(size_t n)
+    T* ptr() @property
     {
-        assert(n < mSize);
-        return cast(void*)mBlocks.data[n / mChunkSize] + (n % mChunkSize) * mElementSize;
+        return cast(T*)mData.ptr;
     }
 
-    const(void*) get(size_t n)
+    size_t nbElements() @property
     {
-        assert(n < mSize);
-        return cast(const(void*))mBlocks.data[n / mChunkSize] + (n % mChunkSize) * mElementSize;
+        return mNbElements;
     }
 
-    void destroy(size_t n)
+    size_t nbChunks() @property
     {
+        return mNbChunks;
     }
 
-protected:
-    Appender!(ubyte*[]) mBlocks;
-    size_t mElementSize;
-    size_t mChunkSize;
-    size_t mSize;
-    size_t mCapacity;
+private:
+    size_t              mNbChunks;
+    size_t              mMaxElements;
+    size_t              mNbElements;
+    ubyte[ChunkSize][]  mData;
 }
 
 
-/**
- * Implementation of BasePool that provides type-"safe" deconstruction of
- * elements in the pool.
- */
-class Pool(T, size_t ChunkSize = 8192) : BasePool
-{
-public:
-    this()
-    {
-        super(sizeof(T), ChunkSize);
-    }
-    /*virtual ~Pool()
-    {
-        // Component destructors *must* be called by owner.
-    }*/
-
-    void destroy(size_t n)
-    {
-        assert(n < size_);
-        /*T *ptr = static_cast<T*>(get(n));
-        ptr->~T();*/
-    }
-}
-
-
+//dmd -main -unittest entitysysd/pool.d
 unittest
 {
+    static struct TestComponent
+    {
+        int    i;
+        string s;
+    }
+
+    Pool!TestComponent pool0;
+    Pool!ulong         pool1;
+
+    assert(pool0.nbChunks == 0 && pool1.nbElements == 0);
+
+    pool0.accomodate(5);
+    pool1.accomodate(2000);
+
+    assert(pool0.nbChunks == 1);
+    assert(pool1.nbChunks == (2000 * ulong.sizeof + 8191) / 8192);
+    assert(pool1.getPtr(1) !is null);
+    assert(pool0.getPtr(5) is null);
+
+    pool0[0].i = 10; pool0[0].s = "hello";
+    pool0[3] = TestComponent(5, "world");
+
+    assert(pool0[0].i == 10 && pool0[0].s == "hello");
+    assert(pool0[1].i == 0  && pool0[1].s is null);
+    assert(pool0[2].i == 0  && pool0[2].s is null);
+    assert(pool0[3].i == 5  && pool0[3].s == "world");
+    assert(pool0[4].i == 0  && pool0[4].s is null);
+
+    pool1[1999] = 325;
+    assert(pool1[1999] == 325);
+
 }

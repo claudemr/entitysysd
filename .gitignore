@@ -2,5 +2,6 @@ dub.selections.json
 .dub
 *.a
 *.o
-event
 bitarray
+event
+pool
