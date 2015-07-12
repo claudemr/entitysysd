@@ -3,5 +3,6 @@ dub.selections.json
 *.a
 *.o
 bitarray
+entity
 event
 pool

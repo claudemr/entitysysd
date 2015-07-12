@@ -4,7 +4,7 @@ import entitysysd.entity;
 import entitysysd.event;
 
 
-/+class ComponentHandle(C, EM = EntityManager)
+struct ComponentHandle(C, EM = EntityManager)
 {
 public:
     alias ComponentType = C;
@@ -70,7 +70,7 @@ private:
 
     EM        mManager;
     Entity.Id mId;
-}+/
+}
 
 struct BaseComponent
 {
