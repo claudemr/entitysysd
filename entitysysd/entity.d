@@ -1,9 +1,9 @@
 module entitysysd.entity;
 
+import std.bitmanip;
 import std.container;
-import std.format;
+import std.string;
 
-import entitysysd.bitarray;
 import entitysysd.component;
 import entitysysd.event;
 import entitysysd.pool;
@@ -20,10 +20,6 @@ public:
         {
             mId = cast(ulong)uId | cast(ulong)vId << 32;
         }
-
-        /*bool operator == (const Id &other) const { return id_ == other.id_; }
-        bool operator != (const Id &other) const { return id_ != other.id_; }
-        bool operator < (const Id &other) const { return id_ < other.id_; }*/
 
         ulong id() @property
         {
@@ -50,7 +46,7 @@ public:
 
     enum Id invalid = Id(0, 0);
 
-    this(BaseEntityManager manager, Id id)
+    this(EntityManager manager, Id id)
     {
         mManager = manager;
         mId = id;
@@ -65,19 +61,6 @@ public:
         mManager.destroy(mId);
         invalidate();
     }
-
-    /+operator bool() const {
-    return valid();
-  }
-  bool operator == (const Entity &other) const {
-    return other.manager_ == manager_ && other.id_ == id_;
-  }
-  bool operator != (const Entity &other) const {
-    return !(other == *this);
-  }
-  bool operator < (const Entity &other) const {
-    return other.id_ < id_;
-  }+/
 
     /**
      * Is this Entity handle valid?
@@ -137,16 +120,16 @@ public:
         mManager.remove!C(mId);
     }
 
-    ref C assign(C, Args...)(Args args)
+    C* component(C)() @property
     {
         assert(valid);
-        return mManager.assign!(C, Args)(mId, args);
+        return mManager.getComponent!(C)(mId);
     }
 
-    ref C assign(C, Args...)(Args args)
+    void component(C)(C c) @property
     {
         assert(valid);
-        return mManager.assign!(C, Args)(mId, args);
+        *mManager.getComponent!(C)(mId) = c;
     }
 
     /+ComponentHandle!(C) component(C)()
@@ -170,15 +153,9 @@ public:
         return mManager.has!C(mId);
     }
 
-    /+void unpack(A, Args...)(ComponentHandle!(A) a, Args args)
-    {
-        assert(valid);
-        mManager.hasComponent!(C, Args)(mId, args);
-    }+/
-
 private:
-    BaseEntityManager mManager;
-    Id                mId = invalid;
+    EntityManager mManager;
+    Id            mId = invalid;
 }
 
 
@@ -217,25 +194,20 @@ struct EntityDestroyedEvent
 }
 +/
 
-interface BaseEntityManager
-{
-    Entity create();
-    void destroy(Entity.Id entityId);
-
-    size_t size() @property;
-    size_t capacity() @property;
-    bool   valid(Entity.Id id);
-}
 
 /**
  * Manages Entity.Id creation and component assignment.
  */
-class EntityManager(size_t MaxComponent) : BaseEntityManager
+class EntityManager
 {
 public:
-    this(EventManager eventManager)
+    this(EventManager eventManager,
+         size_t maxComponent = 64,
+         size_t poolSize     = 8192)
     {
         mEventManager = eventManager;
+        mMaxComponent = maxComponent;
+        mPoolSize     = poolSize;
     }
     //virtual ~EntityManager();
 
@@ -402,7 +374,7 @@ public:
      */
     size_t size() @property
     {
-        return mEntityComponentMask.length - mNbFreedIds;
+        return mEntityComponentMask.length - mNbFreeIds;
     }
 
     /**
@@ -443,7 +415,7 @@ public:
         {
             uniqueId = mFreeIds.front;
             mFreeIds.removeFront();
-            mNbFreedIds--;
+            mNbFreeIds--;
             versionId = mEntityVersions[uniqueId-1];
         }
 
@@ -478,14 +450,15 @@ public:
         }*/
 
         // reset all components for that entity
-        mEntityComponentMask[uniqueId-1].reset();
+        foreach (ref bit; mEntityComponentMask[uniqueId-1])
+            bit = 0;
         // invalidate its version, incrementing it
         mEntityVersions[uniqueId-1]++;
         mFreeIds.insertFront(uniqueId);
-        mNbFreedIds++;
+        mNbFreeIds++;
     }
 
-    Entity get(Entity.Id id)
+    Entity getEntity(Entity.Id id)
     {
         assertValid(id);
         return Entity(this, id);
@@ -493,9 +466,9 @@ public:
 
     void insert(C)(Entity.Id id)
     {
-        assertValid(entity.id);
+        assertValid(id);
         const BaseComponent.Family family = componentFamily!(C)();
-        assert(family < MaxComponent);
+        assert(family < mMaxComponent);
         const auto uniqueId = id.uniqueId;
         assert(!mEntityComponentMask[uniqueId-1][family]);
 
@@ -519,7 +492,7 @@ public:
     {
         assertValid(id);
         const BaseComponent.Family family = componentFamily!(C)();
-        assert(family < MaxComponent);
+        assert(family < mMaxComponent);
         const auto uniqueId = id.uniqueId;
         assert(mEntityComponentMask[uniqueId-1][family]);
 
@@ -538,20 +511,20 @@ public:
         //pool.destroy(index);
     }
 
-    ref C assign(C, Args...)(Entity.Id id, Args args)
+    /*C* assign(C, Args...)(Entity.Id id, Args args)
     {
         assertValid(id);
         const BaseComponent.Family family = componentFamily!(C)();
-        assert(family < MaxComponent);
+        assert(family < mMaxComponent);
         const auto uniqueId = id.uniqueId;
         assert(mEntityComponentMask[uniqueId-1][family]);
 
         // Placement new into the component pool.
-        Pool!(C) *pool = &mComponentPools[family];
+        Pool!C pool = cast(Pool!C)mComponentPools[family];
 
-        (*pool)[uniqueId-1] = C(args);
-        return (*pool)[uniqueId-1];
-    }
+        pool[uniqueId-1] = C(args);
+        return &pool[uniqueId-1];
+    }*/
 
     /**
      * Check if an Entity has a component.
@@ -562,7 +535,7 @@ public:
         const BaseComponent.Family family = componentFamily!(C)();
         const auto uniqueId = id.uniqueId;
 
-        if (family >= MaxComponent)
+        if (family >= mMaxComponent)
             return false;
 
         return mEntityComponentMask[uniqueId-1][family];
@@ -573,18 +546,41 @@ public:
      *
      * @returns Pointer to an instance of C, or nullptr if the Entity.Id does not have that Component.
      */
-    ref C get(C)(Entity.Id id)
+    C* getComponent(C)(Entity.Id id)
     {
         assertValid(id);
         const BaseComponent.Family family = componentFamily!(C)();
-        assert(family < MaxComponent);
+        assert(family < mMaxComponent);
         const auto uniqueId = id.uniqueId;
         assert(mEntityComponentMask[uniqueId-1][family]);
 
         // Placement new into the component pool.
-        Pool!(C) *pool = &mComponentPools[family];
+        Pool!C pool = cast(Pool!C)mComponentPools[family];
 
-        return (*pool)[uniqueId-1];
+        return &pool[uniqueId-1];
+    }
+
+    int opApply(int delegate(Entity entity) dg)
+    {
+        int result = 0;
+
+        // copy version-ids
+        auto versionIds = mEntityVersions.dup;
+        // and remove those that are free
+        foreach (freeId; mFreeIds)
+            versionIds[freeId-1] = uint.max;
+
+        foreach (uniqueId, versionId; versionIds)
+        {
+            if (versionId == uint.max)
+                continue;
+            result = dg(Entity(this,
+                               Entity.Id(cast(uint)uniqueId+1, versionId)));
+            if (result)
+                break;
+        }
+
+        return result;
     }
 
     /**
@@ -705,50 +701,20 @@ private:
         assert(mEntityVersions[id.uniqueId-1] == id.versionId, "Attempt to access Entity via an obsolete Entity.Id");
     }
 
-    /*C *getComponentPtr(C)(Entity.Id id)
-    {
-        assert(valid(id));
-        BasePool *pool = mComponentPools[componentFamily!(C)()];
-        assert(pool);
-        return cast(C*)(pool.get(id.index));
-    }
-
-    auto componentMask(Entity.Id id)
-    {
-        assertValid(id);
-        return mEntityComponentMask.at(id.index);
-    }
-
-    auto componentMask(C)()
-    {
-        ComponentMask mask;
-        mask.set(componentFamily!(C)());
-        return mask;
-    }*/
-
     BaseComponent.Family componentFamily(C)()
     {
         return Component!(C).family();
     }
-
-
-/*    template <typename C1, typename C2, typename ... Components>
-    ComponentMask component_mask() {
-      return component_mask<C1>() | component_mask<C2, Components ...>();
-    }
-
-    template <typename C1, typename ... Components>
-    ComponentMask component_mask(const ComponentHandle<C1> &c1, const ComponentHandle<Components> &... args) {
-      return component_mask<C1, Components ...>();
-    }*/
 
     void accomodateEntity()
     {
         if (mEntityComponentMask.length < mIndexCounter)
         {
             mEntityComponentMask.length = mIndexCounter;
+            foreach (ref mask; mEntityComponentMask)
+                mask.length = mMaxComponent;
             mEntityVersions.length = mIndexCounter;
-            foreach (pool; mComponentPools)
+            foreach (ref pool; mComponentPools)
                 pool.accomodate(mIndexCounter);
         }
     }
@@ -760,34 +726,37 @@ private:
         if (mComponentPools.length <= family)
             mComponentPools.length = family + 1;
 
-        mComponentPools[family] = Pool!C(mIndexCounter);
+        mComponentPools[family] = new Pool!C(mIndexCounter);
         return cast(Pool!C*)&mComponentPools[family];
     }
 
 
     // Current number of Entities
     uint            mIndexCounter = 0;
+    size_t          mMaxComponent;
+    size_t          mPoolSize;
     // Event Manager
     EventManager    mEventManager;
     // Array of pools for each component family
     BasePool[]      mComponentPools;
     // Bitmask of components for each entities.
     // Index into the vector is the Entity.Id.
-    BitArray!MaxComponent[]      mEntityComponentMask;
+    BitArray[]      mEntityComponentMask;
     // Vector of entity version id's
     // Incremented each time an entity is destroyed
     uint[]          mEntityVersions;
     // List of available entity id's.
     SList!uint      mFreeIds;
-    uint            mNbFreedIds;
+    uint            mNbFreeIds;
 }
 
+import std.stdio;
 
 unittest
 {
     //dmd -main -unittest entitysysd/entity.d entitysysd/component.d entitysysd/event.d entitysysd/pool.d
 
-    auto em = new EntityManager!(64)(new EventManager());
+    auto em = new EntityManager(new EventManager());
 
     auto ent0 = em.create();
     assert(em.capacity == 1);
@@ -815,5 +784,43 @@ unittest
     assert(ent2.id.uniqueId == 3);
     assert(ent2.id.versionId == 0);
 
+    struct NameComponent
+    {
+        string name;
+    }
 
+    struct PosComponent
+    {
+        int x, y;
+    }
+
+    ent0.insert!NameComponent();
+    ent1.insert!NameComponent();
+    ent2.insert!NameComponent();
+
+    ent0.insert!PosComponent();
+    ent2.insert!PosComponent();
+
+    ent0.component!NameComponent.name = "Hello";
+    ent1.component!NameComponent.name = "World";
+    ent2.component!NameComponent.name = "Again";
+    assert(ent0.component!NameComponent.name == "Hello");
+    assert(ent1.component!NameComponent.name == "World");
+    assert(ent2.component!NameComponent.name == "Again");
+
+    ent0.component!PosComponent = PosComponent(5, 6);
+    ent2.component!PosComponent = PosComponent(2, 3);
+    assert(ent0.component!PosComponent.x == 5);
+    assert(ent0.component!PosComponent.y == 6);
+    assert(ent2.component!PosComponent.x == 2);
+    assert(ent2.component!PosComponent.y == 3);
+
+    ent1.destroy();
+
+    // List all current valid entities
+    foreach (ent; em)
+    {
+        assert(ent.valid);
+        //writeln(ent.component!NameComponent.name);
+    }
 }

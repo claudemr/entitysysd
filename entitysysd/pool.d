@@ -1,6 +1,6 @@
 module entitysysd.pool;
 
-struct BasePool
+class BasePool
 {
 public:
     this(size_t elementSize, size_t chunkSize)
@@ -22,19 +22,6 @@ public:
         mNbElements  = nbElements;
     }
 
-    void* getPtr(in size_t n)
-    {
-        if (n >= mNbElements)
-            return null;
-        size_t offset = n * mElementSize;
-        return cast(void*)&mData[offset];
-    }
-
-    void* ptr() @property
-    {
-        return cast(void*)mData.ptr;
-    }
-
     size_t nbElements() @property
     {
         return mNbElements;
@@ -54,17 +41,12 @@ private:
     ubyte[] mData;
 }
 
-struct Pool(T, size_t ChunkSize = 8192)
+class Pool(T, size_t ChunkSize = 8192) : BasePool
 {
-public:
-    alias mBase this;
-
-    @disable this();
-
     this(in size_t n)
     {
-        mBase = BasePool(T.sizeof, ChunkSize);
-        mBase.accomodate(n);
+        super(T.sizeof, ChunkSize);
+        accomodate(n);
     }
 
     ref T opIndex(size_t n)
@@ -82,16 +64,17 @@ public:
 
     T* getPtr(in size_t n)
     {
-        return cast(T*)mBase.getPtr(n);
+        if (n >= mNbElements)
+            return null;
+        size_t offset = n * mElementSize;
+        return cast(T*)&mData[offset];
     }
 
     T* ptr() @property
     {
-        return cast(T*)mBase.ptr;
+        return cast(T*)mData.ptr;
     }
 
-private:
-    BasePool    mBase;
 }
 
 
@@ -104,8 +87,8 @@ unittest
         string s;
     }
 
-    Pool!TestComponent pool0 = Pool!TestComponent(5);
-    Pool!ulong         pool1 = Pool!ulong(2000);
+    auto pool0 = new Pool!TestComponent(5);
+    auto pool1 = new Pool!ulong(2000);
 
     assert(pool0.nbChunks == 1);
     assert(pool1.nbChunks == (2000 * ulong.sizeof + 8191) / 8192);
