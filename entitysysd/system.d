@@ -18,7 +18,7 @@ class BaseSystem
      *
      * Typically used to set up event handlers.
      */
-    void configure(BaseEntityManager entities, EventManager events)
+    void configure(EntityManager entities, EventManager events)
     {
         configure(events);
     }
@@ -35,7 +35,7 @@ class BaseSystem
      *
      * Called every game step.
      */
-    void update(BaseEntityManager entities, EventManager events, TimeDelta dt)
+    void update(EntityManager entities, EventManager events, TimeDelta dt)
     {
     }
 };
@@ -62,7 +62,7 @@ private:
 class SystemManager
 {
 public:
-    this(BaseEntityManager entityManager,
+    this(EntityManager entityManager,
          EventManager eventManager)
     {
         mEntityManager = entityManager;
@@ -139,7 +139,7 @@ public:
     void updateAll(TimeDelta dt)
     {
         assert(mInitialized, "SystemManager.configure() not called");
-        foreach (s; mSystems.data)
+        foreach (s; mSystems)
             s.update(mEntityManager, mEventManager, dt);
     }
 
@@ -150,16 +150,16 @@ public:
      */
     void configure()
     {
-        foreach (s; mSystems.data)
+        foreach (s; mSystems)
             s.configure(mEntityManager, mEventManager);
         mInitialized = true;
     }
 
 private:
-    bool                    mInitialized;
-    BaseEntityManager       mEntityManager;
-    EventManager            mEventManager;
-    Appender!(BaseSystem[]) mSystems;
+    bool          mInitialized;
+    EntityManager mEntityManager;
+    EventManager  mEventManager;
+    BaseSystem[]  mSystems;
 }
 
 

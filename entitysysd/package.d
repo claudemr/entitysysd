@@ -4,16 +4,16 @@ import entitysysd.entity;
 import entitysysd.event;
 import entitysysd.system;
 
-class EntitySysD(uint MaxComponent)
+class EntitySysD
 {
-    this()
+    this(size_t maxComponent = 64, size_t poolSize = 8192)
     {
         events   = new EventManager;
-        entities = new EntityManager!(MaxComponent)(events);
+        entities = new EntityManager(events, maxComponent, poolSize);
         systems  = new SystemManager(entities, events);
     }
 
-    EventManager                 events;
-    EntityManager!(MaxComponent) entities;
-    SystemManager                systems;
+    EventManager  events;
+    EntityManager entities;
+    SystemManager systems;
 }
