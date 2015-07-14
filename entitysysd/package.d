@@ -1,8 +1,8 @@
 module entitysysd;
 
-import entitysysd.entity;
-import entitysysd.event;
-import entitysysd.system;
+public import entitysysd.entity;
+public import entitysysd.event;
+public import entitysysd.system;
 
 class EntitySysD
 {

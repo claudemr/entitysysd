@@ -11,6 +11,11 @@
             "name": "library",
             "targetType": "library",
             "sourcePaths": ["entitysysd"]
+        },
+        {
+            "name": "example",
+            "targetType": "executable",
+            "sourcePaths": ["entitysysd", "example"]
         }
     ]
 }

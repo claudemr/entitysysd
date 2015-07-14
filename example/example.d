@@ -325,11 +325,12 @@ private:
 };
 +/
 
-class Application : EntitySysD!(64)
+class Application : EntitySysD
 {
 public:
-    this(/*sf::RenderTarget &target, sf::Font &font*/)
+    this()
     {
+    	super();
         /*systems.add<SpawnSystem>(target, 500);
         systems.add<BodySystem>();
         systems.add<BounceSystem>(target);
@@ -341,7 +342,7 @@ public:
         systems.configure();
     }
 
-    void update(TimeDelta dt)
+    void update(Duration dt)
     {
         /*systems.update<SpawnSystem>(dt);
         systems.update<BodySystem>(dt);
@@ -387,7 +388,9 @@ int main()
 
         window.clear();
         sf::Time elapsed = clock.restart();*/
-        app.update(0/*elapsed.asSeconds()*/);
+        app.update(Duration.zero/*elapsed.asSeconds()*/);
         //window.display();
     }
+
+    return 0;
 }
