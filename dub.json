@@ -14,8 +14,13 @@
         },
         {
             "name": "example",
+            "targetName": "ex0",
             "targetType": "executable",
-            "sourcePaths": ["entitysysd", "example"]
+            "sourcePaths": ["entitysysd", "example"],
+            "dependencies":
+            {
+                "derelict-sdl2": "~>1.9.0"
+            }
         }
     ]
 }

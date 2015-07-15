@@ -19,7 +19,7 @@ interface System
      *
      * Typically used to set up event handlers.
      */
-    void configure(EntityManager entities, EventManager events);
+    //void configure(EntityManager entities, EventManager events);
 
     /**
      * Apply System behavior.
@@ -44,7 +44,7 @@ public:
     {
         auto sysNode = mSystems[].find(system);
         if (!sysNode.empty)
-        	return;
+            return;
         mSystems ~= system;
     }
 
@@ -52,7 +52,7 @@ public:
     {
         auto sysNode = mSystems[].find(system);
         if (sysNode.empty)
-        	return;
+            return;
         mSystems.linearRemove(sysNode.take(1));
     }
 
@@ -69,8 +69,8 @@ public:
      */
     void update(Duration dt)
     {
-        if (!mInitialized)
-        	return;
+        //if (!mInitialized)
+          //  return;
         foreach (s; mSystems)
             s.update(mEntityManager, mEventManager, dt);
     }
@@ -80,12 +80,12 @@ public:
      *
      * This is typically used to set up event handlers.
      */
-    void configure()
+    /*void configure()
     {
         foreach (s; mSystems)
             s.configure(mEntityManager, mEventManager);
         mInitialized = true;
-    }
+    }*/
 
 private:
     bool          mInitialized;
