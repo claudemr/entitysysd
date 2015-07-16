@@ -21,7 +21,7 @@ public:
             mId = cast(ulong)uId | cast(ulong)vId << 32;
         }
 
-        ulong id() @property
+        ulong id() const @property
         {
             return mId;
         }
@@ -32,6 +32,11 @@ public:
         uint versionId() @property
         {
             return mId >> 32;
+        }
+
+        bool opEquals()(auto const ref Id lId) const
+        {
+            return id == lId.id;
         }
 
         string toString()
@@ -82,7 +87,7 @@ public:
         mManager = null;
     }
 
-    Id id() @property
+    Id id() const @property
     {
         return mId;
     }
@@ -115,6 +120,11 @@ public:
     {
         assert(valid);
         return mManager.has!C(mId);
+    }
+
+    bool opEquals()(auto const ref Entity lEntity) const
+    {
+        return id == lEntity.id;
     }
 
     string toString()
