@@ -117,6 +117,11 @@ public:
         return mManager.has!C(mId);
     }
 
+    string toString()
+    {
+        return mId.toString();
+    }
+
 private:
     EntityManager mManager;
     Id            mId = invalid;
@@ -319,7 +324,6 @@ public:
 
         // Placement new into the component pool.
         Pool!C pool = cast(Pool!C)mComponentPools[family];
-
         return &pool[uniqueId-1];
     }
 
@@ -464,9 +468,10 @@ private:
         BaseComponent.Family family = componentFamily!C();
 
         if (mComponentPools.length <= family)
+        {
             mComponentPools.length = family + 1;
-
-        mComponentPools[family] = new Pool!C(mIndexCounter);
+            mComponentPools[family] = new Pool!C(mIndexCounter);
+        }
         return cast(Pool!C*)&mComponentPools[family];
     }
 

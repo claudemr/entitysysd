@@ -63,12 +63,9 @@ struct CollisionEvent
 class SpawnSystem : System
 {
 public:
-    this(SDL_Renderer* renderer, int count)
+    this(SDL_Window* window, int count)
     {
-        SDL_RendererInfo info;
-        SDL_GetRendererInfo(renderer, &info);
-        mSizeX = info.max_texture_width;
-        mSizeY = info.max_texture_height;
+        SDL_GetWindowSize(window, &mSizeX, &mSizeY);
         mCount = count;
     }
 
@@ -352,10 +349,10 @@ private:
 class Application : EntitySysD
 {
 public:
-    this(SDL_Renderer* renderer)
+    this(SDL_Renderer* renderer, SDL_Window* window)
     {
         super();
-        systems.insert(new SpawnSystem(renderer, 10));
+        systems.insert(new SpawnSystem(window, 10));
         /*systems.add<BodySystem>();
         systems.add<BounceSystem>(target);
         systems.add<CollisionSystem>(target);
@@ -384,19 +381,19 @@ public:
 
 
 
-int main()
+void main()
 {
     DerelictSDL2.load();
     scope(exit) DerelictSDL2.unload();
 
     if (SDL_Init(SDL_INIT_EVERYTHING) == -1)
-        return -1;
+        return;
 
     SDL_Window* window = SDL_CreateWindow("Server", 0, 0, 640, 480, 0);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
     SDL_RenderSetLogicalSize(renderer, 640, 480);
 
-    auto app = new Application(renderer);
+    auto app = new Application(renderer, window);
 
     bool loop = true;
     MonoTime timestamp = MonoTime.currTime;
@@ -415,15 +412,16 @@ int main()
 
         app.update(dur!"msecs"(16));
 
-        SDL_RenderPresent( renderer);
+        SDL_RenderPresent(renderer);
 
         MonoTime now = MonoTime.currTime;
         Duration timeElapsed = now - timestamp;
+        long delay = 16 - timeElapsed.total!"msecs";
+        if (delay < 0)
+            delay = 0;
 
         // Add a 16msec delay to run at ~60 fps
-        SDL_Delay(cast(uint)(16 - timeElapsed.total!"msecs"));
+        SDL_Delay(cast(uint)delay);
         timestamp = MonoTime.currTime;
     }
-
-    return 0;
 }
