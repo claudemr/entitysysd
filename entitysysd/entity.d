@@ -92,10 +92,10 @@ public:
         return mId;
     }
 
-    void insert(C)()
+    C* insert(C)()
     {
         assert(valid);
-        mManager.insert!C(mId);
+        return mManager.insert!C(mId);
     }
 
     void remove(C)()
@@ -272,7 +272,7 @@ public:
         return Entity(this, id);
     }
 
-    void insert(C)(Entity.Id id)
+    C* insert(C)(Entity.Id id)
     {
         assertValid(id);
         const BaseComponent.Family family = componentFamily!(C)();
@@ -281,10 +281,12 @@ public:
         assert(!mEntityComponentMask[uniqueId-1][family]);
 
         // Placement new into the component pool.
-        Pool!(C) *pool = accomodateComponent!(C)();
+        auto pool = accomodateComponent!(C)();
 
         // Set the bit for this component.
         mEntityComponentMask[uniqueId-1][family] = true;
+
+        return &pool[uniqueId-1];
     }
 
     /**
@@ -473,7 +475,7 @@ private:
         }
     }
 
-    Pool!C* accomodateComponent(C)()
+    Pool!C accomodateComponent(C)()
     {
         BaseComponent.Family family = componentFamily!C();
 
@@ -482,7 +484,7 @@ private:
             mComponentPools.length = family + 1;
             mComponentPools[family] = new Pool!C(mIndexCounter);
         }
-        return cast(Pool!C*)&mComponentPools[family];
+        return cast(Pool!C)mComponentPools[family];
     }
 
 

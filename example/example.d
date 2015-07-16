@@ -8,7 +8,7 @@ import derelict.sdl2.sdl;
 import entitysysd;
 
 
-//*** Component structures ***
+//*** Helpers ***
 struct Vector2f
 {
     float x, y;
@@ -20,6 +20,7 @@ struct Color
 }
 
 
+//*** Component structures ***
 struct Body
 {
     Vector2f position;
@@ -94,17 +95,16 @@ public:
             //collideable = entity.assign<Collideable>(r(10, 5));
 
             // "Physical" attributes.
-            entity.insert!Body();
-            entity.component!Body.position  = Vector2f(r(mSizeX), r(mSizeY));
-            entity.component!Body.direction = Vector2f(r(300, -150),
-                                                       r(300, -150));
+            auto bod = entity.insert!Body();
+            bod.position  = Vector2f(r(mSizeX), r(mSizeY));
+            bod.direction = Vector2f(r(300, -150), r(300, -150));
 
             // Shape to apply to entity.
-            entity.insert!Renderable();
-            entity.component!Renderable.radius = radius;
-            entity.component!Renderable.color = Color(cast(ubyte)r(128, 127),
-                                                      cast(ubyte)r(128, 127),
-                                                      cast(ubyte)r(128, 127));
+            auto ren = entity.insert!Renderable();
+            ren.radius = radius;
+            ren.color  = Color(cast(ubyte)r(128, 127),
+                               cast(ubyte)r(128, 127),
+                               cast(ubyte)r(128, 127));
         }
     }
 
@@ -127,7 +127,7 @@ public:
     {
         foreach (Entity entity; es.entitiesWith!Body)
         {
-            Body *bod = entity.component!Body;
+            auto bod = entity.component!Body;
 
             // update position
             bod.position.x += bod.direction.x * dt.total!"msecs" / 1000.0;
@@ -207,8 +207,8 @@ private:
     {
         foreach (entity; entities.entitiesWith!(Body, Collideable))
         {
-            Body*        bod = entity.component!Body;
-            Collideable* col = entity.component!Collideable;
+            auto bod = entity.component!Body;
+            auto col = entity.component!Collideable;
 
             auto left   = cast(int)(bod.position.x - col.radius) / mPartitions;
             auto top    = cast(int)(bod.position.y - col.radius) / mPartitions;
@@ -334,9 +334,9 @@ public:
 
     void emitParticles(EntityManager es, Entity entity)
     {
-        Body*        bod = entity.component!Body;
-        Renderable*  ren = entity.component!Renderable;
-        Collideable* col = entity.component!Collideable;
+        auto bod = entity.component!Body;
+        auto ren = entity.component!Renderable;
+        auto col = entity.component!Collideable;
 
         float area = (PI * col.radius * col.radius) / 3.0;
         for (int i = 0; i < area; i++)
@@ -350,18 +350,18 @@ public:
             float offset = r(cast(int)col.radius, 1.0);
             float angle  = r(360) * PI / 180.0;
 
-            particle.insert!Body();
-            particle.component!Body.position.x = bod.position.x + offset * cos(angle);
-            particle.component!Body.position.y = bod.position.y + offset * sin(angle);
-            particle.component!Body.direction.x = offset * 2 * cos(angle);
-            particle.component!Body.direction.y = offset * 2 * sin(angle);
+            auto partBody = particle.insert!Body();
+            partBody.position.x  = bod.position.x + offset * cos(angle);
+            partBody.position.y  = bod.position.y + offset * sin(angle);
+            partBody.direction.x = offset * 2 * cos(angle);
+            partBody.direction.y = offset * 2 * sin(angle);
 
             float radius = r(3, 1);
-            particle.insert!Particle();
-            particle.component!Particle.color = ren.color;
-            particle.component!Particle.radius = radius;
-            particle.component!Particle.alpha = 200;
-            particle.component!Particle.d = r(3, 1) / 2;
+            auto partPart = particle.insert!Particle();
+            partPart.color  = ren.color;
+            partPart.radius = radius;
+            partPart.alpha  = 200;
+            partPart.d      = r(3, 1) / 2;
         }
     }
 
@@ -458,7 +458,7 @@ void main()
                 loop = false;
         }
 
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255 );
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderClear(renderer);
 
         app.update(dur!"msecs"(16));
