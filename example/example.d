@@ -26,15 +26,11 @@ struct Body
 {
     Vector2f position;
     Vector2f direction;
-    float rotation = 0.0, rotationd;
 }
 
 
 struct Renderable
 {
-  /*explicit Renderable(std::unique_ptr<sf::Shape> shape) : shape(std::move(shape)) {}
-
-  std::unique_ptr<sf::Shape> shape;*/
     float radius;
     Color color;
 }
@@ -82,18 +78,20 @@ public:
 
             // Mark as collideable (explosion particles will not be collideable).
             //todo use "assign" to merge the 2 next instructions
+            float radius = r(10, 5);
             entity.insert!Collideable();
-            entity.component!Collideable.radius = r(10, 5);
+            entity.component!Collideable.radius = radius;
             //collideable = entity.assign<Collideable>(r(10, 5));
 
             // "Physical" attributes.
             entity.insert!Body();
             entity.component!Body.position  = Vector2f(r(mSizeX), r(mSizeY));
-            entity.component!Body.direction = Vector2f(r(100, -50), r(100, -50));
+            entity.component!Body.direction = Vector2f(r(300, -150),
+            	                                       r(300, -150));
 
             // Shape to apply to entity.
             entity.insert!Renderable();
-            entity.component!Renderable.radius = entity.component!Collideable.radius;
+            entity.component!Renderable.radius = radius;
             entity.component!Renderable.color = Color(cast(ubyte)r(128, 127),
                                                       cast(ubyte)r(128, 127),
                                                       cast(ubyte)r(128, 127));
@@ -101,45 +99,57 @@ public:
     }
 
 private:
-    int mSizeX, mSizeY;;
+    int mSizeX, mSizeY;
     int mCount;
 };
 
-/+
+
 // Updates a body's position and rotation.
-struct BodySystem : public System<BodySystem> {
-  void update(EntityManager &es, EventManager &events, Duration dt) override {
-    ComponentHandle<Body> body;
-    for (Entity entity : es.entities_with_components(body)) {
-      body->position += body->direction * static_cast<float>(dt);
-      body->rotation += body->rotationd * dt;
-    }
-  };
-};
-
-
-// Bounce bodies off the edge of the screen.
-class BounceSystem : public System<BounceSystem> {
+class MoveSystem : System
+{
 public:
-  explicit BounceSystem(sf::RenderTarget &target) : size(target.getSize()) {}
-
-  void update(EntityManager &es, EventManager &events, Duration dt) override {
-    ComponentHandle<Body> body;
-    for (Entity entity : es.entities_with_components(body)) {
-      if (body->position.x + body->direction.x < 0 ||
-          body->position.x + body->direction.x >= size.x)
-        body->direction.x = -body->direction.x;
-      if (body->position.y + body->direction.y < 0 ||
-          body->position.y + body->direction.y >= size.y)
-        body->direction.y = -body->direction.y;
+    this(SDL_Window* window)
+    {
+        SDL_GetWindowSize(window, &mSizeX, &mSizeY);
     }
-  }
 
+    void update(EntityManager es, EventManager events, Duration dt)
+    {
+        foreach (Entity entity; es.entitiesWith!Body)
+        {
+            Body *bod = entity.component!Body;
+
+            // update position
+            bod.position.x += bod.direction.x * dt.total!"msecs" / 1000.0;
+            bod.position.y += bod.direction.y * dt.total!"msecs" / 1000.0;
+            // make it bounce on the edges of the window
+            if (bod.position.x < 0.0)
+            {
+                bod.position.x = -bod.position.x;
+                bod.direction.x = -bod.direction.x;
+            }
+            if (bod.position.x >= mSizeX)
+            {
+                bod.position.x = 2 * mSizeX - bod.position.x;
+                bod.direction.x = -bod.direction.x;
+            }
+            if (bod.position.y < 0.0)
+            {
+                bod.position.y = -bod.position.y;
+                bod.direction.y = -bod.direction.y;
+            }
+            if (bod.position.y >= mSizeY)
+            {
+                bod.position.y = 2 * mSizeY - bod.position.y;
+                bod.direction.y = -bod.direction.y;
+            }
+        }
+    }
 private:
-  sf::Vector2u size;
-};
+    int mSizeX, mSizeY;
+}
 
-
+/+
 // Determines if two Collideable bodies have collided. If they have it emits a
 // CollisionEvent. This is used by ExplosionSystem to create explosion
 // particles, but it could be used by a SoundSystem to play an explosion
@@ -353,9 +363,8 @@ public:
     {
         super();
         systems.insert(new SpawnSystem(window, 10));
-        /*systems.add<BodySystem>();
-        systems.add<BounceSystem>(target);
-        systems.add<CollisionSystem>(target);
+        systems.insert(new MoveSystem(window));
+        /*systems.add<CollisionSystem>(target);
         systems.add<ExplosionSystem>();
         systems.add<ParticleSystem>();*/
         systems.insert(new RenderSystem(renderer));
