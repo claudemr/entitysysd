@@ -1,3 +1,4 @@
+import std.container;
 import std.random;
 import std.stdio;
 
@@ -50,9 +51,14 @@ struct Collideable
 
 
 // Emitted when two entities collide.
-struct CollisionEvent
+class CollisionEvent : Event!(CollisionEvent)
 {
-    Entity left, right;
+    this(Entity lA, Entity lB)
+    {
+        a = lA;
+        b = lB;
+    }
+    Entity a, b;
 }
 
 
@@ -87,7 +93,7 @@ public:
             entity.insert!Body();
             entity.component!Body.position  = Vector2f(r(mSizeX), r(mSizeY));
             entity.component!Body.direction = Vector2f(r(300, -150),
-            	                                       r(300, -150));
+                                                       r(300, -150));
 
             // Shape to apply to entity.
             entity.insert!Renderable();
@@ -122,23 +128,25 @@ public:
             // update position
             bod.position.x += bod.direction.x * dt.total!"msecs" / 1000.0;
             bod.position.y += bod.direction.y * dt.total!"msecs" / 1000.0;
+
             // make it bounce on the edges of the window
             if (bod.position.x < 0.0)
             {
                 bod.position.x = -bod.position.x;
                 bod.direction.x = -bod.direction.x;
             }
-            if (bod.position.x >= mSizeX)
+            else if (bod.position.x >= mSizeX)
             {
                 bod.position.x = 2 * mSizeX - bod.position.x;
                 bod.direction.x = -bod.direction.x;
             }
+
             if (bod.position.y < 0.0)
             {
                 bod.position.y = -bod.position.y;
                 bod.direction.y = -bod.direction.y;
             }
-            if (bod.position.y >= mSizeY)
+            else if (bod.position.y >= mSizeY)
             {
                 bod.position.y = 2 * mSizeY - bod.position.y;
                 bod.direction.y = -bod.direction.y;
@@ -149,88 +157,103 @@ private:
     int mSizeX, mSizeY;
 }
 
-/+
+
 // Determines if two Collideable bodies have collided. If they have it emits a
 // CollisionEvent. This is used by ExplosionSystem to create explosion
 // particles, but it could be used by a SoundSystem to play an explosion
 // sound, etc..
 //
 // Uses a fairly rudimentary 2D partition system, but performs reasonably well.
-class CollisionSystem : public System<CollisionSystem> {
-  static const int PARTITIONS = 200;
-
-  struct Candidate {
-    sf::Vector2f position;
-    float radius;
-    Entity entity;
-  };
-
+class CollisionSystem : System
+{
 public:
-  explicit CollisionSystem(sf::RenderTarget &target) : size(target.getSize()) {
-    size.x = size.x / PARTITIONS + 1;
-    size.y = size.y / PARTITIONS + 1;
-  }
+    this(SDL_Window* window)
+    {
+        SDL_GetWindowSize(window, &mSizeX, &mSizeY);
+        mGrid.length = mSizeX * mSizeY;
+    }
 
-  void update(EntityManager &es, EventManager &events, Duration dt) override {
-    reset();
-    collect(es);
-    collide(events);
-  };
+    void update(EntityManager es, EventManager events, Duration dt)
+    {
+        reset();
+        collect(es);
+        collide(events);
+    };
 
 private:
-  std::vector<std::vector<Candidate>> grid;
-  sf::Vector2u size;
+    enum int mPartitions = 200;
 
-  void reset() {
-    grid.clear();
-    grid.resize(size.x * size.y);
-  }
+    struct Candidate
+    {
+        Vector2f position;
+        float radius;
+        Entity entity;
+    };
 
-  void collect(EntityManager &entities) {
-    ComponentHandle<Body> body;
-    ComponentHandle<Collideable> collideable;
-    for (Entity entity : entities.entities_with_components(body, collideable)) {
-      unsigned int
-          left = static_cast<int>(body->position.x - collideable->radius) / PARTITIONS,
-          top = static_cast<int>(body->position.y - collideable->radius) / PARTITIONS,
-          right = static_cast<int>(body->position.x + collideable->radius) / PARTITIONS,
-          bottom = static_cast<int>(body->position.y + collideable->radius) / PARTITIONS;
-        Candidate candidate {body->position, collideable->radius, entity};
-        unsigned int slots[4] = {
-          left + top * size.x,
-          right + top * size.x,
-          left  + bottom * size.x,
-          right + bottom * size.x,
-        };
-        grid[slots[0]].push_back(candidate);
-        if (slots[0] != slots[1]) grid[slots[1]].push_back(candidate);
-        if (slots[1] != slots[2]) grid[slots[2]].push_back(candidate);
-        if (slots[2] != slots[3]) grid[slots[3]].push_back(candidate);
+    Candidate[][] mGrid;
+    int mSizeX, mSizeY;
+
+    void reset()
+    {
+        foreach (ref candidates; mGrid)
+            candidates.length = 0;
     }
-  }
 
-  void collide(EventManager &events) {
-    for (const std::vector<Candidate> &candidates : grid) {
-      for (const Candidate &left : candidates) {
-        for (const Candidate &right : candidates) {
-          if (left.entity == right.entity) continue;
-          if (collided(left, right))
-            events.emit<CollisionEvent>(left.entity, right.entity);
+    void collect(EntityManager entities)
+    {
+        foreach (entity; entities.entitiesWith!(Body, Collideable))
+        {
+            Body*        bod = entity.component!Body;
+            Collideable* col = entity.component!Collideable;
+
+            auto left   = cast(int)(bod.position.x - col.radius) / mPartitions;
+            auto top    = cast(int)(bod.position.y - col.radius) / mPartitions;
+            auto right  = cast(int)(bod.position.x + col.radius) / mPartitions;
+            auto bottom = cast(int)(bod.position.y + col.radius) / mPartitions;
+
+            auto candidate = Candidate(bod.position, col.radius, entity);
+            uint[4] slots = [left + top * mSizeX,     right + top * mSizeX,
+                             left  + bottom * mSizeX, right + bottom * mSizeX];
+            mGrid[slots[0]] ~= candidate;
+            if (slots[0] != slots[1])
+                mGrid[slots[1]] ~= candidate;
+            if (slots[1] != slots[2])
+                mGrid[slots[2]] ~= candidate;
+            if (slots[2] != slots[3])
+                mGrid[slots[3]] ~= candidate;
         }
-      }
     }
-  }
 
-  float length(const sf::Vector2f &v) {
-    return std::sqrt(v.x * v.x + v.y * v.y);
-  }
+    void collide(EventManager events)
+    {
+        foreach (candidates; mGrid)
+            foreach (ref candidateA; candidates)
+                foreach (ref candidateB; candidates)
+                {
+                    if (candidateA.entity == candidateB.entity)
+                        continue;
+                    if (collided(candidateA, candidateB))
+                        events.emit!CollisionEvent(candidateA.entity,
+                                                   candidateB.entity);
+            }
+    }
 
-  bool collided(const Candidate &left, const Candidate &right) {
-    return length(left.position - right.position) < left.radius + right.radius;
-  }
-};
+    float length2(const ref Vector2f v)
+    {
+        return v.x * v.x + v.y * v.y;
+    }
 
+    bool collided(in ref Candidate a, in ref Candidate b)
+    {
+        auto ab = Vector2f(a.position.x - b.position.x,
+                           a.position.y - b.position.y);
+        float radius2 = a.radius + b.radius;
+        radius2 *= radius2;
+        return length2(ab) < radius2;
+    }
+}
 
+/+
 class ParticleSystem : public System<ParticleSystem> {
 public:
   void update(EntityManager &es, EventManager &events, Duration dt) override {
@@ -268,23 +291,32 @@ private:
   sf::RenderTarget &target;
 };
 
++/
 
 // For any two colliding bodies, destroys the bodies and emits a bunch of bodgy explosion particles.
-class ExplosionSystem : public System<ExplosionSystem>, public Receiver<ExplosionSystem> {
+class ExplosionSystem : System, Receiver!CollisionEvent
+{
 public:
-  void configure(EventManager &events) override {
-    events.subscribe<CollisionEvent>(*this);
-  }
-
-  void update(EntityManager &es, EventManager &events, Duration dt) override {
-    for (Entity entity : collided) {
-      emit_particles(es, entity);
-      entity.destroy();
+    this(EventManager events)
+    {
+        events.subscribe!CollisionEvent(this);
     }
-    collided.clear();
-  }
 
-  void emit_particles(EntityManager &es, Entity entity) {
+    void update(EntityManager es, EventManager events, Duration dt)
+    {
+        foreach (entity; mCollisions)
+        {
+            // the same entity might be detected by collision several times
+            if (!entity.valid)
+                continue;
+            //emit_particles(es, entity);
+            entity.destroy();
+        }
+        while (!mCollisions.empty)
+            mCollisions.removeFront();
+    }
+
+  /+void emit_particles(EntityManager &es, Entity entity) {
     ComponentHandle<Body> body = entity.component<Body>();
     ComponentHandle<Renderable> renderable = entity.component<Renderable>();
     ComponentHandle<Collideable> collideable = entity.component<Collideable>();
@@ -308,19 +340,19 @@ public:
       float radius = r(3, 1);
       particle.assign<Particle>(colour, radius, radius / 2);
     }
-  }
+  }+/
 
-  void receive(const CollisionEvent &collision) {
-    // Events are immutable, so we can't destroy the entities here. We defer
-    // the work until the update loop.
-    collided.insert(collision.left);
-    collided.insert(collision.right);
-  }
+    void receive(CollisionEvent collision)
+    {
+        // Events are immutable, so we can't destroy the entities here. We defer
+        // the work until the update loop.
+        mCollisions.insertFront(collision.a);
+        mCollisions.insertFront(collision.b);
+    }
 
 private:
-  std::unordered_set<Entity> collided;
+    SList!Entity mCollisions;
 };
-+/
 
 // Render all Renderable entities
 class RenderSystem : System
@@ -364,9 +396,9 @@ public:
         super();
         systems.insert(new SpawnSystem(window, 10));
         systems.insert(new MoveSystem(window));
-        /*systems.add<CollisionSystem>(target);
-        systems.add<ExplosionSystem>();
-        systems.add<ParticleSystem>();*/
+        systems.insert(new CollisionSystem(window));
+        systems.insert(new ExplosionSystem(events));
+        //systems.add<ParticleSystem>();
         systems.insert(new RenderSystem(renderer));
         /*systems.add<ParticleRenderSystem>(target);*/
         //systems.configure();
