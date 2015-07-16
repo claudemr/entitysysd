@@ -1,4 +1,5 @@
 import std.container;
+import std.math;
 import std.random;
 import std.stdio;
 
@@ -7,11 +8,7 @@ import derelict.sdl2.sdl;
 import entitysysd;
 
 
-float r(int a, float b = 0)
-{
-    return cast(float)(uniform(0, a * 1000) + b * 1000) / 1000.0;
-}
-
+//*** Component structures ***
 struct Vector2f
 {
     float x, y;
@@ -28,7 +25,6 @@ struct Body
     Vector2f position;
     Vector2f direction;
 }
-
 
 struct Renderable
 {
@@ -49,8 +45,14 @@ struct Collideable
     float radius;
 }
 
+//*** Random-number-generator utility function ***
+float r(int a, float b = 0)
+{
+    return cast(float)(uniform(0, a * 1000) + b * 1000) / 1000.0;
+}
 
-// Emitted when two entities collide.
+//*** Event classes ***
+
 class CollisionEvent : Event!(CollisionEvent)
 {
     this(Entity lA, Entity lB)
@@ -61,6 +63,8 @@ class CollisionEvent : Event!(CollisionEvent)
     Entity a, b;
 }
 
+
+//*** System classes ***
 
 class SpawnSystem : System
 {
@@ -178,7 +182,7 @@ public:
         reset();
         collect(es);
         collide(events);
-    };
+    }
 
 private:
     enum int mPartitions = 200;
@@ -253,45 +257,57 @@ private:
     }
 }
 
-/+
-class ParticleSystem : public System<ParticleSystem> {
+
+class ParticleSystem : System
+{
 public:
-  void update(EntityManager &es, EventManager &events, Duration dt) override {
-    ComponentHandle<Particle> particle;
-    for (Entity entity : es.entities_with_components(particle)) {
-      particle->alpha -= particle->d * dt;
-      if (particle->alpha <= 0) {
-        entity.destroy();
-      } else {
-        particle->colour.a = particle->alpha;
-      }
+    void update(EntityManager es, EventManager events, Duration dt)
+    {
+        foreach (entity; es.entitiesWith!Particle)
+        {
+            auto particle = entity.component!Particle;
+            particle.alpha -= particle.d * dt.total!"msecs";
+            if (particle.alpha <= 0)
+                entity.destroy();
+        }
     }
-  }
-};
+}
 
 
-class ParticleRenderSystem : public System<ParticleRenderSystem> {
+class ParticleRenderSystem : System
+{
 public:
-  explicit ParticleRenderSystem(sf::RenderTarget &target) : target(target) {}
-
-  void update(EntityManager &es, EventManager &events, Duration dt) override {
-    sf::VertexArray vertices(sf::Quads);
-    ComponentHandle<Particle> particle;
-    ComponentHandle<Body> body;
-    for (Entity entity : es.entities_with_components(body, particle)) {
-      float r = particle->radius;
-      vertices.append(sf::Vertex(body->position + sf::Vector2f(-r, -r), particle->colour));
-      vertices.append(sf::Vertex(body->position + sf::Vector2f(r, -r), particle->colour));
-      vertices.append(sf::Vertex(body->position + sf::Vector2f(r, r), particle->colour));
-      vertices.append(sf::Vertex(body->position + sf::Vector2f(-r, r), particle->colour));
+    this(SDL_Renderer* renderer)
+    {
+        mpRenderer = renderer;
     }
-    target.draw(vertices);
-  }
+
+    void update(EntityManager es, EventManager events, Duration dt)
+    {
+        foreach (Entity entity; es.entitiesWith!(Body, Particle))
+        {
+            auto particle = entity.component!Particle;
+            auto bod      = entity.component!Body;
+            auto radius = particle.radius;
+            // Change color
+            SDL_SetRenderDrawColor(mpRenderer,
+                                   particle.color.r,
+                                   particle.color.g,
+                                   particle.color.b,
+                                   cast(ubyte)particle.alpha );
+            SDL_Rect rect;
+            rect.x = cast(int)(bod.position.x - radius);
+            rect.y = cast(int)(bod.position.y - radius);
+            rect.w = cast(int)(radius * 2);
+            rect.h = cast(int)(radius * 2);
+            SDL_RenderFillRect(mpRenderer, &rect);
+        }
+    }
+
 private:
-  sf::RenderTarget &target;
-};
+    SDL_Renderer* mpRenderer;
+}
 
-+/
 
 // For any two colliding bodies, destroys the bodies and emits a bunch of bodgy explosion particles.
 class ExplosionSystem : System, Receiver!CollisionEvent
@@ -309,38 +325,45 @@ public:
             // the same entity might be detected by collision several times
             if (!entity.valid)
                 continue;
-            //emit_particles(es, entity);
+            emitParticles(es, entity);
             entity.destroy();
         }
         while (!mCollisions.empty)
             mCollisions.removeFront();
     }
 
-  /+void emit_particles(EntityManager &es, Entity entity) {
-    ComponentHandle<Body> body = entity.component<Body>();
-    ComponentHandle<Renderable> renderable = entity.component<Renderable>();
-    ComponentHandle<Collideable> collideable = entity.component<Collideable>();
-    sf::Color colour = renderable->shape->getFillColor();
-    colour.a = 200;
+    void emitParticles(EntityManager es, Entity entity)
+    {
+        Body*        bod = entity.component!Body;
+        Renderable*  ren = entity.component!Renderable;
+        Collideable* col = entity.component!Collideable;
 
-    float area = (M_PI * collideable->radius * collideable->radius) / 3.0;
-    for (int i = 0; i < area; i++) {
-      Entity particle = es.create();
+        float area = (PI * col.radius * col.radius) / 3.0;
+        for (int i = 0; i < area; i++)
+        {
+            Entity particle = es.create();
 
-      float rotationd = r(720, 180);
-      if (std::rand() % 2 == 0) rotationd = -rotationd;
+            float rotationd = r(720, 180);
+            if (uniform(0, 2) == 0)
+                rotationd = -rotationd;
 
-      float offset = r(collideable->radius, 1);
-      float angle = r(360) * M_PI / 180.0;
-      particle.assign<Body>(
-        body->position + sf::Vector2f(offset * cos(angle), offset * sin(angle)),
-        body->direction + sf::Vector2f(offset * 2 * cos(angle), offset * 2 * sin(angle)),
-        rotationd);
+            float offset = r(cast(int)col.radius, 1.0);
+            float angle  = r(360) * PI / 180.0;
 
-      float radius = r(3, 1);
-      particle.assign<Particle>(colour, radius, radius / 2);
+            particle.insert!Body();
+            particle.component!Body.position.x = bod.position.x + offset * cos(angle);
+            particle.component!Body.position.y = bod.position.y + offset * sin(angle);
+            particle.component!Body.direction.x = offset * 2 * cos(angle);
+            particle.component!Body.direction.y = offset * 2 * sin(angle);
+
+            float radius = r(3, 1);
+            particle.insert!Particle();
+            particle.component!Particle.color = ren.color;
+            particle.component!Particle.radius = radius;
+            particle.component!Particle.alpha = 200;
+            particle.component!Particle.d = r(3, 1) / 2;
+        }
     }
-  }+/
 
     void receive(CollisionEvent collision)
     {
@@ -352,7 +375,7 @@ public:
 
 private:
     SList!Entity mCollisions;
-};
+}
 
 // Render all Renderable entities
 class RenderSystem : System
@@ -394,33 +417,20 @@ public:
     this(SDL_Renderer* renderer, SDL_Window* window)
     {
         super();
-        systems.insert(new SpawnSystem(window, 10));
+        systems.insert(new SpawnSystem(window, 20));
         systems.insert(new MoveSystem(window));
         systems.insert(new CollisionSystem(window));
         systems.insert(new ExplosionSystem(events));
-        //systems.add<ParticleSystem>();
+        systems.insert(new ParticleSystem());
         systems.insert(new RenderSystem(renderer));
-        /*systems.add<ParticleRenderSystem>(target);*/
-        //systems.configure();
+        systems.insert(new ParticleRenderSystem(renderer));
     }
 
     void update(Duration dt)
     {
         systems.update(dt);
-        /+
-        systems.update<SpawnSystem>(dt);
-        /*systems.update<BodySystem>(dt);
-        systems.update<BounceSystem>(dt);
-        systems.update<CollisionSystem>(dt);
-        systems.update<ExplosionSystem>(dt);
-        systems.update<ParticleSystem>(dt);*/
-        systems.update<RenderSystem>(dt);
-        /*systems.update<ParticleRenderSystem>(dt);*/
-        +/
     }
-};
-
-
+}
 
 void main()
 {
