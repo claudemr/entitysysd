@@ -54,3 +54,13 @@ EntitySysD will move towards Major version 1 (and so forth).
 > http://semver.org/
 
 It has been tested on GNU-Linux environment using DMD64 D Compiler v2.067.1.
+
+To-do
+-----
+
+* Use UDA (User-Defined-Argument, D feature) to mark components and systems.
+* Use traits to detect proper components and systems when registering/subscribing them.
+* Give proper function names.
+* Make code more secure.
+* Add some docs.
+* Improve unit-tests.
