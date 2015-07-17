@@ -109,17 +109,17 @@ public:
             // Mark as collideable (explosion particles will not be collideable).
             //todo use "assign" to merge the 2 next instructions
             float radius = r(10, 5);
-            entity.insert!Collideable();
+            entity.register!Collideable();
             entity.component!Collideable.radius = radius;
             //collideable = entity.assign<Collideable>(r(10, 5));
 
             // "Physical" attributes.
-            auto bod = entity.insert!Body();
+            auto bod = entity.register!Body();
             bod.position  = Vector2f(r(mSizeX), r(mSizeY));
             bod.direction = Vector2f(r(300, -150), r(300, -150));
 
             // Shape to apply to entity.
-            auto ren = entity.insert!Renderable();
+            auto ren = entity.register!Renderable();
             ren.radius = radius;
             ren.color  = Color(cast(ubyte)r(128, 127),
                                cast(ubyte)r(128, 127),
@@ -369,14 +369,14 @@ public:
             float offset = r(cast(int)col.radius, 1.0);
             float angle  = r(360) * PI / 180.0;
 
-            auto partBody = particle.insert!Body();
+            auto partBody = particle.register!Body();
             partBody.position.x  = bod.position.x + offset * cos(angle);
             partBody.position.y  = bod.position.y + offset * sin(angle);
             partBody.direction.x = offset * 2 * cos(angle);
             partBody.direction.y = offset * 2 * sin(angle);
 
             float radius = r(3, 1);
-            auto partPart = particle.insert!Particle();
+            auto partPart = particle.register!Particle();
             partPart.color  = ren.color;
             partPart.radius = radius;
             partPart.alpha  = 200;

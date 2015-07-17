@@ -19,130 +19,49 @@ along with EntitySysD. If not, see <http://www.gnu.org/licenses/>.
 
 module entitysysd.component;
 
-import entitysysd.entity;
-import entitysysd.event;
+// UDA for component types
+enum component;
 
 
-struct ComponentHandle(C, EM = EntityManager)
+struct BaseComponentCounter
 {
-public:
-    alias ComponentType = C;
-
-    bool valid()
-    {
-        return (mManager !is null)   &&
-               (mManager.valid(mId)) &&
-               (mManager.hasComponent!(C)(mId));
-    }
-
-    /+
-    template <typename C, typename EM>
-    inline ComponentHandle<C, EM>::operator bool() const {
-      return valid();
-    }
-
-    template <typename C, typename EM>
-    inline C *ComponentHandle<C, EM>::operator -> () {
-      assert(valid());
-      return manager_->template get_component_ptr<C>(id_);
-    }
-
-    template <typename C, typename EM>
-    inline const C *ComponentHandle<C, EM>::operator -> () const {
-      assert(valid());
-      return manager_->template get_component_ptr<C>(id_);
-    }+/
-
-
-    C* get()
-    {
-        assert(valid());
-        return mManager.getComponentPtr!(C)(mId);
-    }
-
-    /+template <typename C, typename EM>
-    inline const C *ComponentHandle<C, EM>::get() const {
-      assert(valid());
-      return manager_->template get_component_ptr<C>(id_);
-    }+/
-
-    void remove()
-    {
-        assert(valid());
-        mManager.remove!(C)(mId);
-    }
-
-    /*bool operator == (const ComponentHandle<C> &other) const {
-        return manager_ == other.manager_ && id_ == other.id_;
-    }
-
-    bool operator != (const ComponentHandle<C> &other) const {
-        return !(*this == other);
-    }*/
-
-private:
-    this(EM *manager, Entity.Id id)
-    {
-        mManager = manager;
-        mId = id;
-    }
-
-    EM        mManager;
-    Entity.Id mId;
+    static size_t counter = 0;
 }
 
-struct BaseComponent
-{
-    alias Family = size_t;
-    static Family familyCounter = 0;
-}
-
-struct Component(Derived)
+struct ComponentCounter(Derived)
 {
 public:
-    //alias Handle = ComponentHandle!(Derived);
-    //alias ConstHandle = ComponentHandle!(const Derived, const EntityManager);
-
-    static BaseComponent.Family family()
+    static size_t getId()
     {
-        static BaseComponent.Family family = -1;
-        if (family == -1)
+        static size_t counter = -1;
+        if (counter == -1)
         {
-            family = mBaseComponent.familyCounter;
-            mBaseComponent.familyCounter++;
+            counter = mBaseComponentCounter.counter;
+            mBaseComponentCounter.counter++;
         }
 
-        return family;
+        return counter;
     }
 
 private:
-    BaseComponent mBaseComponent;
-};
-
-/+
-/**
- * Emitted when any component is inserted to an entity.
- */
-class ComponentInsertedEvent : Event!(ComponentInsertedEvent)
-{
-    this(Entity lEntity)
-    {
-        entity = lEntity;
-    }
-
-    Entity entity;
+    BaseComponentCounter mBaseComponentCounter;
 }
 
-/**
- * Emitted when any component is removed from an entity.
- */
-class ComponentRemovedEvent(C) : Event!(ComponentRemovedEvent)
+//******************************************************************************
+//***** UNIT-TESTS
+//******************************************************************************
+
+version(unittest)
 {
-    this(Entity lEntity)
+    @component alias TestComponent0 = float;
+
+    @component struct TestComponent1
     {
-        entity = lEntity;
+        int a, b;
     }
 
-    Entity entity;
+    @component class TestComponent2
+    {
+        string str;
+    }
 }
-+/

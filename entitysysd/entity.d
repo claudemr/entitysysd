@@ -28,7 +28,6 @@ import entitysysd.event;
 import entitysysd.pool;
 
 
-
 struct Entity
 {
 public:
@@ -64,7 +63,6 @@ public:
         }
 
     private:
-        //friend class EntityManager;
         ulong   mId;
     }
 
@@ -99,10 +97,10 @@ public:
         return mId;
     }
 
-    C* insert(C)()
+    C* register(C)()
     {
         assert(valid);
-        return mManager.insert!C(mId);
+        return mManager.register!C(mId);
     }
 
     void remove(C)()
@@ -143,42 +141,6 @@ private:
     EntityManager mManager;
     Id            mId = invalid;
 }
-
-
-/+
-/**
- * Emitted when an entity is added to the system.
- */
-struct EntityCreatedEvent
-{
-    alias event this;
-
-    this(Entity lEntity)
-    {
-        entity = lEntity;
-    }
-
-    Entity entity;
-    Event!(EntityCreatedEvent) event;
-}
-
-
-/**
- * Called just prior to an entity being destroyed.
- */
-struct EntityDestroyedEvent
-{
-    alias event this;
-
-    this(Entity lEntity)
-    {
-        entity = lEntity;
-    }
-
-    Entity entity;
-    Event!(EntityDestroyedEvent) event;
-}
-+/
 
 
 /**
@@ -269,57 +231,57 @@ public:
         return Entity(this, id);
     }
 
-    C* insert(C)(Entity.Id id)
+    C* register(C)(Entity.Id id)
     {
         assertValid(id);
-        const BaseComponent.Family family = componentFamily!(C)();
-        assert(family < mMaxComponent);
+        const auto compId = componentId!(C)();
+        assert(compId < mMaxComponent);
         const auto uniqueId = id.uniqueId;
-        assert(!mEntityComponentMask[uniqueId-1][family]);
+        assert(!mEntityComponentMask[uniqueId-1][compId]);
 
         // Placement new into the component pool.
         auto pool = accomodateComponent!(C)();
 
         // Set the bit for this component.
-        mEntityComponentMask[uniqueId-1][family] = true;
+        mEntityComponentMask[uniqueId-1][compId] = true;
 
         return &pool[uniqueId-1];
     }
 
-    void remove(C)(Entity.Id id)
+    void unregister(C)(Entity.Id id)
     {
         assertValid(id);
-        const BaseComponent.Family family = componentFamily!(C)();
-        assert(family < mMaxComponent);
+        const auto compId = componentId!(C)();
+        assert(compId < mMaxComponent);
         const auto uniqueId = id.uniqueId;
-        assert(mEntityComponentMask[uniqueId-1][family]);
+        assert(mEntityComponentMask[uniqueId-1][compId]);
 
         // Remove component bit.
-        mEntityComponentMask[uniqueId-1][family] = false;
+        mEntityComponentMask[uniqueId-1][compId] = false;
     }
 
-    bool has(C)(Entity.Id id)
+    bool isRegistered(C)(Entity.Id id)
     {
         assertValid(id);
-        const BaseComponent.Family family = componentFamily!(C)();
+        const auto compId = componentId!(C)();
         const auto uniqueId = id.uniqueId;
 
-        if (family >= mMaxComponent)
+        if (compId >= mMaxComponent)
             return false;
 
-        return mEntityComponentMask[uniqueId-1][family];
+        return mEntityComponentMask[uniqueId-1][compId];
     }
 
     C* getComponent(C)(Entity.Id id)
     {
         assertValid(id);
-        const BaseComponent.Family family = componentFamily!(C)();
-        assert(family < mMaxComponent);
+        const auto compId = componentId!(C)();
+        assert(compId < mMaxComponent);
         const auto uniqueId = id.uniqueId;
-        assert(mEntityComponentMask[uniqueId-1][family]);
+        assert(mEntityComponentMask[uniqueId-1][compId]);
 
         // Placement new into the component pool.
-        Pool!C pool = cast(Pool!C)mComponentPools[family];
+        Pool!C pool = cast(Pool!C)mComponentPools[compId];
         return &pool[uniqueId-1];
     }
 
@@ -368,12 +330,12 @@ public:
         {
             int result = 0;
 
-            BaseComponent.Family family = entityManager.componentFamily!C();
-            Pool!C pool = cast(Pool!C)entityManager.mComponentPools[family];
+            auto compId = entityManager.componentId!C();
+            Pool!C pool = cast(Pool!C)entityManager.mComponentPools[compId];
 
             for (int i; i < pool.nbElements; i++)
             {
-                if (!entityManager.mEntityComponentMask[i][family])
+                if (!entityManager.mEntityComponentMask[i][compId])
                     continue;
                 result = dg(&pool[i]);
                 if (result)
@@ -411,8 +373,8 @@ public:
             {
                 foreach (C; CList)
                 {
-                    auto family = entityManager.componentFamily!C();
-                    if (!componentMask[family])
+                    auto compId = entityManager.componentId!C();
+                    if (!componentMask[compId])
                         continue entityLoop;
                 }
 
@@ -441,9 +403,9 @@ private:
         assert(mEntityVersions[id.uniqueId-1] == id.versionId, "Attempt to access Entity via an obsolete Entity.Id");
     }
 
-    BaseComponent.Family componentFamily(C)()
+    size_t componentId(C)()
     {
-        return Component!(C).family();
+        return ComponentCounter!(C).getId();
     }
 
     void accomodateEntity()
@@ -461,14 +423,14 @@ private:
 
     Pool!C accomodateComponent(C)()
     {
-        BaseComponent.Family family = componentFamily!C();
+        auto compId = componentId!C();
 
-        if (mComponentPools.length <= family)
+        if (mComponentPools.length <= compId)
         {
-            mComponentPools.length = family + 1;
-            mComponentPools[family] = new Pool!C(mIndexCounter);
+            mComponentPools.length = compId + 1;
+            mComponentPools[compId] = new Pool!C(mIndexCounter);
         }
-        return cast(Pool!C)mComponentPools[family];
+        return cast(Pool!C)mComponentPools[compId];
     }
 
 
@@ -478,7 +440,7 @@ private:
     size_t          mPoolSize;
     // Event Manager
     EventManager    mEventManager;
-    // Array of pools for each component family
+    // Array of pools for each component types
     BasePool[]      mComponentPools;
     // Bitmask of components for each entities.
     // Index into the vector is the Entity.Id.
@@ -535,12 +497,12 @@ unittest
         int x, y;
     }
 
-    ent0.insert!NameComponent();
-    ent1.insert!NameComponent();
-    ent2.insert!NameComponent();
+    ent0.register!NameComponent();
+    ent1.register!NameComponent();
+    ent2.register!NameComponent();
 
-    ent0.insert!PosComponent();
-    ent2.insert!PosComponent();
+    ent0.register!PosComponent();
+    ent2.register!PosComponent();
 
     ent0.component!NameComponent.name = "Hello";
     ent1.component!NameComponent.name = "World";

@@ -30,7 +30,7 @@ public:
 
 protected:
     static Family mFamilyCounter = 0;
-};
+}
 
 
 class Event(Derived) : BaseEvent
@@ -48,7 +48,7 @@ public:
 
         return family;
     }
-};
+}
 
 interface BaseReceiver
 {
@@ -57,7 +57,7 @@ interface BaseReceiver
 interface Receiver(E) : BaseReceiver
 {
     void receive(E event);
-};
+}
 
 
 class EventManager
