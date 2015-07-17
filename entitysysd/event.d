@@ -1,3 +1,22 @@
+/*
+Copyright 2015 Claude Merle
+
+This file is part of EntitySysD.
+
+EntitySysD is free software: you can redistribute it and/or modify it
+under the terms of the Lesser GNU General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+EntitySysD is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+Lesser GNU General Public License for more details.
+
+You should have received a copy of the Lesser GNU General Public License
+along with EntitySysD. If not, see <http://www.gnu.org/licenses/>.
+*/
+
 module entitysysd.event;
 
 
@@ -14,14 +33,6 @@ protected:
 };
 
 
-/**
- * Event types should subclass from this.
- *
- * struct Explosion : public Event<Explosion> {
- *   Explosion(int damage) : damage(damage) {}
- *   int damage;
- * };
- */
 class Event(Derived) : BaseEvent
 {
 public:
@@ -49,29 +60,9 @@ interface Receiver(E) : BaseReceiver
 };
 
 
-/**
- * Handles event subscription and delivery.
- *
- * Subscriptions are automatically removed when receivers are destroyed..
- */
 class EventManager
 {
 public:
-    /**
-     * Subscribe an object to receive events of type E.
-     *
-     * Receivers must be subclasses of Receiver and must implement a receive() method accepting the given event type.
-     *
-     * eg.
-     *
-     *     struct ExplosionReceiver : public Receiver<ExplosionReceiver> {
-     *       void receive(const Explosion &explosion) {
-     *       }
-     *     };
-     *
-     *     ExplosionReceiver receiver;
-     *     em.subscribe<Explosion>(receiver);
-     */
     void subscribe(E)(Receiver!E receiver)
     {
         ReceiverDelegate receive = cast(ReceiverDelegate)&receiver.receive;
@@ -102,12 +93,6 @@ public:
     }
 
 
-    /**
-     * Unsubscribe an object in order to not receive events of type E anymore.
-     *
-     * Receivers must have subscribed for event E before unsubscribing from event E.
-     *
-     */
     void unsubscribe(E)(Receiver!E receiver)
     {
         ReceiverDelegate receive = cast(ReceiverDelegate)&receiver.receive;
@@ -120,9 +105,6 @@ public:
                 rcv = null;
     }
 
-    /**
-     * Emit an already constructed event.
-     */
     void emit(E)(E event)
     {
         auto eventFamily = E.family();
@@ -135,17 +117,6 @@ public:
         }
     }
 
-    /**
-     * Emit an event to receivers.
-     *
-     * This method constructs a new event object of type E with the provided arguments, then delivers it to all receivers.
-     *
-     * eg.
-     *
-     * auto em = new EventManager();
-     * em.emit!(Explosion)(10);
-     *
-     */
     void emit(E, Args...)(Args args)
     {
         auto event = new E(args);

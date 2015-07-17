@@ -1,3 +1,22 @@
+/*
+Copyright 2015 Claude Merle
+
+This file is part of EntitySysD.
+
+EntitySysD is free software: you can redistribute it and/or modify it
+under the terms of the Lesser GNU General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+EntitySysD is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+Lesser GNU General Public License for more details.
+
+You should have received a copy of the Lesser GNU General Public License
+along with EntitySysD. If not, see <http://www.gnu.org/licenses/>.
+*/
+
 module entitysysd.entity;
 
 import std.bitmanip;
@@ -57,9 +76,6 @@ public:
         mId = id;
     }
 
-    /**
-     * Destroy and invalidate this Entity.
-     */
     void destroy()
     {
         assert(valid);
@@ -67,20 +83,11 @@ public:
         invalidate();
     }
 
-    /**
-     * Is this Entity handle valid?
-     */
     bool valid() @property
     {
         return mManager !is null && mManager.valid(mId);
     }
 
-    /**
-     * Invalidate Entity handle, disassociating it from an EntityManager and invalidating its ID.
-     *
-     * Note that this does *not* affect the underlying entity and its
-     * components. Use destroy() to destroy the associated Entity and components.
-     */
     void invalidate()
     {
         mId = invalid;
@@ -215,11 +222,6 @@ public:
                mEntityVersions[id.uniqueId-1] == id.versionId;
     }
 
-    /**
-     * Create a new Entity.Id.
-     *
-     * Emits EntityCreatedEvent.
-     */
     Entity create()
     {
         uint uniqueId, versionId;
@@ -246,11 +248,6 @@ public:
         return entity;
     }
 
-    /**
-     * Destroy an existing Entity.Id and its associated Components.
-     *
-     * Emits EntityDestroyedEvent.
-     */
     void destroy(Entity.Id id)
     {
         assertValid(id);
@@ -289,11 +286,6 @@ public:
         return &pool[uniqueId-1];
     }
 
-    /**
-     * Remove a Component from an Entity.Id
-     *
-     * Emits a ComponentRemovedEvent<C> event.
-     */
     void remove(C)(Entity.Id id)
     {
         assertValid(id);
@@ -306,9 +298,6 @@ public:
         mEntityComponentMask[uniqueId-1][family] = false;
     }
 
-    /**
-     * Check if an Entity has a component.
-     */
     bool has(C)(Entity.Id id)
     {
         assertValid(id);
@@ -321,11 +310,6 @@ public:
         return mEntityComponentMask[uniqueId-1][family];
     }
 
-    /**
-     * Retrieve a Component assigned to an Entity.Id.
-     *
-     * @returns Pointer to an instance of C, or nullptr if the Entity.Id does not have that Component.
-     */
     C* getComponent(C)(Entity.Id id)
     {
         assertValid(id);

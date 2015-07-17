@@ -2,9 +2,10 @@
     "name": "entitysysd",
     "description": "Entity/Component System engine",
     "homepage": "https://github.com/claudemr/entitysysd",
+    "copyright": "Copyright © 2015, Claude Merle",
     "license": "LGPL3",
     "authors": [
-        "Claude M"
+        "Claude Merle"
     ],
     "configurations": [
         {
@@ -19,7 +20,7 @@
             "sourcePaths": ["entitysysd", "example"],
             "dependencies":
             {
-                "derelict-sdl2": "~>1.9.0"
+                "derelict-sdl2": "~>1.9"
             }
         }
     ]
