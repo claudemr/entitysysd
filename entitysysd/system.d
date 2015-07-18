@@ -33,7 +33,7 @@ import entitysysd.event;
  */
 interface System
 {
-    void update(EntityManager entities, EventManager events, Duration dt);
+    void run(EntityManager entities, EventManager events, Duration dt);
 }
 
 
@@ -47,7 +47,7 @@ public:
         mEventManager  = eventManager;
     }
 
-    void insert(System system)
+    void register(System system)
     {
         auto sysNode = mSystems[].find(system);
         if (!sysNode.empty)
@@ -55,7 +55,7 @@ public:
         mSystems ~= system;
     }
 
-    void remove(System system)
+    void unregister(System system)
     {
         auto sysNode = mSystems[].find(system);
         if (sysNode.empty)
@@ -63,10 +63,10 @@ public:
         mSystems.linearRemove(sysNode.take(1));
     }
 
-    void update(Duration dt)
+    void run(Duration dt)
     {
         foreach (s; mSystems)
-            s.update(mEntityManager, mEventManager, dt);
+            s.run(mEntityManager, mEventManager, dt);
     }
 
 private:

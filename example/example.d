@@ -95,7 +95,7 @@ public:
         mCount = count;
     }
 
-    void update(EntityManager es, EventManager events, Duration dt)
+    void run(EntityManager es, EventManager events, Duration dt)
     {
         int c = 0;
         //ComponentHandle<Collideable> collideable;
@@ -142,7 +142,7 @@ public:
         SDL_GetWindowSize(window, &mSizeX, &mSizeY);
     }
 
-    void update(EntityManager es, EventManager events, Duration dt)
+    void run(EntityManager es, EventManager events, Duration dt)
     {
         foreach (Entity entity; es.entitiesWith!Body)
         {
@@ -196,7 +196,7 @@ public:
         mGrid.length = mSizeX * mSizeY;
     }
 
-    void update(EntityManager es, EventManager events, Duration dt)
+    void run(EntityManager es, EventManager events, Duration dt)
     {
         reset();
         collect(es);
@@ -280,7 +280,7 @@ private:
 class ParticleSystem : System
 {
 public:
-    void update(EntityManager es, EventManager events, Duration dt)
+    void run(EntityManager es, EventManager events, Duration dt)
     {
         foreach (entity; es.entitiesWith!Particle)
         {
@@ -301,7 +301,7 @@ public:
         mpRenderer = renderer;
     }
 
-    void update(EntityManager es, EventManager events, Duration dt)
+    void run(EntityManager es, EventManager events, Duration dt)
     {
         foreach (Entity entity; es.entitiesWith!(Body, Particle))
         {
@@ -337,7 +337,7 @@ public:
         events.subscribe!CollisionEvent(this);
     }
 
-    void update(EntityManager es, EventManager events, Duration dt)
+    void run(EntityManager es, EventManager events, Duration dt)
     {
         foreach (entity; mCollisions)
         {
@@ -405,7 +405,7 @@ public:
         mpRenderer = renderer;
     }
 
-    void update(EntityManager es, EventManager events, Duration dt)
+    void run(EntityManager es, EventManager events, Duration dt)
     {
         foreach (Entity entity; es.entitiesWith!(Body, Renderable))
         {
@@ -436,18 +436,18 @@ public:
     this(SDL_Renderer* renderer, SDL_Window* window)
     {
         super();
-        systems.insert(new SpawnSystem(window, 20));
-        systems.insert(new MoveSystem(window));
-        systems.insert(new CollisionSystem(window));
-        systems.insert(new ExplosionSystem(events));
-        systems.insert(new ParticleSystem());
-        systems.insert(new RenderSystem(renderer));
-        systems.insert(new ParticleRenderSystem(renderer));
+        systems.register(new SpawnSystem(window, 20));
+        systems.register(new MoveSystem(window));
+        systems.register(new CollisionSystem(window));
+        systems.register(new ExplosionSystem(events));
+        systems.register(new ParticleSystem());
+        systems.register(new RenderSystem(renderer));
+        systems.register(new ParticleRenderSystem(renderer));
     }
 
-    void update(Duration dt)
+    void run(Duration dt)
     {
-        systems.update(dt);
+        systems.run(dt);
     }
 }
 
@@ -480,7 +480,7 @@ void main()
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderClear(renderer);
 
-        app.update(dur!"msecs"(16));
+        app.run(dur!"msecs"(16));
 
         SDL_RenderPresent(renderer);
 
