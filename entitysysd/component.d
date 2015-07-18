@@ -22,6 +22,23 @@ module entitysysd.component;
 // UDA for component types
 enum component;
 
+template isComponent(C)
+{
+    import std.typetuple : anySatisfy;
+    enum isComponentAttr(D) = is(D == component);
+    static if(__traits(compiles, __traits(getAttributes, C)))
+        enum isComponent = (anySatisfy!(isComponentAttr,
+                                        __traits(getAttributes, C)));
+    else
+        enum isComponent = false;
+}
+
+template areComponents(CList...)
+{
+    import std.typetuple : allSatisfy;
+    enum areComponents = allSatisfy!(isComponent, CList);
+}
+
 
 struct BaseComponentCounter
 {
@@ -51,17 +68,20 @@ private:
 //***** UNIT-TESTS
 //******************************************************************************
 
-version(unittest)
+///
+unittest
 {
-    @component alias TestComponent0 = float;
-
-    @component struct TestComponent1
+    @component struct TestComponent0
     {
         int a, b;
     }
 
-    @component class TestComponent2
+    @component class TestComponent1
     {
         string str;
     }
+
+    static assert(!isComponent!int);
+    static assert(isComponent!TestComponent0);
+    static assert(isComponent!TestComponent1);
 }

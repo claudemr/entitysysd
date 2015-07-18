@@ -26,6 +26,7 @@ import std.string;
 import entitysysd.component;
 import entitysysd.event;
 import entitysysd.pool;
+public import entitysysd.component : component;
 
 
 struct Entity
@@ -98,33 +99,38 @@ public:
     }
 
     C* register(C)()
+        if (isComponent!C)
     {
         assert(valid);
         return mManager.register!C(mId);
     }
 
-    void remove(C)()
+    void unregister(C)()
+        if (isComponent!C)
     {
         assert(valid);
-        mManager.remove!C(mId);
+        mManager.unregister!C(mId);
     }
 
     C* component(C)() @property
+        if (isComponent!C)
     {
         assert(valid);
         return mManager.getComponent!(C)(mId);
     }
 
     void component(C)(C c) @property
+        if (isComponent!C)
     {
         assert(valid);
         *mManager.getComponent!(C)(mId) = c;
     }
 
-    bool has(C)()
+    bool isRegistered(C)()
+        if (isComponent!C)
     {
         assert(valid);
-        return mManager.has!C(mId);
+        return mManager.isRegistered!C(mId);
     }
 
     bool opEquals()(auto const ref Entity lEntity) const
@@ -232,6 +238,7 @@ public:
     }
 
     C* register(C)(Entity.Id id)
+        if (isComponent!C)
     {
         assertValid(id);
         const auto compId = componentId!(C)();
@@ -249,6 +256,7 @@ public:
     }
 
     void unregister(C)(Entity.Id id)
+        if (isComponent!C)
     {
         assertValid(id);
         const auto compId = componentId!(C)();
@@ -261,6 +269,7 @@ public:
     }
 
     bool isRegistered(C)(Entity.Id id)
+        if (isComponent!C)
     {
         assertValid(id);
         const auto compId = componentId!(C)();
@@ -273,6 +282,7 @@ public:
     }
 
     C* getComponent(C)(Entity.Id id)
+        if (isComponent!C)
     {
         assertValid(id);
         const auto compId = componentId!(C)();
@@ -349,6 +359,7 @@ public:
     }
 
     ComponentView!C components(C)() @property
+        if (isComponent!C)
     {
         return ComponentView!C(this);
     }
@@ -391,7 +402,9 @@ public:
         EntityManager entityManager;
     }
 
+    //todo check CList
     EntitiesWithView!(CList) entitiesWith(CList...)() @property
+        if (areComponents!CList)
     {
         return EntitiesWithView!(CList)(this);
     }

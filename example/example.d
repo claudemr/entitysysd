@@ -40,27 +40,27 @@ struct Color
 
 
 //*** Component structures ***
-struct Body
+@component struct Body
 {
     Vector2f position;
     Vector2f direction;
 }
 
-struct Renderable
+@component struct Renderable
 {
     float radius;
     Color color;
 }
 
 
-struct Particle
+@component struct Particle
 {
     Color color;
     float radius, alpha, d;
 }
 
 
-struct Collideable
+@component struct Collideable
 {
     float radius;
 }
