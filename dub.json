@@ -15,7 +15,7 @@
         },
         {
             "name": "example",
-            "targetName": "ex0",
+            "targetName": "entitysysd_example",
             "targetType": "executable",
             "sourcePaths": ["entitysysd", "example"],
             "dependencies":
