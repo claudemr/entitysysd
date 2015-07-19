@@ -466,12 +466,15 @@ private:
     uint            mNbFreeIds;
 }
 
+
+//******************************************************************************
+//***** UNIT-TESTS
+//******************************************************************************
+
 import std.stdio;
 
 unittest
 {
-    //dmd -main -unittest entitysysd/entity.d entitysysd/component.d entitysysd/event.d entitysysd/pool.d
-
     auto em = new EntityManager(new EventManager());
 
     auto ent0 = em.create();
@@ -500,12 +503,12 @@ unittest
     assert(ent2.id.uniqueId == 3);
     assert(ent2.id.versionId == 0);
 
-    struct NameComponent
+    @component struct NameComponent
     {
         string name;
     }
 
-    struct PosComponent
+    @component struct PosComponent
     {
         int x, y;
     }

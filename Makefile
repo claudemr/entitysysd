@@ -2,7 +2,7 @@ _OBJ = component.o entity.o event.o package.o pool.o system.o
 OBJ = $(patsubst %,out/%,$(_OBJ))
 
 out/%.o: entitysysd/%.d
-	dmd -c -D -Dddoc -odout $<
+	dmd -c -D -Dddoc -odout -unittest $<
 
 unittest: $(OBJ)
 	dmd $^ -unittest -main -odout -ofout/entitysysd_unittest

@@ -71,15 +71,10 @@ float r(int a, float b = 0)
     return cast(float)(uniform(0, a * 1000) + b * 1000) / 1000.0;
 }
 
-//*** Event classes ***
+//*** Event struct ***
 
-class CollisionEvent : Event!(CollisionEvent)
+@event struct CollisionEvent
 {
-    this(Entity lA, Entity lB)
-    {
-        a = lA;
-        b = lB;
-    }
     Entity a, b;
 }
 

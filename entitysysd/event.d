@@ -18,43 +18,51 @@ along with EntitySysD. If not, see <http://www.gnu.org/licenses/>.
 */
 
 module entitysysd.event;
+import std.typecons;
 
 
-private alias ReceiverDelegate = void delegate(BaseEvent);
+enum event;
+
+private alias ReceiverDelegate = void delegate(...);
+
+private template isEvent(E)
+{
+    import std.typetuple : anySatisfy;
+    enum isEventAttr(D) = is(D == event);
+    static if(__traits(compiles, __traits(getAttributes, E)))
+        enum isEvent = (anySatisfy!(isEventAttr,
+                        __traits(getAttributes, E)));
+    else
+        enum isEvent = false;
+}
 
 // Used internally by the EventManager.
-class BaseEvent
+private struct BaseEventCounter
 {
-public:
-    alias Family = size_t;
-
-protected:
-    static Family mFamilyCounter = 0;
+    static size_t counter = 0;
 }
 
-
-class Event(Derived) : BaseEvent
+private struct EventCounter(Derived)
 {
 public:
-    /// Create a family id for each derived event
-    static Family family()
+    static size_t getId()
     {
-        static Family family = -1;
-        if (family == -1)
+        static size_t counter = -1;
+        if (counter == -1)
         {
-            family = mFamilyCounter;
-            mFamilyCounter++;
+            counter = mBaseEventCounter.counter;
+            mBaseEventCounter.counter++;
         }
 
-        return family;
+        return counter;
     }
+
+private:
+    BaseEventCounter mBaseEventCounter;
 }
 
-interface BaseReceiver
-{
-}
 
-interface Receiver(E) : BaseReceiver
+interface Receiver(E)
 {
     void receive(E event);
 }
@@ -64,24 +72,25 @@ class EventManager
 {
 public:
     void subscribe(E)(Receiver!E receiver)
+        if (isEvent!E)
     {
         ReceiverDelegate receive = cast(ReceiverDelegate)&receiver.receive;
-        auto eventFamily = E.family();
+        auto eventId = EventCounter!E.getId();
 
         // no subscriber for the event family, so create one, and we're done
-        if (!(eventFamily in mHandlers))
+        if (!(eventId in mHandlers))
         {
-            mHandlers[eventFamily] = [];
-            mHandlers[eventFamily] ~= receive;
+            mHandlers[eventId] = [];
+            mHandlers[eventId] ~= receive;
             return;
         }
 
         // already subscribed?
-        foreach (ref rcv; mHandlers[eventFamily])
+        foreach (ref rcv; mHandlers[eventId])
             assert(!(rcv == receive));
 
         // look for empty spots
-        foreach (ref rcv; mHandlers[eventFamily])
+        foreach (ref rcv; mHandlers[eventId])
             if (rcv is null)
             {
                 rcv = receive;
@@ -89,100 +98,131 @@ public:
             }
 
         // else append the subscriber callback to the array
-        mHandlers[eventFamily] ~= receive;
+        mHandlers[eventId] ~= receive;
     }
 
 
     void unsubscribe(E)(Receiver!E receiver)
+        if (isEvent!E)
     {
         ReceiverDelegate receive = cast(ReceiverDelegate)&receiver.receive;
-        auto eventFamily = E.family();
+        auto eventId = EventCounter!E.getId();
 
-        assert(eventFamily in mHandlers);
+        assert(eventId in mHandlers);
 
-        foreach (ref rcv; mHandlers[eventFamily])
+        foreach (ref rcv; mHandlers[eventId])
             if (rcv == receive)
                 rcv = null;
     }
 
-    void emit(E)(E event)
+    void emit(E)(in ref E event)
+        if (isEvent!E)
     {
-        auto eventFamily = E.family();
+        auto eventId = EventCounter!E.getId();
 
-        foreach (rcv; mHandlers[eventFamily])
+        foreach (rcv; mHandlers[eventId])
         {
             // already subscribed
             if (rcv !is null)
-                rcv(event);
+            {
+                auto rcvE = cast(void delegate(in E))rcv;
+                rcvE(event);
+            }
         }
     }
 
-    void emit(E, Args...)(Args args)
+    void emit(E, Args...)(auto ref Args args)
+        if (isEvent!E)
     {
-        auto event = new E(args);
+        auto event = E(args);
         emit(event);
     }
 
 private:
 
-    // For each family of event, we have a set of receiver-delegates
-    ReceiverDelegate[][BaseEvent.Family] mHandlers;
+    // For each id of event, we have a set of receiver-delegates
+    ReceiverDelegate[][size_t] mHandlers;
 }
 
+
+//******************************************************************************
+//***** UNIT-TESTS
+//******************************************************************************
+
+version(unittest)
+{
 
 import std.conv;
 import std.stdio;
 
+@event struct TestEvent
+{
+    string data;
+}
+
+@event struct IntEvent
+{
+    int data;
+}
+
+class TestReceiver0 : Receiver!TestEvent
+{
+    string str;
+
+    this(EventManager evtManager)
+    {
+        evtManager.subscribe!TestEvent(this);
+    }
+
+    void receive(TestEvent event)
+    {
+        str ~= event.data;
+    }
+}
+
+class TestReceiver1 : Receiver!IntEvent
+{
+    string str;
+
+    this(EventManager evtManager)
+    {
+        evtManager.subscribe!IntEvent(this);
+    }
+
+    void receive(IntEvent event)
+    {
+        str ~= to!string(event.data);
+    }
+}
+
+class TestReceiver2 : Receiver!TestEvent, Receiver!IntEvent
+{
+    string str;
+
+    this(EventManager evtManager)
+    {
+        evtManager.subscribe!TestEvent(this);
+        evtManager.subscribe!IntEvent(this);
+    }
+
+    void receive(TestEvent event)
+    {
+        str ~= event.data;
+    }
+    void receive(IntEvent event)
+    {
+        str ~= event.data.to!(string)();
+    }
+}
+
+}
+
 unittest
 {
-    //dmd -main -unittest entitysysd/event.d
-    static class TestEvent : Event!(TestEvent)
-    {
-        this(string str)
-        {
-            data = str.idup;
-        }
-
-        string data;
-    }
-
-    static class IntEvent : Event!(IntEvent)
-    {
-        this(int n)
-        {
-            data = n;
-        }
-
-        int data;
-    }
-
-    auto strEvt0 = new TestEvent("hello");
-    auto strEvt1 = new TestEvent("world");
-    auto intEvt0 = new IntEvent(123);
-    auto intEvt1 = new IntEvent(456);
-
-    //*** Check event family works fine ***
-    assert(strEvt0.family == 0);
-    assert(intEvt1.family == 1);
-    assert(strEvt0.family == 0);
-    assert(strEvt1.family == 0);
-    assert(intEvt0.family == 1);
-    assert(intEvt1.family == 1);
-
-    static class TestReceiver0 : Receiver!TestEvent
-    {
-        string str;
-
-        this(EventManager evtManager)
-        {
-            evtManager.subscribe!TestEvent(this);
-        }
-
-        void receive(TestEvent event)
-        {
-            str ~= event.data;
-        }
-    }
+    auto strEvt0 = TestEvent("hello");
+    auto strEvt1 = TestEvent("world");
+    auto intEvt0 = IntEvent(123);
+    auto intEvt1 = IntEvent(456);
 
     //*** create a new event manager ***
     auto evtManager = new EventManager;
@@ -196,41 +236,6 @@ unittest
     assert(testRcv0.str == "goodbye world");
 
     //*** test with multiple receiver and multiple events ***
-    static class TestReceiver1 : Receiver!IntEvent
-    {
-        string str;
-
-        this(EventManager evtManager)
-        {
-            evtManager.subscribe!IntEvent(this);
-        }
-
-        void receive(IntEvent event)
-        {
-            str ~= to!string(event.data);
-        }
-    }
-
-    static class TestReceiver2 : Receiver!TestEvent, Receiver!IntEvent
-    {
-        string str;
-
-        this(EventManager evtManager)
-        {
-            evtManager.subscribe!TestEvent(this);
-            evtManager.subscribe!IntEvent(this);
-        }
-
-        void receive(TestEvent event)
-        {
-            str ~= event.data;
-        }
-        void receive(IntEvent event)
-        {
-            str ~= event.data.to!(string)();
-        }
-    }
-
     auto testRcv1 = new TestReceiver1(evtManager);
     auto testRcv2 = new TestReceiver2(evtManager);
     testRcv0.str = ""; // reset string
