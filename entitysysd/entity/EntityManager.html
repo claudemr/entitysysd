@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<title>Class EntityManager</title>
+		<link rel="stylesheet" type="text/css" href="../../styles/ddox.css"/>
+		<link rel="stylesheet" href="../../prettify/prettify.css" type="text/css"/>
+		<script type="text/javascript" src="../../scripts/jquery.js">/**/</script>
+		<script type="text/javascript" src="../../prettify/prettify.js">/**/</script>
+		<script type="text/javascript" src="../../scripts/ddox.js">/**/</script>
+	</head>
+	<body onload="prettyPrint(); setupDdox();">
+		<nav id="main-nav">
+						<ul class="tree-view">
+							<li class=" tree-view">
+								<a href="#" class="package">entitysysd</a>
+						<ul class="tree-view">
+							<li>
+								<a href="../../entitysysd/entity.html" class="selected module">entity</a>
+							</li>
+							<li>
+								<a href="../../entitysysd/event.html" class=" module">event</a>
+							</li>
+							<li>
+								<a href="../../entitysysd/system.html" class=" module">system</a>
+							</li>
+						</ul>
+							</li>
+							<li>
+								<a href="../../entitysysd.html" class=" module">entitysysd</a>
+							</li>
+						</ul>
+				<noscript>
+					<p style="color: red">The search functionality needs JavaScript enabled</p>
+				</noscript>
+				<div id="symbolSearchPane" style="display: none">
+					<p>
+						<input id="symbolSearch" type="text" placeholder="Search for symbols" onchange="performSymbolSearch(24);" onkeypress="this.onchange();" onpaste="this.onchange();" oninput="this.onchange();"/>
+					</p>
+	<ul id="symbolSearchResults" style="display: none"></ul>
+	<script type="application/javascript" src="../../symbols.js"></script>
+	<script type="application/javascript">
+var symbolSearchRootDir = "../../";
+$('#symbolSearchPane').show();
+	</script>
+				</div>
+		</nav>
+		<div id="main-contents">
+			<h1>Class EntityManager</h1>
+			<section>
+				<p> Manages entities creation and component memory management.
+</p>
+
+					<section>
+						<h3>Inherits from</h3>
+						<ul>
+							<li>
+								<code class="prettyprint lang-d"><code class="prettyprint lang-d">Object</code></code>
+ (base class)
+							</li>
+						</ul>
+					</section>
+					<section>
+						<h3>Constructors</h3>
+						<table>
+							<col class="caption"/>
+							<tr>
+								<th>Name</th>
+								<th>Description</th>
+							</tr>
+							<tr>
+								<td>
+									<a href="../../entitysysd/entity/EntityManager.this.html" class="public">
+										<code>this</code>
+									</a>
+								</td>
+								<td> Constructor of the entity-manager. <a href="../../entitysysd/entity/EntityManager.this.html#eventManager"><code class="prettyprint lang-d">eventManager</code></a> may be used to notify
+ about entity creation and component registration. <a href="../../entitysysd/entity/EntityManager.this.html#maxComponent"><code class="prettyprint lang-d">maxComponent</code></a> sets
+ the maximum number of <a href="../../entitysysd/entity/EntityManager.components.html"><code class="prettyprint lang-d">components</code></a> supported by the whole manager. <a href="../../entitysysd/entity/EntityManager.this.html#poolSize"><code class="prettyprint lang-d">poolSize</code></a>
+ is the chunk <a href="../../entitysysd/entity/EntityManager.size.html"><code class="prettyprint lang-d">size</code></a> in bytes for each <a href="../../entitysysd/entity/EntityManager.components.html"><code class="prettyprint lang-d">components</code></a>.
+</td>
+							</tr>
+						</table>
+					</section>
+					<section>
+						<h3>Properties</h3>
+						<table>
+							<col class="caption"/>
+							<tr>
+								<th>Name</th>
+								<th>Type</th>
+								<th>Description</th>
+							</tr>
+							<tr>
+								<td>
+									<a href="../../entitysysd/entity/EntityManager.capacity.html" class="public property"><code>capacity</code></a>
+									<span class="tableEntryAnnotation">[get]</span>
+								</td>
+								<td class="typecol"><code class="prettyprint lang-d">ulong</code></td>
+								<td> Current <code class="prettyprint lang-d">capacity</code> entity.
+</td>
+							</tr>
+							<tr>
+								<td>
+									<a href="../../entitysysd/entity/EntityManager.components.html" class="public property"><code>components</code></a>
+									<span class="tableEntryAnnotation">[get]</span>
+								</td>
+								<td class="typecol"><code class="prettyprint lang-d"></code></td>
+								<td> Allows to browse through all the <a href="../../entitysysd/entity/EntityManager.valid.html"><code class="prettyprint lang-d">valid</code></a> instances of a component with
+ a foreach loop.
+</td>
+							</tr>
+							<tr>
+								<td>
+									<a href="../../entitysysd/entity/EntityManager.entitiesWith.html" class="public property"><code>entitiesWith</code></a>
+									<span class="tableEntryAnnotation">[get]</span>
+								</td>
+								<td class="typecol"><code class="prettyprint lang-d"></code></td>
+								<td> Allows to browse through the entities that have a required set of
+ <a href="../../entitysysd/entity/EntityManager.components.html"><code class="prettyprint lang-d">components</code></a>.
+</td>
+							</tr>
+							<tr>
+								<td>
+									<a href="../../entitysysd/entity/EntityManager.size.html" class="public property"><code>size</code></a>
+									<span class="tableEntryAnnotation">[get]</span>
+								</td>
+								<td class="typecol"><code class="prettyprint lang-d">ulong</code></td>
+								<td> Current number of managed entities.
+</td>
+							</tr>
+						</table>
+					</section>
+					<section>
+						<h3>Methods</h3>
+						<table>
+							<col class="caption"/>
+							<tr>
+								<th>Name</th>
+								<th>Description</th>
+							</tr>
+							<tr>
+								<td>
+									<a href="../../entitysysd/entity/EntityManager.create.html" class="public">
+										<code>create</code>
+									</a>
+								</td>
+								<td> Create an entity.
+</td>
+							</tr>
+							<tr>
+								<td>
+									<a href="../../entitysysd/entity/EntityManager.getEntity.html" class="public">
+										<code>getEntity</code>
+									</a>
+								</td>
+								<td> Returns an entity from an an entity-<a href="../../entitysysd/entity/EntityManager.getEntity.html#id"><code class="prettyprint lang-d">id</code></a>
+</td>
+							</tr>
+							<tr>
+								<td>
+									<a href="../../entitysysd/entity/EntityManager.opApply.html" class="public">
+										<code>opApply</code>
+									</a>
+								</td>
+								<td> Allows to browse through all the <a href="../../entitysysd/entity/EntityManager.valid.html"><code class="prettyprint lang-d">valid</code></a> entities of the manager with
+ a foreach loop.
+</td>
+							</tr>
+							<tr>
+								<td>
+									<a href="../../entitysysd/entity/EntityManager.valid.html" class="public">
+										<code>valid</code>
+									</a>
+								</td>
+								<td> Return true if the given entity ID is still <code class="prettyprint lang-d">valid</code>.
+</td>
+							</tr>
+						</table>
+					</section>
+
+			</section>
+			<section>
+				<h2>Authors</h2>
+<p>Claude Merle
+</p>
+
+			</section>
+			<section>
+				<h2>Copyright</h2>
+<p>© 2015 Claude Merle
+</p>
+
+			</section>
+			<section>
+				<h2>License</h2>
+<p>This file is part of EntitySysD.
+</p>
+
+<p>EntitySysD is free software: you can redistribute it and/or modify it
+under the terms of the Lesser GNU General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+</p>
+
+<p>EntitySysD is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+Lesser GNU General Public License for more details.
+</p>
+
+<p>You should have received a copy of the Lesser GNU General Public License
+along with EntitySysD. If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>.
+</p>
+
+			</section>
+		</div>
+	</body>
+</html>
