@@ -1,7 +1,9 @@
-/*
-Copyright 2015 Claude Merle
+/**
+Component facilities module.
 
-This file is part of EntitySysD.
+Copyright: © 2015 Claude Merle
+Authors: Claude Merle
+License: This file is part of EntitySysD.
 
 EntitySysD is free software: you can redistribute it and/or modify it
 under the terms of the Lesser GNU General Public License as published
@@ -14,7 +16,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 Lesser GNU General Public License for more details.
 
 You should have received a copy of the Lesser GNU General Public License
-along with EntitySysD. If not, see <http://www.gnu.org/licenses/>.
+along with EntitySysD. If not, see $(LINK http://www.gnu.org/licenses/).
 */
 
 module entitysysd.component;
