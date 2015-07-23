@@ -1,4 +1,8 @@
 .dub
 entitysysd_example
 out/*
-doc/*
+doc/*.html
+doc/*.json
+doc/public/*.html
+doc/public/*.*
+doc/public/entitysysd/*

@@ -16,8 +16,9 @@ doc:
 	../ddox/ddox generate-html --navigation-type=ModuleTree \
 		doc/docs.json doc/public
 
-.PHONY: clean unittest doc
+.PHONY: clean doc unittest
 
 clean:
 	rm -rf out
-	rm -rf doc
+	rm doc/public/*.*
+	rm -rf doc/public/entitysysd
