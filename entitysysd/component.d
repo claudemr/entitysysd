@@ -26,9 +26,10 @@ template isComponent(C)
 {
     import std.typetuple : anySatisfy;
     enum isComponentAttr(D) = is(D == component);
-    static if(__traits(compiles, __traits(getAttributes, C)))
-        enum isComponent = (anySatisfy!(isComponentAttr,
-                                        __traits(getAttributes, C)));
+    static if (__traits(compiles, __traits(getAttributes, C)))
+        enum isComponent = anySatisfy!(isComponentAttr,
+                                       __traits(getAttributes, C)) &&
+                           (is(C == struct) || is(C == union));
     else
         enum isComponent = false;
 }
@@ -76,12 +77,19 @@ unittest
         int a, b;
     }
 
-    @component class TestComponent1
+    @component class TestComponent1 // component cannot be a class
     {
         string str;
     }
 
+    @component union TestComponent2
+    {
+        float f;
+        uint  u;
+    }
+
     static assert(!isComponent!int);
     static assert(isComponent!TestComponent0);
-    static assert(isComponent!TestComponent1);
+    static assert(!isComponent!TestComponent1);
+    static assert(isComponent!TestComponent2);
 }

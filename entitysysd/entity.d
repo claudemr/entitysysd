@@ -246,8 +246,13 @@ public:
         const auto uniqueId = id.uniqueId;
         assert(!mEntityComponentMask[uniqueId-1][compId]);
 
-        // Placement new into the component pool.
-        auto pool = accomodateComponent!(C)();
+        // place new component into the pools
+        if (mComponentPools.length <= compId)
+        {
+            mComponentPools.length = compId + 1;
+            mComponentPools[compId] = new Pool!C(mIndexCounter);
+        }
+        auto pool = cast(Pool!C)mComponentPools[compId];
 
         // Set the bit for this component.
         mEntityComponentMask[uniqueId-1][compId] = true;
@@ -433,19 +438,6 @@ private:
                 pool.accomodate(mIndexCounter);
         }
     }
-
-    Pool!C accomodateComponent(C)()
-    {
-        auto compId = componentId!C();
-
-        if (mComponentPools.length <= compId)
-        {
-            mComponentPools.length = compId + 1;
-            mComponentPools[compId] = new Pool!C(mIndexCounter);
-        }
-        return cast(Pool!C)mComponentPools[compId];
-    }
-
 
     // Current number of Entities
     uint            mIndexCounter = 0;

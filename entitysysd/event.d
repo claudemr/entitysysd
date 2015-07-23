@@ -30,8 +30,9 @@ private template isEvent(E)
     import std.typetuple : anySatisfy;
     enum isEventAttr(D) = is(D == event);
     static if(__traits(compiles, __traits(getAttributes, E)))
-        enum isEvent = (anySatisfy!(isEventAttr,
-                        __traits(getAttributes, E)));
+        enum isEvent = anySatisfy!(isEventAttr,
+                                   __traits(getAttributes, E)) &&
+             (is(E == struct) || is(E == union));
     else
         enum isEvent = false;
 }
