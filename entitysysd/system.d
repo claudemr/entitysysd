@@ -26,6 +26,7 @@ import std.range;
 
 import entitysysd.entity;
 import entitysysd.event;
+import entitysysd.exception;
 
 
 /**
@@ -50,16 +51,14 @@ public:
     void register(System system)
     {
         auto sysNode = mSystems[].find(system);
-        if (!sysNode.empty)
-            return;
+        enforce!SystemException(sysNode.empty);
         mSystems ~= system;
     }
 
     void unregister(System system)
     {
         auto sysNode = mSystems[].find(system);
-        if (sysNode.empty)
-            return;
+        enforce!SystemException(!sysNode.empty);
         mSystems.linearRemove(sysNode.take(1));
     }
 

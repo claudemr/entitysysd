@@ -25,9 +25,9 @@ import std.string;
 
 import entitysysd.component;
 import entitysysd.event;
+import entitysysd.exception;
 import entitysysd.pool;
 public import entitysysd.component : component;
-
 
 struct Entity
 {
@@ -77,7 +77,7 @@ public:
 
     void destroy()
     {
-        assert(valid);
+        enforce!EntityException(valid);
         mManager.destroy(mId);
         invalidate();
     }
@@ -101,35 +101,35 @@ public:
     C* register(C)()
         if (isComponent!C)
     {
-        assert(valid);
+        enforce!EntityException(valid);
         return mManager.register!C(mId);
     }
 
     void unregister(C)()
         if (isComponent!C)
     {
-        assert(valid);
+        enforce!EntityException(valid);
         mManager.unregister!C(mId);
     }
 
     C* component(C)() @property
         if (isComponent!C)
     {
-        assert(valid);
+        enforce!EntityException(valid);
         return mManager.getComponent!(C)(mId);
     }
 
     void component(C)(C c) @property
         if (isComponent!C)
     {
-        assert(valid);
+        enforce!EntityException(valid);
         *mManager.getComponent!(C)(mId) = c;
     }
 
     bool isRegistered(C)()
         if (isComponent!C)
     {
-        assert(valid);
+        enforce!EntityException(valid);
         return mManager.isRegistered!C(mId);
     }
 
@@ -211,93 +211,13 @@ public:
 
         Entity entity = Entity(this, Entity.Id(uniqueId, versionId));
 
-        //todo ?
-        //mEventManager.emit!(EntityCreatedEvent)(entity);
         return entity;
-    }
-
-    void destroy(Entity.Id id)
-    {
-        assertValid(id);
-
-        uint uniqueId = id.uniqueId;
-
-        // reset all components for that entity
-        foreach (ref bit; mEntityComponentMask[uniqueId-1])
-            bit = 0;
-        // invalidate its version, incrementing it
-        mEntityVersions[uniqueId-1]++;
-        mFreeIds.insertFront(uniqueId);
-        mNbFreeIds++;
     }
 
     Entity getEntity(Entity.Id id)
     {
-        assertValid(id);
+        enforce!EntityException(valid(id));
         return Entity(this, id);
-    }
-
-    C* register(C)(Entity.Id id)
-        if (isComponent!C)
-    {
-        assertValid(id);
-        const auto compId = componentId!(C)();
-        assert(compId < mMaxComponent);
-        const auto uniqueId = id.uniqueId;
-        assert(!mEntityComponentMask[uniqueId-1][compId]);
-
-        // place new component into the pools
-        if (mComponentPools.length <= compId)
-        {
-            mComponentPools.length = compId + 1;
-            mComponentPools[compId] = new Pool!C(mIndexCounter);
-        }
-        auto pool = cast(Pool!C)mComponentPools[compId];
-
-        // Set the bit for this component.
-        mEntityComponentMask[uniqueId-1][compId] = true;
-
-        return &pool[uniqueId-1];
-    }
-
-    void unregister(C)(Entity.Id id)
-        if (isComponent!C)
-    {
-        assertValid(id);
-        const auto compId = componentId!(C)();
-        assert(compId < mMaxComponent);
-        const auto uniqueId = id.uniqueId;
-        assert(mEntityComponentMask[uniqueId-1][compId]);
-
-        // Remove component bit.
-        mEntityComponentMask[uniqueId-1][compId] = false;
-    }
-
-    bool isRegistered(C)(Entity.Id id)
-        if (isComponent!C)
-    {
-        assertValid(id);
-        const auto compId = componentId!(C)();
-        const auto uniqueId = id.uniqueId;
-
-        if (compId >= mMaxComponent)
-            return false;
-
-        return mEntityComponentMask[uniqueId-1][compId];
-    }
-
-    C* getComponent(C)(Entity.Id id)
-        if (isComponent!C)
-    {
-        assertValid(id);
-        const auto compId = componentId!(C)();
-        assert(compId < mMaxComponent);
-        const auto uniqueId = id.uniqueId;
-        assert(mEntityComponentMask[uniqueId-1][compId]);
-
-        // Placement new into the component pool.
-        Pool!C pool = cast(Pool!C)mComponentPools[compId];
-        return &pool[uniqueId-1];
     }
 
     //*** Browsing features ***
@@ -335,6 +255,7 @@ public:
      * a foreach loop.
      */
     struct ComponentView(C)
+        if (isComponent!C)
     {
         this(EntityManager em)
         {
@@ -374,6 +295,7 @@ public:
      * components.
      */
     struct EntitiesWithView(CList...)
+        if (areComponents!CList)
     {
         this(EntityManager em)
         {
@@ -415,10 +337,76 @@ public:
     }
 
 private:
-    void assertValid(Entity.Id id)
+    void destroy(Entity.Id id)
     {
-        assert(id.uniqueId-1 < mEntityComponentMask.length, "Entity.Id ID outside entity vector range");
-        assert(mEntityVersions[id.uniqueId-1] == id.versionId, "Attempt to access Entity via an obsolete Entity.Id");
+        uint uniqueId = id.uniqueId;
+
+        // reset all components for that entity
+        foreach (ref bit; mEntityComponentMask[uniqueId-1])
+            bit = 0;
+        // invalidate its version, incrementing it
+        mEntityVersions[uniqueId-1]++;
+        mFreeIds.insertFront(uniqueId);
+        mNbFreeIds++;
+    }
+
+    C* register(C)(Entity.Id id)
+        if (isComponent!C)
+    {
+        const auto compId = componentId!(C)();
+        enforce!ComponentException(compId < mMaxComponent);
+        const auto uniqueId = id.uniqueId;
+        enforce!ComponentException(!mEntityComponentMask[uniqueId-1][compId]);
+
+        // place new component into the pools
+        if (mComponentPools.length <= compId)
+        {
+            mComponentPools.length = compId + 1;
+            mComponentPools[compId] = new Pool!C(mIndexCounter);
+        }
+        auto pool = cast(Pool!C)mComponentPools[compId];
+
+        // Set the bit for this component.
+        mEntityComponentMask[uniqueId-1][compId] = true;
+
+        return &pool[uniqueId-1];
+    }
+
+    void unregister(C)(Entity.Id id)
+        if (isComponent!C)
+    {
+        const auto compId = componentId!(C)();
+        enforce!ComponentException(compId < mMaxComponent);
+        const auto uniqueId = id.uniqueId;
+        enforce!ComponentException(mEntityComponentMask[uniqueId-1][compId]);
+
+        // Remove component bit.
+        mEntityComponentMask[uniqueId-1][compId] = false;
+    }
+
+    bool isRegistered(C)(Entity.Id id)
+        if (isComponent!C)
+    {
+        const auto compId = componentId!(C)();
+        const auto uniqueId = id.uniqueId;
+
+        if (compId >= mMaxComponent)
+            return false;
+
+        return mEntityComponentMask[uniqueId-1][compId];
+    }
+
+    C* getComponent(C)(Entity.Id id)
+        if (isComponent!C)
+    {
+        const auto compId = componentId!(C)();
+        enforce!ComponentException(compId < mMaxComponent);
+        const auto uniqueId = id.uniqueId;
+        enforce!ComponentException(mEntityComponentMask[uniqueId-1][compId]);
+
+        // Placement new into the component pool.
+        Pool!C pool = cast(Pool!C)mComponentPools[compId];
+        return &pool[uniqueId-1];
     }
 
     size_t componentId(C)()

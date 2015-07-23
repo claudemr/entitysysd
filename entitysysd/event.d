@@ -18,7 +18,10 @@ along with EntitySysD. If not, see <http://www.gnu.org/licenses/>.
 */
 
 module entitysysd.event;
+
 import std.typecons;
+
+import entitysysd.exception;
 
 
 enum event;
@@ -32,7 +35,7 @@ private template isEvent(E)
     static if(__traits(compiles, __traits(getAttributes, E)))
         enum isEvent = anySatisfy!(isEventAttr,
                                    __traits(getAttributes, E)) &&
-             (is(E == struct) || is(E == union));
+                       (is(E == struct) || is(E == union));
     else
         enum isEvent = false;
 }
@@ -88,7 +91,7 @@ public:
 
         // already subscribed?
         foreach (ref rcv; mHandlers[eventId])
-            assert(!(rcv == receive));
+            enforce!EventException(!(rcv == receive));
 
         // look for empty spots
         foreach (ref rcv; mHandlers[eventId])
@@ -109,7 +112,7 @@ public:
         ReceiverDelegate receive = cast(ReceiverDelegate)&receiver.receive;
         auto eventId = EventCounter!E.getId();
 
-        assert(eventId in mHandlers);
+        enforce!EventException(eventId in mHandlers);
 
         foreach (ref rcv; mHandlers[eventId])
             if (rcv == receive)

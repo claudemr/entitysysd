@@ -70,13 +70,11 @@ class Pool(T, size_t ChunkSize = 8192) : BasePool
 
     ref T opIndex(size_t n)
     {
-        assert(n < nbElements);
         return *getPtr(n);
     }
 
     T opIndexAssign(T t, size_t n)
     {
-        assert(n < nbElements);
         *getPtr(n) = t;
         return t;
     }

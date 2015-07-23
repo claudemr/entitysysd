@@ -17,23 +17,38 @@ You should have received a copy of the Lesser GNU General Public License
 along with EntitySysD. If not, see <http://www.gnu.org/licenses/>.
 */
 
-module entitysysd;
+module entitysysd.exception;
 
-public import entitysysd.entity;
-public import entitysysd.event;
-public import entitysysd.exception;
-public import entitysysd.system;
+public import std.exception;
 
-class EntitySysD
+class EntityException : Exception
 {
-    this(size_t maxComponent = 64, size_t poolSize = 8192)
+    this(string msg, string file = null, size_t line = 0) @safe pure nothrow
     {
-        events   = new EventManager;
-        entities = new EntityManager(events, maxComponent, poolSize);
-        systems  = new SystemManager(entities, events);
+        super(msg, file, line);
     }
+}
 
-    EventManager  events;
-    EntityManager entities;
-    SystemManager systems;
+class ComponentException : Exception
+{
+    this(string msg, string file = null, size_t line = 0) @safe pure nothrow
+    {
+        super(msg, file, line);
+    }
+}
+
+class EventException : Exception
+{
+    this(string msg, string file = null, size_t line = 0) @safe pure nothrow
+    {
+        super(msg, file, line);
+    }
+}
+
+class SystemException : Exception
+{
+    this(string msg, string file = null, size_t line = 0) @safe pure nothrow
+    {
+        super(msg, file, line);
+    }
 }
