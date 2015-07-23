@@ -30,14 +30,20 @@ import entitysysd.exception;
 
 
 /**
- * System interface.
+ * System interface. System class has to derive it and implement run.
  */
 interface System
 {
+    /**
+     * Called by the system-manager anytime its method run is called.
+     */
     void run(EntityManager entities, EventManager events, Duration dt);
 }
 
 
+/**
+ * Entry point for systems. Allow to register systems.
+ */
 class SystemManager
 {
 public:
@@ -48,6 +54,11 @@ public:
         mEventManager  = eventManager;
     }
 
+    /**
+     * Register a new system.
+     *
+     * Throws: SystemException if the system was already registered.
+     */
     void register(System system)
     {
         auto sysNode = mSystems[].find(system);
@@ -55,6 +66,11 @@ public:
         mSystems ~= system;
     }
 
+    /**
+     * Unregister a system.
+     *
+     * Throws: SystemException if the system was not registered.
+     */
     void unregister(System system)
     {
         auto sysNode = mSystems[].find(system);
@@ -62,6 +78,11 @@ public:
         mSystems.linearRemove(sysNode.take(1));
     }
 
+    /**
+     * Run all the registered systems.
+     *
+     * They are runt in the order that they were registered.
+     */
     void run(Duration dt)
     {
         foreach (s; mSystems)

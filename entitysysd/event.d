@@ -65,16 +65,55 @@ private:
     BaseEventCounter mBaseEventCounter;
 }
 
-
+/**
+ * Any receiver class needs to derive from this interface using a specific event
+ * type and implement receive.
+ */
 interface Receiver(E)
+    if (isEvent!E)
 {
+    /**
+     * Will be called each time an event of type E is emitted.
+     */
     void receive(E event);
 }
 
+///
+unittest
+{
+    @event struct MyEvent
+    {
+        int data;
+    }
 
+    class MySystem : Receiver!MyEvent
+    {
+        this(EventManager evtManager)
+        {
+            evtManager.subscribe!MyEvent(this);
+        }
+
+        void receive(MyEvent event)
+        {
+            import std.stdio : write;
+            // do something with event
+            write(event.data);
+        }
+    }
+}
+
+/**
+ * Manages events and receivers.
+ */
 class EventManager
 {
 public:
+    /**
+     * Subscribe a receiver class instance to an event.
+     *
+     * Throws: EventException if the receiver is already subscribed to that
+     *         event.
+     */
     void subscribe(E)(Receiver!E receiver)
         if (isEvent!E)
     {
@@ -105,7 +144,12 @@ public:
         mHandlers[eventId] ~= receive;
     }
 
-
+    /**
+     * Unsubscribe a receiver class instance from an event.
+     *
+     * Throws: EventException if the receiver was not subscribed to that
+     *         event.
+     */
     void unsubscribe(E)(Receiver!E receiver)
         if (isEvent!E)
     {
@@ -119,6 +163,11 @@ public:
                 rcv = null;
     }
 
+    /**
+     * Emit an event.
+     *
+     * It will be dispatched to all receivers that subscribed to it.
+     */
     void emit(E)(in ref E event)
         if (isEvent!E)
     {
@@ -138,11 +187,28 @@ public:
         }
     }
 
+    /** ditto */
     void emit(E, Args...)(auto ref Args args)
         if (isEvent!E)
     {
         auto event = E(args);
         emit(event);
+    }
+
+    ///
+    unittest
+    {
+        @event struct MyEvent
+        {
+            int data;
+        }
+
+        auto em = new EventManager;
+
+        auto e = MyEvent(43);
+
+        em.emit(e);
+        em.emit!MyEvent(42);
     }
 
 private:

@@ -29,6 +29,11 @@ import entitysysd.exception;
 import entitysysd.pool;
 public import entitysysd.component : component;
 
+/**
+ * Entity structure.
+ *
+ * This is the combination of two 32-bits id: a unique-id and a version-id.
+ */
 struct Entity
 {
 public:
@@ -75,6 +80,11 @@ public:
         mId = id;
     }
 
+    /**
+     * Destroy the entity.
+     *
+     * Throws: EntityException if the entity is invalid.
+     */
     void destroy()
     {
         enforce!EntityException(valid);
@@ -82,22 +92,42 @@ public:
         invalidate();
     }
 
+    /**
+     * Tells whether the entity is valid.
+     *
+     * Returns: true if the entity is valid, false otherwise.
+     */
     bool valid() @property
     {
         return mManager !is null && mManager.valid(mId);
     }
 
+    /**
+     * Invalidate the entity instance (but does not destroy it).
+     */
     void invalidate()
     {
         mId = invalid;
         mManager = null;
     }
 
+    /**
+     * Returns the id of the entity.
+     */
     Id id() const @property
     {
         return mId;
     }
 
+    /**
+     * Register a component C to an entity.
+     *
+     * Returns: A pointer on the component for this entity.
+     *
+     * Throws: EntityException if the entity is invalid.
+     *         ComponentException if there is no room for that component or if
+     *                            if the component is already registered.
+     */
     C* register(C)()
         if (isComponent!C)
     {
@@ -105,6 +135,12 @@ public:
         return mManager.register!C(mId);
     }
 
+    /**
+     * Unregister a component C from an entity.
+     *
+     * Throws: EntityException if the entity is invalid.
+     *         ComponentException if the component is not registered.
+     */
     void unregister(C)()
         if (isComponent!C)
     {
@@ -112,6 +148,14 @@ public:
         mManager.unregister!C(mId);
     }
 
+    /**
+     * Get a component pointer of the entity.
+     *
+     * Returns: A pointer on the component for this entity.
+     *
+     * Throws: EntityException if the entity is invalid.
+     *         ComponentException if the component is not registered.
+     */
     C* component(C)() @property
         if (isComponent!C)
     {
@@ -119,13 +163,27 @@ public:
         return mManager.getComponent!(C)(mId);
     }
 
-    void component(C)(C c) @property
+    /**
+     * Set the value of a component of the entity.
+     *
+     * Throws: EntityException if the entity is invalid.
+     *         ComponentException if the component is not registered.
+     */
+    void component(C)(auto ref C c) @property
         if (isComponent!C)
     {
         enforce!EntityException(valid);
         *mManager.getComponent!(C)(mId) = c;
     }
 
+    /**
+     * Set the value of a component of the entity.
+     *
+     * Returns: true if the component is registered to the entity,
+     *          false otherwise.
+     *
+     * Throws: EntityException if the entity is invalid.
+     */
     bool isRegistered(C)()
         if (isComponent!C)
     {
@@ -133,11 +191,20 @@ public:
         return mManager.isRegistered!C(mId);
     }
 
+    /**
+     * Compare two entities and tells whether they are the same (same id).
+     */
     bool opEquals()(auto const ref Entity lEntity) const
     {
         return id == lEntity.id;
     }
 
+    /**
+     * Returns a string representation of an entity.
+     *
+     * It has the form: #uid:vid where uid is the unique-id and
+     * vid is the version-id
+     */
     string toString()
     {
         return mId.toString();
@@ -150,11 +217,17 @@ private:
 
 
 /**
- * Manages Entity.Id creation and component assignment.
+ * Manages entities creation and component memory management.
  */
 class EntityManager
 {
 public:
+    /**
+     * Constructor of the entity-manager. eventManager may be used to notify
+     * about entity creation and component registration. maxComponent sets
+     * the maximum number of components supported by the whole manager. poolSize
+     * is the chunk size in bytes for each components.
+     */
     this(EventManager eventManager,
          size_t maxComponent = 64,
          size_t poolSize     = 8192)
@@ -165,7 +238,7 @@ public:
     }
 
     /**
-     * Number of managed entities.
+     * Current number of managed entities.
      */
     size_t size() @property
     {
@@ -173,7 +246,7 @@ public:
     }
 
     /**
-     * Current entity capacity.
+     * Current capacity entity.
      */
     size_t capacity() @property
     {
@@ -190,6 +263,11 @@ public:
                mEntityVersions[id.uniqueId-1] == id.versionId;
     }
 
+    /**
+     * Create an entity.
+     *
+     * Returns: a new valid entity.
+     */
     Entity create()
     {
         uint uniqueId, versionId;
@@ -214,6 +292,13 @@ public:
         return entity;
     }
 
+    /**
+     * Returns an entity from an an entity-id
+     *
+     * Returns: the entity from the id.
+     *
+     * Throws: EntityException if the id is invalid.
+     */
     Entity getEntity(Entity.Id id)
     {
         enforce!EntityException(valid(id));
@@ -254,85 +339,84 @@ public:
      * Allows to browse through all the valid instances of a component with
      * a foreach loop.
      */
-    struct ComponentView(C)
+    auto components(C)() @property
         if (isComponent!C)
     {
-        this(EntityManager em)
+        struct ComponentView(C)
+            if (isComponent!C)
         {
-            entityManager = em;
-        }
-
-        int opApply(int delegate(C* component) dg)
-        {
-            int result = 0;
-
-            auto compId = entityManager.componentId!C();
-            Pool!C pool = cast(Pool!C)entityManager.mComponentPools[compId];
-
-            for (int i; i < pool.nbElements; i++)
+            this(EntityManager em)
             {
-                if (!entityManager.mEntityComponentMask[i][compId])
-                    continue;
-                result = dg(&pool[i]);
-                if (result)
-                    break;
+                entityManager = em;
             }
 
-            return result;
+            int opApply(int delegate(C* component) dg)
+            {
+                int result = 0;
+
+                auto compId = entityManager.componentId!C();
+                Pool!C pool = cast(Pool!C)entityManager.mComponentPools[compId];
+
+                for (int i; i < pool.nbElements; i++)
+                {
+                    if (!entityManager.mEntityComponentMask[i][compId])
+                        continue;
+                    result = dg(&pool[i]);
+                    if (result)
+                        break;
+                }
+
+                return result;
+            }
+
+            EntityManager entityManager;
         }
 
-        EntityManager entityManager;
-    }
-
-    ComponentView!C components(C)() @property
-        if (isComponent!C)
-    {
         return ComponentView!C(this);
     }
+
 
     /**
      * Allows to browse through the entities that have a required set of
      * components.
      */
-    struct EntitiesWithView(CList...)
+    auto entitiesWith(CList...)() @property
         if (areComponents!CList)
     {
-        this(EntityManager em)
+        struct EntitiesWithView(CList...)
+            if (areComponents!CList)
         {
-            entityManager = em;
-        }
-
-        int opApply(int delegate(Entity entity) dg)
-        {
-            int result = 0;
-
-            entityLoop: foreach (i, ref componentMask;
-                                 entityManager.mEntityComponentMask)
+            this(EntityManager em)
             {
-                foreach (C; CList)
-                {
-                    auto compId = entityManager.componentId!C();
-                    if (!componentMask[compId])
-                        continue entityLoop;
-                }
-
-                auto versionId = entityManager.mEntityVersions[i];
-                result = dg(Entity(entityManager,
-                                   Entity.Id(cast(uint)i+1, versionId)));
-                if (result)
-                    break;
+                entityManager = em;
             }
 
-            return result;
+            int opApply(int delegate(Entity entity) dg)
+            {
+                int result = 0;
+
+                entityLoop: foreach (i, ref componentMask;
+                                     entityManager.mEntityComponentMask)
+                {
+                    foreach (C; CList)
+                    {
+                        auto compId = entityManager.componentId!C();
+                        if (!componentMask[compId])
+                            continue entityLoop;
+                    }
+
+                    auto versionId = entityManager.mEntityVersions[i];
+                    result = dg(Entity(entityManager,
+                                       Entity.Id(cast(uint)i+1, versionId)));
+                    if (result)
+                        break;
+                }
+
+                return result;
+            }
+
+            EntityManager entityManager;
         }
-
-        EntityManager entityManager;
-    }
-
-    //todo check CList
-    EntitiesWithView!(CList) entitiesWith(CList...)() @property
-        if (areComponents!CList)
-    {
         return EntitiesWithView!(CList)(this);
     }
 
