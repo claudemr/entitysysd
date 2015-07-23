@@ -124,6 +124,9 @@ public:
     {
         auto eventId = EventCounter!E.getId();
 
+        if (mHandlers.length == 0) // no event-receiver registered yet
+            return;
+
         foreach (rcv; mHandlers[eventId])
         {
             // already subscribed
