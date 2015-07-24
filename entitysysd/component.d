@@ -27,19 +27,21 @@ enum component;
 template isComponent(C)
 {
     import std.typetuple : anySatisfy;
-    enum isComponentAttr(D) = is(D == component);
+        import std.traits : isIntegral;
+
+    enum bool isComponentAttr(D) = is(D == component);
     static if (__traits(compiles, __traits(getAttributes, C)))
-        enum isComponent = anySatisfy!(isComponentAttr,
-                                       __traits(getAttributes, C)) &&
-                           (is(C == struct) || is(C == union));
+        enum bool isComponent = anySatisfy!(isComponentAttr,
+                                            __traits(getAttributes, C)) &&
+                                (is(C == struct) || is(C == union));
     else
-        enum isComponent = false;
+        enum bool isComponent = false;
 }
 
 template areComponents(CList...)
 {
     import std.typetuple : allSatisfy;
-    enum areComponents = allSatisfy!(isComponent, CList);
+    enum bool areComponents = allSatisfy!(isComponent, CList);
 }
 
 

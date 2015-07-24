@@ -132,11 +132,14 @@ public:
      *         ComponentException if there is no room for that component or if
      *                            if the component is already registered.
      */
-    C* register(C)()
+    C* register(C, Args...)(Args args)
         if (isComponent!C)
     {
         enforce!EntityException(valid);
-        return mManager.register!C(mId);
+        auto component = mManager.register!C(mId);
+        static if (Args.length != 0)
+            *component = C(args);
+        return component;
     }
 
     /**
@@ -219,6 +222,21 @@ private:
     Id            mId = invalid;
 }
 
+///
+unittest
+{
+    @component struct Position
+    {
+        float x, y;
+    }
+
+    auto em = new EntityManager(new EventManager);
+    auto entity = em.create();
+    auto posCompPtr = entity.register!Position(2.0, 3.0);
+    assert(posCompPtr == entity.component!Position &&
+           posCompPtr.x == 2.0 &&
+           entity.component!Position.y == 3.0);
+}
 
 /**
  * Manages entities creation and component memory management.
