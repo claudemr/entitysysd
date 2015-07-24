@@ -1,5 +1,15 @@
 _OBJ = component.o entity.o exception.o event.o package.o pool.o system.o
 OBJ = $(patsubst %,out/%,$(_OBJ))
+DDOX = ../ddox/ddox
+
+help:
+	@echo "Build and run unit-tests:"
+	@echo "    make unittest"
+	@echo "Generate ddox documentation:"
+	@echo "    make doc"
+	@echo "Clean all output files from unittest and doc:"
+	@echo "    make clean"
+
 
 out/%.o: entitysysd/%.d
 	dmd -c -odout -unittest $<
@@ -10,13 +20,13 @@ unittest: $(OBJ)
 
 doc:
 	dmd -o- -c -D -Dddoc -X -Xfdoc/docs.json entitysysd/*.d
-	../ddox/ddox filter --min-protection=Public doc/docs.json \
+	$(DDOX) filter --min-protection=Public doc/docs.json \
 		--ex entitysysd.pool --ex entitysysd.exception \
 		--ex entitysysd.component
-	../ddox/ddox generate-html --navigation-type=ModuleTree \
+	$(DDOX) generate-html --navigation-type=ModuleTree \
 		doc/docs.json doc/public
 
-.PHONY: clean doc unittest
+.PHONY: clean doc unittest help
 
 clean:
 	rm -rf out
