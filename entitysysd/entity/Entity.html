@@ -211,6 +211,21 @@ $('#symbolSearchPane').show();
 							</tr>
 						</table>
 					</section>
+<section><h3>Example</h3>
+
+<pre class="code prettyprint lang-d">@<a href="../../entitysysd/entity/Entity.component.html">component</a> struct Position
+{
+	float x, y;
+}
+
+auto em = new <a href="../../entitysysd/entity/EntityManager.html">EntityManager</a>(new EventManager);
+auto entity = em.create();
+auto posCompPtr = entity.register!Position(2.0, 3.0);
+assert(posCompPtr == entity.component!Position &&
+	   posCompPtr.x == 2.0 &&
+       entity.component!Position.y == 3.0);
+</pre>
+</section>
 
 			</section>
 			<section>
