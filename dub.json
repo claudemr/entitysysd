@@ -7,6 +7,9 @@
     "authors": [
         "Claude Merle"
     ],
+    "importPaths": [
+        "."
+    ],
     "configurations": [
         {
             "name": "library",
