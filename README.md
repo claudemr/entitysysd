@@ -190,6 +190,15 @@ Use dub to build and run it:
 dub --config=example
 ```
 
+## Thread-safety
+
+**EntitySysD** API is NOT (and will not be) thread-safe. Events will never be
+natively sent accross threads. If the user wants to use EntitySysD in a
+multi-threaded process, he will have to do its own resource synchronization on
+top of it.
+Thread-safety adds too much complexity. And from a software architecture point
+of view, it makes more sense to manage resource synchronization at the highest
+level. **EntitySysD** is just a library.
 
 ## Credits
 
@@ -237,5 +246,4 @@ It has been tested on GNU-Linux environment using DMD64 D Compiler v2.067.1.
 Todo's:
 * Implement ranges.
 * Implement dependencies.
-* Implement inter-thread events, make everything thread-safe.
-* Check const-ness, immutability for component and event structures.
+* Check field qualifiers for events.
