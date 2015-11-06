@@ -24,16 +24,26 @@ module entitysysd.component;
 // UDA for component types
 enum component;
 
+/**
+ * To a be a valid component, $(D C) must:
+ * - be a $(D struct) or $(D union)
+ * - have the UDA $(D component)
+ * - must contain only mutable or const fields (no $(D immutable), $(D inout) or
+ *   $(D shared) qualifiers)
+ */
 template isComponent(C)
 {
-    import std.typetuple : anySatisfy;
-        import std.traits : isIntegral;
+    import std.typetuple : anySatisfy, allSatisfy;
+    import std.traits : RepresentationTypeTuple, isMutable;
 
+    enum bool isMutableOrConst(F) = isMutable!(F) || is(F == const);
     enum bool isComponentAttr(D) = is(D == component);
     static if (__traits(compiles, __traits(getAttributes, C)))
-        enum bool isComponent = anySatisfy!(isComponentAttr,
+        enum bool isComponent = (is(C == struct) || is(C == union)) &&
+                                anySatisfy!(isComponentAttr,
                                             __traits(getAttributes, C)) &&
-                                (is(C == struct) || is(C == union));
+                                allSatisfy!(isMutableOrConst,
+                                            RepresentationTypeTuple!C);
     else
         enum bool isComponent = false;
 }

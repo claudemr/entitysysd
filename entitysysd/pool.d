@@ -21,6 +21,16 @@ along with EntitySysD. If not, see $(LINK http://www.gnu.org/licenses/).
 
 module entitysysd.pool;
 
+
+template hasConst(C)
+{
+    import std.typetuple : anySatisfy;
+    import std.traits : RepresentationTypeTuple;
+
+    enum bool isConst(F) = is(F == const);
+    enum bool hasConst = anySatisfy!(isConst, RepresentationTypeTuple!C);
+}
+
 class BasePool
 {
 public:
@@ -75,10 +85,19 @@ class Pool(T, size_t ChunkSize = 8192) : BasePool
         return *getPtr(n);
     }
 
-    T opIndexAssign(T t, size_t n)
+    static if (!hasConst!T)
     {
-        *getPtr(n) = t;
-        return t;
+        T opIndexAssign(T t, size_t n)
+        {
+            *getPtr(n) = t;
+            return t;
+        }
+    }
+
+    void initN(size_t n)
+    {
+        import std.conv : emplace;
+        emplace(getPtr(n));
     }
 
     T* getPtr(in size_t n)

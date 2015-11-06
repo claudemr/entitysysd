@@ -10,7 +10,8 @@ help:
 	@echo "Clean all output files from unittest and doc:"
 	@echo "    make clean"
 
-
+#todo: Dependencies do not work if a module uses a template instance of another
+#      module that gets recompiled.
 out/%.o: entitysysd/%.d
 	dmd -c -odout -unittest $<
 

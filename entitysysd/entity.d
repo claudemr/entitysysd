@@ -475,6 +475,8 @@ private:
         // Set the bit for this component.
         mEntityComponentMask[uniqueId-1][compId] = true;
 
+        pool.initN(uniqueId-1);
+
         return &pool[uniqueId-1];
     }
 
@@ -598,7 +600,6 @@ unittest
     {
         int x, y;
     }
-
     ent0.register!NameComponent();
     ent1.register!NameComponent();
     ent2.register!NameComponent();
@@ -641,4 +642,24 @@ unittest
         assert(ent.valid);
         //writeln(ent.component!NameComponent.name);
     }
+
+    // Check const fields are properly handled
+    @component struct ConstComp
+    {
+        int         a, b;
+        const float cFloat = 5.0;
+    }
+
+    ent0.register!ConstComp();
+    assert(ent0.component!ConstComp.cFloat == 5.0);
+
+    // Check immutable fields are not accepted
+    @component struct ImmutableComp
+    {
+        int             a, b;
+        immutable float iFloat = 5.0;
+    }
+
+    // Check it will NOT compile if a field is immutable
+    assert(!__traits(compiles, ent0.register!ImmutableComp()));
 }
