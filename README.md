@@ -31,7 +31,7 @@ To use this project as a dependency, add the version you want (see Releases) to
 your dub.json:
 ```
 "dependencies": {
-    "entitysysd": "~>1.0"
+    "entitysysd": "~>2.0"
 }
 ```
 
@@ -49,7 +49,7 @@ make doc
 ### API documentation
 
 The complete reference API is there (generated with
-[ddox](https://github.com/rejectedsoftware/ddox)):
+[ddox](https://github.com/rejectedsoftware/ddox)) (v0.11.5):
 > [Reference API](https://claudemr.github.io/entitysysd/)
 
 
@@ -126,7 +126,7 @@ system manager and running it:
 ```
 class RenderSystem : System
 {
-    void run(EntityManager entities, EventManager events, Duration dt)
+    override void run(EntityManager entities, EventManager events, Duration dt)
     {
         // render renderable entities
     }
@@ -228,7 +228,25 @@ See COPYING.txt and COPYING.LESSER.txt for more information.
 
 ## History
 
-The 1st release (v1.x.x) puts down the base of **EntitySysD** API.
+### v2.x.x
+
+Change:
+* `System` interface is renamed to `ISystem` and becomes an abstract class.
+* API break: with `std.meta` and `hasUDA`. It cannot be compiled anymore
+with DMD compiler with a version below **2.068.0**.
+
+Add:
+* `ISystem` declares 2 new methods: `prepare` and `unprepare`. `System`
+abstract class implements empty body for `prepare`, `run` and `unprepare`.
+* `SystemManager.runFull` calls `prepare`, `run` and `unprepare`.
+
+To convert 1.x.x user application to 2.0.0, prefix all your `System.run`
+methods with `override`, and upgrade your DMD compiler to a version
+**>= 2.068.0**.
+
+### v1.x.x
+
+The 1st release puts down the base of **EntitySysD** API.
 
 It uses exceptions (removed all the assert's)
 
@@ -241,9 +259,10 @@ needs at the moment. So the current implementation is pretty naive and could
 totally miss the point of being cache-friendly. User experience will tell. So
 further enhancements may be programmed.
 
-It has been tested on GNU-Linux environment using DMD64 D Compiler v2.067.1.
+It has been tested on GNU-Linux environment using DMD64 D Compiler v2.068.x and
+v2.069.x.
 
-Todo's:
+### Todo
 * Implement ranges.
 * Implement dependencies.
 * Check field qualifiers for events.
