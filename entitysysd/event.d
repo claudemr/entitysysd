@@ -26,7 +26,7 @@ import std.typecons;
 import entitysysd.exception;
 
 
-/// Attribute to use uppon event struct's and union's.
+/// UDA to use upon event struct's and union's.
 enum event;
 
 private alias ReceiverDelegate = void delegate(...);

@@ -25,7 +25,7 @@ module entitysysd.component;
 enum component;
 
 /**
- * To a be a valid component, $(D C) must:
+ * To be a valid component, $(D C) must:
  * - be a $(D struct) or $(D union)
  * - have the UDA $(D component)
  * - must contain only mutable or const fields (no $(D immutable), $(D inout) or

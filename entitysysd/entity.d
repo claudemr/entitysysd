@@ -233,9 +233,10 @@ unittest
     auto em = new EntityManager(new EventManager);
     auto entity = em.create();
     auto posCompPtr = entity.register!Position(2.0, 3.0);
-    assert(posCompPtr == entity.component!Position &&
-           posCompPtr.x == 2.0 &&
-           entity.component!Position.y == 3.0);
+
+    assert(posCompPtr == entity.component!Position);
+    assert(posCompPtr.x == 2.0);
+    assert(entity.component!Position.y == 3.0);
 }
 
 /**
