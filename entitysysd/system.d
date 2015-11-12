@@ -32,14 +32,54 @@ import entitysysd.exception;
 
 
 /**
- * System interface. System class has to derive it and implement run.
+ * ISystem interface. System classes must derive from it and implement
+ * $(D prepare), $(D run) or $(D unprepare).
  */
-interface System
+interface ISystem
 {
+    /**
+     * Prepare any by the system-manager anytime its method run is called.
+     */
+    void prepare(EntityManager entities, EventManager events, Duration dt);
+
     /**
      * Called by the system-manager anytime its method run is called.
      */
     void run(EntityManager entities, EventManager events, Duration dt);
+
+    /**
+     * Called by the system-manager anytime its method run is called.
+     */
+    void unprepare(EntityManager entities, EventManager events, Duration dt);
+}
+
+
+/**
+ * System abstract class. System classes may derive from it and override
+ * $(D prepare), $(D run) or $(D unprepare).
+ */
+abstract class System : ISystem
+{
+    /**
+     * Prepare any by the system-manager anytime its method run is called.
+     */
+    void prepare(EntityManager entities, EventManager events, Duration dt)
+    {
+    }
+
+    /**
+     * Called by the system-manager anytime its method run is called.
+     */
+    void run(EntityManager entities, EventManager events, Duration dt)
+    {
+    }
+
+    /**
+     * Called by the system-manager anytime its method run is called.
+     */
+    void unprepare(EntityManager entities, EventManager events, Duration dt)
+    {
+    }
 }
 
 
@@ -61,7 +101,7 @@ public:
      *
      * Throws: SystemException if the system was already registered.
      */
-    void register(System system)
+    void register(ISystem system)
     {
         auto sysNode = mSystems[].find(system);
         enforce!SystemException(sysNode.empty);
@@ -73,11 +113,22 @@ public:
      *
      * Throws: SystemException if the system was not registered.
      */
-    void unregister(System system)
+    void unregister(ISystem system)
     {
         auto sysNode = mSystems[].find(system);
         enforce!SystemException(!sysNode.empty);
         mSystems.linearRemove(sysNode.take(1));
+    }
+
+    /**
+     * Prepare all the registered systems.
+     *
+     * They are prepared in the order that they were registered.
+     */
+    void prepare(Duration dt)
+    {
+        foreach (s; mSystems)
+            s.prepare(mEntityManager, mEventManager, dt);
     }
 
     /**
@@ -91,8 +142,29 @@ public:
             s.run(mEntityManager, mEventManager, dt);
     }
 
+    /**
+     * Unprepare all the registered systems.
+     *
+     * They are unprepared in the reverse order that they were registered.
+     */
+    void unprepare(Duration dt)
+    {
+        foreach_reverse (s; mSystems)
+            s.unprepare(mEntityManager, mEventManager, dt);
+    }
+
+    /**
+     * Prepare, run and unprepare all the registered systems.
+     */
+    void runFull(Duration dt)
+    {
+        prepare(dt);
+        run(dt);
+        unprepare(dt);
+    }
+
 private:
-    EntityManager mEntityManager;
-    EventManager  mEventManager;
-    DList!System  mSystems;
+    EntityManager  mEntityManager;
+    EventManager   mEventManager;
+    DList!ISystem  mSystems;
 }
