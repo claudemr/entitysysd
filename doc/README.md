@@ -3,8 +3,8 @@
 Steps to upgrade doc generation.
 
 Prerequisites:
-* Clone ddox at the same directory level as your entitysysd work directory level ̀ git clone git@github.com:rejectedsoftware/ddox.git`.
-* Clone entitysysd doc branch at the same directory level as your entitysysd work directory level ̀ git clone git@github.com:claudemr/entitysysd.git entitysysd_doc` and ̀ git checkout gh-pages`.
+* Clone ddox at the same directory level as your entitysysd work directory level `git clone git@github.com:rejectedsoftware/ddox.git`.
+* Clone entitysysd doc branch at the same directory level as your entitysysd work directory level `git clone git@github.com:claudemr/entitysysd.git entitysysd_doc` and `git checkout gh-pages`.
 * So you should have "entitysysd", "entitysysd_doc" and "ddox" at the same directory level.
 
 Upgrade:
