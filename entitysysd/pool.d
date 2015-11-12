@@ -24,7 +24,7 @@ module entitysysd.pool;
 
 template hasConst(C)
 {
-    import std.typetuple : anySatisfy;
+    import std.meta : anySatisfy;
     import std.traits : RepresentationTypeTuple;
 
     enum bool isConst(F) = is(F == const);

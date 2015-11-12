@@ -33,15 +33,14 @@ private alias ReceiverDelegate = void delegate(...);
 
 private template isEvent(E)
 {
-    import std.typetuple : anySatisfy;
-    enum bool isEventAttr(D) = is(D == event);
-    static if(__traits(compiles, __traits(getAttributes, E)))
-        enum bool isEvent = anySatisfy!(isEventAttr,
-                                        __traits(getAttributes, E)) &&
+    import std.traits : hasUDA;
+    static if(__traits(compiles, hasUDA!(E, event)))
+        enum bool isEvent = hasUDA!(E, event) &&
                             (is(E == struct) || is(E == union));
     else
         enum bool isEvent = false;
 }
+
 
 // Used internally by the EventManager.
 private struct BaseEventCounter

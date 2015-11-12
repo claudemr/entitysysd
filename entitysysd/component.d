@@ -33,15 +33,13 @@ enum component;
  */
 template isComponent(C)
 {
-    import std.typetuple : anySatisfy, allSatisfy;
-    import std.traits : RepresentationTypeTuple, isMutable;
+    import std.meta : allSatisfy;
+    import std.traits : RepresentationTypeTuple, isMutable, hasUDA;
 
-    enum bool isMutableOrConst(F) = isMutable!(F) || is(F == const);
-    enum bool isComponentAttr(D) = is(D == component);
-    static if (__traits(compiles, __traits(getAttributes, C)))
+    enum bool isMutableOrConst(F) = isMutable!F || is(F == const);
+    static if (__traits(compiles, hasUDA!(C, component)))
         enum bool isComponent = (is(C == struct) || is(C == union)) &&
-                                anySatisfy!(isComponentAttr,
-                                            __traits(getAttributes, C)) &&
+                                hasUDA!(C, component) &&
                                 allSatisfy!(isMutableOrConst,
                                             RepresentationTypeTuple!C);
     else
@@ -50,7 +48,7 @@ template isComponent(C)
 
 template areComponents(CList...)
 {
-    import std.typetuple : allSatisfy;
+    import std.meta : allSatisfy;
     enum bool areComponents = allSatisfy!(isComponent, CList);
 }
 
