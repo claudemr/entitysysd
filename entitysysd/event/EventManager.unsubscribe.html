@@ -48,18 +48,23 @@ $('#symbolSearchPane').show();
 		<div id="main-contents">
 			<h1>Function EventManager.unsubscribe</h1>
 			<section>
-				<p> Unsubscribe a <a href="../../entitysysd/event/EventManager.unsubscribe.html#receiver"><code class="prettyprint lang-d">receiver</code></a> class instance from an <a href="../../entitysysd/event/event.html"><code class="prettyprint lang-d">event</code></a>.
+				<p>Unsubscribe a <a href="../../entitysysd/event/EventManager.unsubscribe.html#receiver"><code class="prettyprint lang-d">receiver</code></a> class instance from an <a href="../../entitysysd/event/event.html"><code class="prettyprint lang-d">event</code></a>.
 </p>
-<section>
-</section>
+<section></section>
 
 					<section>
 						<h3>Prototype</h3>
-						<pre class="code prettyprint lang-d prototype">
+						<div class="prototype">
+							<code class="prettyprint lang-d">
 void unsubscribe(E)(
+								<br/>
 &nbsp;&nbsp;<a href="../../entitysysd/event/Receiver.html">Receiver</a>!E receiver
+								<br/>
 )
-if (isEvent!E);</pre>
+								<br/>
+if (isEvent!E);
+							</code>
+						</div>
 					</section>
 <section><h3>Throws</h3>
 <p>EventException if the <a href="../../entitysysd/event/EventManager.unsubscribe.html#receiver"><code class="prettyprint lang-d">receiver</code></a> was not subscribed to that

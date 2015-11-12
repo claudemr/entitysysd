@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<title>Interface System</title>
+		<title>Class System</title>
 		<link rel="stylesheet" type="text/css" href="../../styles/ddox.css"/>
 		<link rel="stylesheet" href="../../prettify/prettify.css" type="text/css"/>
 		<script type="text/javascript" src="../../scripts/jquery.js">/**/</script>
@@ -46,11 +46,24 @@ $('#symbolSearchPane').show();
 				</div>
 		</nav>
 		<div id="main-contents">
-			<h1>Interface System</h1>
+			<h1>Class System</h1>
 			<section>
-				<p> <code class="prettyprint lang-d">System</code> interface. <code class="prettyprint lang-d">System</code> class has to derive it and implement <a href="../../entitysysd/system/System.run.html"><code class="prettyprint lang-d">run</code></a>.
+				<p><code class="prettyprint lang-d">System</code> abstract class. <code class="prettyprint lang-d">System</code> classes may derive from it and override
+ <a href="../../entitysysd/system/System.prepare.html"><code class="prettyprint lang-d">prepare</code></a>, <a href="../../entitysysd/system/System.run.html"><code class="prettyprint lang-d">run</code></a> or <a href="../../entitysysd/system/System.unprepare.html"><code class="prettyprint lang-d">unprepare</code></a>.
 </p>
 
+					<section>
+						<h3>Inherits from</h3>
+						<ul>
+							<li>
+								<code class="prettyprint lang-d">Object</code>
+ (base class)
+							</li>
+							<li>
+								<code class="prettyprint lang-d"><a href="../../entitysysd/system/ISystem.html">ISystem</a></code>
+							</li>
+						</ul>
+					</section>
 					<section>
 						<h3>Methods</h3>
 						<table>
@@ -61,11 +74,29 @@ $('#symbolSearchPane').show();
 							</tr>
 							<tr>
 								<td>
+									<a href="../../entitysysd/system/System.prepare.html" class="public">
+										<code>prepare</code>
+									</a>
+								</td>
+								<td>Prepare any by the system-manager anytime its method <a href="../../entitysysd/system/System.run.html"><code class="prettyprint lang-d">run</code></a> is called.
+</td>
+							</tr>
+							<tr>
+								<td>
 									<a href="../../entitysysd/system/System.run.html" class="public">
 										<code>run</code>
 									</a>
 								</td>
-								<td> Called by the system-manager anytime its method <code class="prettyprint lang-d">run</code> is called.
+								<td>Called by the system-manager anytime its method <code class="prettyprint lang-d">run</code> is called.
+</td>
+							</tr>
+							<tr>
+								<td>
+									<a href="../../entitysysd/system/System.unprepare.html" class="public">
+										<code>unprepare</code>
+									</a>
+								</td>
+								<td>Called by the system-manager anytime its method <a href="../../entitysysd/system/System.run.html"><code class="prettyprint lang-d">run</code></a> is called.
 </td>
 							</tr>
 						</table>
