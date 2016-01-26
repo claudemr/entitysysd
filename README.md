@@ -117,6 +117,13 @@ foreach (entity; ecs.entities.entitiesWith!(Position, Renderable))
 }
 ```
 
+```
+foreach (entity, pos, render; ecs.entities.entitiesWith!(Position, Renderable))
+{
+    // pos is equivalent to entity.component!Position
+    // render is equivalent to entity.component!Renderable
+}
+```
 
 ### Systems
 
