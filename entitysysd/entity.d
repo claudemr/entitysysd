@@ -438,6 +438,17 @@ public:
                 return result;
             }
 
+            int opApply(int delegate(Entity entity, Pointers!CList components) dg)
+            {
+                auto withComponents(Entity ent) {
+                    import std.meta : staticMap;
+                    auto get(T)() { return ent.component!T; }
+                    return dg(ent, staticMap!(get, CList));
+                }
+
+                return opApply(&withComponents);
+            }
+
             EntityManager entityManager;
         }
         return EntitiesWithView!(CList)(this);
@@ -555,6 +566,13 @@ private:
     uint            mNbFreeIds;
 }
 
+// Translate a list of types to a list of pointers to those types.
+private template Pointers(T...)
+{
+    import std.meta : staticMap;
+    private alias PtrTo(U) = U*;
+    alias Pointers = staticMap!(PtrTo, T);
+}
 
 //******************************************************************************
 //***** UNIT-TESTS
@@ -663,4 +681,31 @@ unittest
 
     // Check it will NOT compile if a field is immutable
     assert(!__traits(compiles, ent0.register!ImmutableComp()));
+}
+
+unittest
+{
+    @component struct Velocity { int x, y; }
+    @component struct Position { int x, y; }
+
+    auto em = new EntityManager(new EventManager());
+
+    auto ent0 = em.create();
+    auto ent1 = em.create();
+
+    ent0.register!Position(0, 0);
+    ent1.register!Position(4, 5);
+
+    ent0.register!Velocity(1, 2);
+    ent1.register!Velocity(3, 4);
+
+    // test getting components from the opApply loop
+    foreach(ent, pos, vel; em.entitiesWith!(Position, Velocity))
+    {
+        pos.x += vel.x;
+        pos.y += vel.y;
+    }
+
+    assert(ent0.component!Position.x == 1 && ent0.component!Position.y == 2);
+    assert(ent1.component!Position.x == 7 && ent1.component!Position.y == 9);
 }
