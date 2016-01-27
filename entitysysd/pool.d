@@ -1,7 +1,7 @@
 /**
 Memory pool for component storage.
 
-Copyright: © 2015 Claude Merle
+Copyright: © 2015-2016 Claude Merle
 Authors: Claude Merle
 License: This file is part of EntitySysD.
 
