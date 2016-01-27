@@ -94,7 +94,7 @@ public:
     {
         int c = 0;
         //ComponentHandle<Collideable> collideable;
-        foreach (Entity entity; es.entitiesWith!Collideable)
+        foreach (entity; es.entitiesWith!Collideable)
             c++;
 
         for (int i = 0; i < mCount - c; i++)
@@ -139,10 +139,8 @@ public:
 
     override void run(EntityManager es, EventManager events, Duration dt)
     {
-        foreach (Entity entity; es.entitiesWith!Body)
+        foreach (entity, bod; es.entitiesWith!Body)
         {
-            auto bod = entity.component!Body;
-
             // update position
             bod.position.x += bod.direction.x * dt.total!"msecs" / 1000.0;
             bod.position.y += bod.direction.y * dt.total!"msecs" / 1000.0;
@@ -219,11 +217,8 @@ private:
 
     void collect(EntityManager entities)
     {
-        foreach (entity; entities.entitiesWith!(Body, Collideable))
+        foreach (entity, bod, col; entities.entitiesWith!(Body, Collideable))
         {
-            auto bod = entity.component!Body;
-            auto col = entity.component!Collideable;
-
             auto left   = cast(int)(bod.position.x - col.radius) / mPartitions;
             auto top    = cast(int)(bod.position.y - col.radius) / mPartitions;
             auto right  = cast(int)(bod.position.x + col.radius) / mPartitions;
@@ -277,9 +272,8 @@ class ParticleSystem : System
 public:
     override void run(EntityManager es, EventManager events, Duration dt)
     {
-        foreach (entity; es.entitiesWith!Particle)
+        foreach (entity, particle; es.entitiesWith!Particle)
         {
-            auto particle = entity.component!Particle;
             particle.alpha -= particle.d * dt.total!"msecs";
             if (particle.alpha <= 0)
                 entity.destroy();
@@ -298,10 +292,8 @@ public:
 
     override void run(EntityManager es, EventManager events, Duration dt)
     {
-        foreach (Entity entity; es.entitiesWith!(Body, Particle))
+        foreach (entity, bod, particle; es.entitiesWith!(Body, Particle))
         {
-            auto particle = entity.component!Particle;
-            auto bod      = entity.component!Body;
             auto radius = particle.radius;
             // Change color
             SDL_SetRenderDrawColor(mpRenderer,
@@ -402,18 +394,18 @@ public:
 
     override void run(EntityManager es, EventManager events, Duration dt)
     {
-        foreach (Entity entity; es.entitiesWith!(Body, Renderable))
+        foreach (entity, bod, rdr; es.entitiesWith!(Body, Renderable))
         {
-            auto radius = entity.component!Renderable.radius;
+            auto radius = rdr.radius;
             // Change color
             SDL_SetRenderDrawColor(mpRenderer,
-                                   entity.component!Renderable.color.r,
-                                   entity.component!Renderable.color.g,
-                                   entity.component!Renderable.color.b,
+                                   rdr.color.r,
+                                   rdr.color.g,
+                                   rdr.color.b,
                                    255 );
             SDL_Rect rect;
-            rect.x = cast(int)(entity.component!Body.position.x - radius);
-            rect.y = cast(int)(entity.component!Body.position.y - radius);
+            rect.x = cast(int)(bod.position.x - radius);
+            rect.y = cast(int)(bod.position.y - radius);
             rect.w = cast(int)(radius * 2);
             rect.h = cast(int)(radius * 2);
             SDL_RenderFillRect(mpRenderer, &rect);

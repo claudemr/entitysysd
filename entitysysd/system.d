@@ -38,7 +38,7 @@ import entitysysd.exception;
 interface ISystem
 {
     /**
-     * Prepare any by the system-manager anytime its method run is called.
+     * Prepare any data for the frame before a proper run.
      */
     void prepare(EntityManager entities, EventManager events, Duration dt);
 
@@ -48,7 +48,7 @@ interface ISystem
     void run(EntityManager entities, EventManager events, Duration dt);
 
     /**
-     * Called by the system-manager anytime its method run is called.
+     * Unprepare any data for the frame after the run.
      */
     void unprepare(EntityManager entities, EventManager events, Duration dt);
 }
@@ -61,7 +61,7 @@ interface ISystem
 abstract class System : ISystem
 {
     /**
-     * Prepare any by the system-manager anytime its method run is called.
+     * Prepare any data for the frame before a proper run.
      */
     void prepare(EntityManager entities, EventManager events, Duration dt)
     {
@@ -75,7 +75,7 @@ abstract class System : ISystem
     }
 
     /**
-     * Called by the system-manager anytime its method run is called.
+     * Unprepare any data for the frame after the run.
      */
     void unprepare(EntityManager entities, EventManager events, Duration dt)
     {
@@ -164,7 +164,7 @@ public:
     }
 
 private:
-    EntityManager  mEntityManager;
-    EventManager   mEventManager;
-    DList!ISystem  mSystems;
+    EntityManager   mEntityManager;
+    EventManager    mEventManager;
+    DList!ISystem   mSystems;
 }

@@ -2,15 +2,12 @@
     "name": "entitysysd",
     "description": "Entity/Component System engine",
     "homepage": "https://github.com/claudemr/entitysysd",
-    "copyright": "Copyright © 2015, Claude Merle",
+    "copyright": "Copyright © 2015-2016, Claude Merle",
     "license": "LGPL3",
-    "authors": [
-        "Claude Merle"
-    ],
-    "importPaths": [
-        "."
-    ],
-    "configurations": [
+    "authors": ["Claude Merle"],
+    "importPaths": ["."],
+    "configurations":
+    [
         {
             "name": "library",
             "targetType": "library",
