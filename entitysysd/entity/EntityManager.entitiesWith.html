@@ -6,10 +6,9 @@
 		<link rel="stylesheet" type="text/css" href="../../styles/ddox.css"/>
 		<link rel="stylesheet" href="../../prettify/prettify.css" type="text/css"/>
 		<script type="text/javascript" src="../../scripts/jquery.js">/**/</script>
-		<script type="text/javascript" src="../../prettify/prettify.js">/**/</script>
 		<script type="text/javascript" src="../../scripts/ddox.js">/**/</script>
 	</head>
-	<body onload="prettyPrint(); setupDdox();">
+	<body onload="setupDdox();">
 		<nav id="main-nav">
 						<ul class="tree-view">
 							<li class=" tree-view">
@@ -49,16 +48,16 @@ $('#symbolSearchPane').show();
 			<h1>Function EntityManager.entitiesWith</h1>
 			<section>
 				<p>Allows to browse through the entities that have a required set of
- <a href="../../entitysysd/entity/EntityManager.components.html"><code class="prettyprint lang-d">components</code></a>.
+ <a href="../../entitysysd/entity/EntityManager.components.html"><code class="lang-d"><span class="pln">components</span></code></a>.
 </p>
 
 					<section>
 						<h3>Prototype</h3>
 						<div class="prototype">
-							<code class="prettyprint lang-d">
-auto entitiesWith(CList...)() @property
+							<code class="lang-d">
+auto <span class="pln">entitiesWith<span class="pun">(</span><span class="typ">CList</span><span class="pun">...)</span><span class="pun">()</span><span class="pln"> </span><span class="pun">@</span><span class="pln">property</span>
 								<br/>
-if (areComponents!CList);
+<span class="kwd">if</span> <span class="pun">(</span><span class="pln">areComponents</span><span class="pun">!</span><span class="typ">CList</span><span class="pun">);</span>
 							</code>
 						</div>
 					</section>

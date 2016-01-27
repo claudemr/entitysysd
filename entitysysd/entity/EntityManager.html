@@ -6,10 +6,9 @@
 		<link rel="stylesheet" type="text/css" href="../../styles/ddox.css"/>
 		<link rel="stylesheet" href="../../prettify/prettify.css" type="text/css"/>
 		<script type="text/javascript" src="../../scripts/jquery.js">/**/</script>
-		<script type="text/javascript" src="../../prettify/prettify.js">/**/</script>
 		<script type="text/javascript" src="../../scripts/ddox.js">/**/</script>
 	</head>
-	<body onload="prettyPrint(); setupDdox();">
+	<body onload="setupDdox();">
 		<nav id="main-nav">
 						<ul class="tree-view">
 							<li class=" tree-view">
@@ -55,7 +54,7 @@ $('#symbolSearchPane').show();
 						<h3>Inherits from</h3>
 						<ul>
 							<li>
-								<code class="prettyprint lang-d">Object</code>
+								<code class="prettyprint lang-d"><span class="typ">Object</span></code>
  (base class)
 							</li>
 						</ul>
@@ -74,10 +73,10 @@ $('#symbolSearchPane').show();
 										<code>this</code>
 									</a>
 								</td>
-								<td>Constructor of the entity-manager. <a href="../../entitysysd/entity/EntityManager.this.html#eventManager"><code class="prettyprint lang-d">eventManager</code></a> may be used to notify
- about entity creation and component registration. <a href="../../entitysysd/entity/EntityManager.this.html#maxComponent"><code class="prettyprint lang-d">maxComponent</code></a> sets
- the maximum number of <a href="../../entitysysd/entity/EntityManager.components.html"><code class="prettyprint lang-d">components</code></a> supported by the whole manager. <a href="../../entitysysd/entity/EntityManager.this.html#poolSize"><code class="prettyprint lang-d">poolSize</code></a>
- is the chunk <a href="../../entitysysd/entity/EntityManager.size.html"><code class="prettyprint lang-d">size</code></a> in bytes for each <a href="../../entitysysd/entity/EntityManager.components.html"><code class="prettyprint lang-d">components</code></a>.
+								<td>Constructor of the entity-manager. <a href="../../entitysysd/entity/EntityManager.this.html#eventManager"><code class="lang-d"><span class="pln">eventManager</span></code></a> may be used to notify
+ about entity creation and component registration. <a href="../../entitysysd/entity/EntityManager.this.html#maxComponent"><code class="lang-d"><span class="pln">maxComponent</span></code></a> sets
+ the maximum number of <a href="../../entitysysd/entity/EntityManager.components.html"><code class="lang-d"><span class="pln">components</span></code></a> supported by the whole manager. <a href="../../entitysysd/entity/EntityManager.this.html#poolSize"><code class="lang-d"><span class="pln">poolSize</span></code></a>
+ is the chunk <a href="../../entitysysd/entity/EntityManager.size.html"><code class="lang-d"><span class="pln">size</span></code></a> in bytes for each <a href="../../entitysysd/entity/EntityManager.components.html"><code class="lang-d"><span class="pln">components</span></code></a>.
 </td>
 							</tr>
 						</table>
@@ -96,8 +95,8 @@ $('#symbolSearchPane').show();
 									<a href="../../entitysysd/entity/EntityManager.capacity.html" class="public property"><code>capacity</code></a>
 									<span class="tableEntryAnnotation">[get]</span>
 								</td>
-								<td class="typecol"><code class="prettyprint lang-d">ulong</code></td>
-								<td>Current <code class="prettyprint lang-d">capacity</code> entity.
+								<td class="typecol"><code class="prettyprint lang-d"><span class="typ">ulong</span></code></td>
+								<td>Current <code class="lang-d"><span class="pln">capacity</span></code> entity.
 </td>
 							</tr>
 							<tr>
@@ -106,7 +105,7 @@ $('#symbolSearchPane').show();
 									<span class="tableEntryAnnotation">[get]</span>
 								</td>
 								<td class="typecol"><code class="prettyprint lang-d"></code></td>
-								<td>Allows to browse through all the <a href="../../entitysysd/entity/EntityManager.valid.html"><code class="prettyprint lang-d">valid</code></a> instances of a component with
+								<td>Allows to browse through all the <a href="../../entitysysd/entity/EntityManager.valid.html"><code class="lang-d"><span class="pln">valid</span></code></a> instances of a component with
  a foreach loop.
 </td>
 							</tr>
@@ -117,7 +116,7 @@ $('#symbolSearchPane').show();
 								</td>
 								<td class="typecol"><code class="prettyprint lang-d"></code></td>
 								<td>Allows to browse through the entities that have a required set of
- <a href="../../entitysysd/entity/EntityManager.components.html"><code class="prettyprint lang-d">components</code></a>.
+ <a href="../../entitysysd/entity/EntityManager.components.html"><code class="lang-d"><span class="pln">components</span></code></a>.
 </td>
 							</tr>
 							<tr>
@@ -125,7 +124,7 @@ $('#symbolSearchPane').show();
 									<a href="../../entitysysd/entity/EntityManager.size.html" class="public property"><code>size</code></a>
 									<span class="tableEntryAnnotation">[get]</span>
 								</td>
-								<td class="typecol"><code class="prettyprint lang-d">ulong</code></td>
+								<td class="typecol"><code class="prettyprint lang-d"><span class="typ">ulong</span></code></td>
 								<td>Current number of managed entities.
 </td>
 							</tr>
@@ -154,7 +153,7 @@ $('#symbolSearchPane').show();
 										<code>getEntity</code>
 									</a>
 								</td>
-								<td>Returns an entity from an an entity-<a href="../../entitysysd/entity/EntityManager.getEntity.html#id"><code class="prettyprint lang-d">id</code></a>
+								<td>Returns an entity from an an entity-<a href="../../entitysysd/entity/EntityManager.getEntity.html#id"><code class="lang-d"><span class="pln">id</span></code></a>
 </td>
 							</tr>
 							<tr>
@@ -163,7 +162,7 @@ $('#symbolSearchPane').show();
 										<code>opApply</code>
 									</a>
 								</td>
-								<td>Allows to browse through all the <a href="../../entitysysd/entity/EntityManager.valid.html"><code class="prettyprint lang-d">valid</code></a> entities of the manager with
+								<td>Allows to browse through all the <a href="../../entitysysd/entity/EntityManager.valid.html"><code class="lang-d"><span class="pln">valid</span></code></a> entities of the manager with
  a foreach loop.
 </td>
 							</tr>
@@ -173,7 +172,7 @@ $('#symbolSearchPane').show();
 										<code>valid</code>
 									</a>
 								</td>
-								<td>Return true if the given entity ID is still <code class="prettyprint lang-d">valid</code>.
+								<td>Return true if the given entity ID is still <code class="lang-d"><span class="pln">valid</span></code>.
 </td>
 							</tr>
 						</table>

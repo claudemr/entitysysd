@@ -6,10 +6,9 @@
 		<link rel="stylesheet" type="text/css" href="../../styles/ddox.css"/>
 		<link rel="stylesheet" href="../../prettify/prettify.css" type="text/css"/>
 		<script type="text/javascript" src="../../scripts/jquery.js">/**/</script>
-		<script type="text/javascript" src="../../prettify/prettify.js">/**/</script>
 		<script type="text/javascript" src="../../scripts/ddox.js">/**/</script>
 	</head>
-	<body onload="prettyPrint(); setupDdox();">
+	<body onload="setupDdox();">
 		<nav id="main-nav">
 						<ul class="tree-view">
 							<li class=" tree-view">
@@ -53,54 +52,54 @@ $('#symbolSearchPane').show();
 			</ul>
 			<section>
 				<h2>Function Entity.component</h2>
-				<p>Get a <code class="prettyprint lang-d">component</code> pointer of the entity.
+				<p>Get a <code class="lang-d"><span class="pln">component</span></code> pointer of the entity.
 </p>
 <section></section>
 
 					<section>
 						<h3>Prototype</h3>
 						<div class="prototype">
-							<code class="prettyprint lang-d">
-C* component(C)() @property
+							<code class="lang-d">
+<span class="pln">C</span><span class="pun">*</span> <span class="pln">component<span class="pun">(</span><span class="pln">C</span><span class="pun">)</span><span class="pun">()</span><span class="pln"> </span><span class="pun">@</span><span class="pln">property</span>
 								<br/>
-if (isComponent!C);
+<span class="kwd">if</span> <span class="pun">(</span><span class="pln">isComponent</span><span class="pun">!</span><span class="pln">C</span><span class="pun">);</span>
 							</code>
 						</div>
 					</section>
 <section><h3>Returns</h3>
-<p>A pointer on the <code class="prettyprint lang-d">component</code> for this entity.
+<p>A pointer on the <code class="lang-d"><span class="pln">component</span></code> for this entity.
 </p>
 </section>
 <section><h3>Throws</h3>
-<p>EntityException if the entity is <a href="../../entitysysd/entity/Entity.invalid.html"><code class="prettyprint lang-d">invalid</code></a>.
-         ComponentException if the <code class="prettyprint lang-d">component</code> is not registered.
+<p>EntityException if the entity is <a href="../../entitysysd/entity/Entity.invalid.html"><code class="lang-d"><span class="pln">invalid</span></code></a>.
+         ComponentException if the <code class="lang-d"><span class="pln">component</span></code> is not registered.
 </p>
 </section>
 
 			</section>
 			<section>
 				<h2>Function Entity.component</h2>
-				<p>Set the value of a <a href="../../entitysysd/entity/Entity.component.html"><code class="prettyprint lang-d">component</code></a> of the entity.
+				<p>Set the value of a <a href="../../entitysysd/entity/Entity.component.html"><code class="lang-d"><span class="pln">component</span></code></a> of the entity.
 </p>
 <section></section>
 
 					<section>
 						<h3>Prototype</h3>
 						<div class="prototype">
-							<code class="prettyprint lang-d">
-void component(C)(
+							<code class="lang-d">
+<span class="typ">void</span> <span class="pln">component</span><span class="pun">(</span><span class="pln">C</span><span class="pun">)</span><span class="pun">(</span>
 								<br/>
-&nbsp;&nbsp;auto ref C c
+&nbsp;&nbsp;<span class="kwd">auto ref </span><span class="pln">C</span> <span class="pln">c</span>
 								<br/>
-) @property
+<span class="pun">)</span><span class="pln"> </span><span class="pun">@</span><span class="pln">property</span>
 								<br/>
-if (isComponent!C);
+<span class="kwd">if</span> <span class="pun">(</span><span class="pln">isComponent</span><span class="pun">!</span><span class="pln">C</span><span class="pun">);</span>
 							</code>
 						</div>
 					</section>
 <section><h3>Throws</h3>
-<p>EntityException if the entity is <a href="../../entitysysd/entity/Entity.invalid.html"><code class="prettyprint lang-d">invalid</code></a>.
-         ComponentException if the <a href="../../entitysysd/entity/Entity.component.html"><code class="prettyprint lang-d">component</code></a> is not registered.
+<p>EntityException if the entity is <a href="../../entitysysd/entity/Entity.invalid.html"><code class="lang-d"><span class="pln">invalid</span></code></a>.
+         ComponentException if the <a href="../../entitysysd/entity/Entity.component.html"><code class="lang-d"><span class="pln">component</span></code></a> is not registered.
 </p>
 </section>
 

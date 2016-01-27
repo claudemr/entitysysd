@@ -6,10 +6,9 @@
 		<link rel="stylesheet" type="text/css" href="../../styles/ddox.css"/>
 		<link rel="stylesheet" href="../../prettify/prettify.css" type="text/css"/>
 		<script type="text/javascript" src="../../scripts/jquery.js">/**/</script>
-		<script type="text/javascript" src="../../prettify/prettify.js">/**/</script>
 		<script type="text/javascript" src="../../scripts/ddox.js">/**/</script>
 	</head>
-	<body onload="prettyPrint(); setupDdox();">
+	<body onload="setupDdox();">
 		<nav id="main-nav">
 						<ul class="tree-view">
 							<li class=" tree-view">
@@ -48,19 +47,19 @@ $('#symbolSearchPane').show();
 		<div id="main-contents">
 			<h1>Class System</h1>
 			<section>
-				<p><code class="prettyprint lang-d">System</code> abstract class. <code class="prettyprint lang-d">System</code> classes may derive from it and override
- <a href="../../entitysysd/system/System.prepare.html"><code class="prettyprint lang-d">prepare</code></a>, <a href="../../entitysysd/system/System.run.html"><code class="prettyprint lang-d">run</code></a> or <a href="../../entitysysd/system/System.unprepare.html"><code class="prettyprint lang-d">unprepare</code></a>.
+				<p><code class="lang-d"><span class="typ">System</span></code> abstract class. <code class="lang-d"><span class="typ">System</span></code> classes may derive from it and override
+ <a href="../../entitysysd/system/System.prepare.html"><code class="lang-d"><span class="pln">prepare</span></code></a>, <a href="../../entitysysd/system/System.run.html"><code class="lang-d"><span class="pln">run</span></code></a> or <a href="../../entitysysd/system/System.unprepare.html"><code class="lang-d"><span class="pln">unprepare</span></code></a>.
 </p>
 
 					<section>
 						<h3>Inherits from</h3>
 						<ul>
 							<li>
-								<code class="prettyprint lang-d">Object</code>
+								<code class="prettyprint lang-d"><span class="typ">Object</span></code>
  (base class)
 							</li>
 							<li>
-								<code class="prettyprint lang-d"><a href="../../entitysysd/system/ISystem.html">ISystem</a></code>
+								<code class="prettyprint lang-d"><a href="../../entitysysd/system/ISystem.html"><span class="typ">ISystem</span></a></code>
 							</li>
 						</ul>
 					</section>
@@ -78,7 +77,7 @@ $('#symbolSearchPane').show();
 										<code>prepare</code>
 									</a>
 								</td>
-								<td>Prepare any by the system-manager anytime its method <a href="../../entitysysd/system/System.run.html"><code class="prettyprint lang-d">run</code></a> is called.
+								<td>Prepare any data for the frame before a proper <a href="../../entitysysd/system/System.run.html"><code class="lang-d"><span class="pln">run</span></code></a>.
 </td>
 							</tr>
 							<tr>
@@ -87,7 +86,7 @@ $('#symbolSearchPane').show();
 										<code>run</code>
 									</a>
 								</td>
-								<td>Called by the system-manager anytime its method <code class="prettyprint lang-d">run</code> is called.
+								<td>Called by the system-manager anytime its method <code class="lang-d"><span class="pln">run</span></code> is called.
 </td>
 							</tr>
 							<tr>
@@ -96,7 +95,7 @@ $('#symbolSearchPane').show();
 										<code>unprepare</code>
 									</a>
 								</td>
-								<td>Called by the system-manager anytime its method <a href="../../entitysysd/system/System.run.html"><code class="prettyprint lang-d">run</code></a> is called.
+								<td>Unprepare any data for the frame after the <a href="../../entitysysd/system/System.run.html"><code class="lang-d"><span class="pln">run</span></code></a>.
 </td>
 							</tr>
 						</table>

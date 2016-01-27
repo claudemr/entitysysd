@@ -6,10 +6,9 @@
 		<link rel="stylesheet" type="text/css" href="../../styles/ddox.css"/>
 		<link rel="stylesheet" href="../../prettify/prettify.css" type="text/css"/>
 		<script type="text/javascript" src="../../scripts/jquery.js">/**/</script>
-		<script type="text/javascript" src="../../prettify/prettify.js">/**/</script>
 		<script type="text/javascript" src="../../scripts/ddox.js">/**/</script>
 	</head>
-	<body onload="prettyPrint(); setupDdox();">
+	<body onload="setupDdox();">
 		<nav id="main-nav">
 						<ul class="tree-view">
 							<li class=" tree-view">
@@ -48,7 +47,7 @@ $('#symbolSearchPane').show();
 		<div id="main-contents">
 			<h1>Function EventManager.emit</h1>
 			<section>
-				<p>Emit an <a href="../../entitysysd/event/EventManager.emit.html#event"><code class="prettyprint lang-d">event</code></a>.
+				<p>Emit an <a href="../../entitysysd/event/EventManager.emit.html#event"><code class="lang-d"><span class="pln">event</span></code></a>.
 </p>
 <section><p>It will be dispatched to all receivers that subscribed to it.
 </p>
@@ -57,41 +56,40 @@ $('#symbolSearchPane').show();
 					<section>
 						<h3>Prototypes</h3>
 						<div class="prototype">
-							<code class="prettyprint lang-d">
-void emit(E)(
+							<code class="lang-d">
+<span class="typ">void</span> <span class="pln">emit</span><span class="pun">(</span><span class="pln">E</span><span class="pun">)</span><span class="pun">(</span>
 								<br/>
-&nbsp;&nbsp;in ref E event
+&nbsp;&nbsp;<span class="kwd">in ref </span><span class="pln">E</span> <span class="pln">event</span>
 								<br/>
-)
+<span class="pun">)</span>
 								<br/>
-if (isEvent!E);
+<span class="kwd">if</span> <span class="pun">(</span><span class="pln">isEvent</span><span class="pun">!</span><span class="pln">E</span><span class="pun">);</span>
 								<br/>
 								<br/>
-void emit(E, Args...)(
+<span class="typ">void</span> <span class="pln">emit</span><span class="pun">(</span><span class="pln">E</span><span class="pun">, </span><span class="typ">Args</span><span class="pun">...)</span><span class="pun">(</span>
 								<br/>
-&nbsp;&nbsp;auto ref Args args
+&nbsp;&nbsp;<span class="kwd">auto ref </span><span class="typ">Args</span> <span class="pln">args</span>
 								<br/>
-)
+<span class="pun">)</span>
 								<br/>
-if (isEvent!E);
+<span class="kwd">if</span> <span class="pun">(</span><span class="pln">isEvent</span><span class="pun">!</span><span class="pln">E</span><span class="pun">);</span>
 							</code>
 						</div>
 					</section>
 <section><h3>Example</h3>
-<pre class="code"><code class="prettyprint lang-d">@<a href="../../entitysysd/event/EventManager.emit.html#event">event</a> struct MyEvent
-{
-    int data;
+<pre class="code"><code class="lang-d"><span class="pun">@<a href="../../entitysysd/event/EventManager.emit.html#event"></span><span class="pln">event</a> </span><span class="kwd">struct </span><span class="typ">MyEvent
+</span><span class="pun">{
+    </span><span class="typ">int </span><span class="pln">data</span><span class="pun">;
 }
 
-auto em = new <a href="../../entitysysd/event/EventManager.html">EventManager</a>;
+</span><span class="kwd">auto </span><span class="pln">em </span><span class="pun">= </span><span class="kwd">new <a href="../../entitysysd/event/EventManager.html"></span><span class="typ">EventManager</a></span><span class="pun">;
 
-auto e = MyEvent(43);
+</span><span class="kwd">auto </span><span class="pln">e </span><span class="pun">= </span><span class="typ">MyEvent</span><span class="pun">(</span><span class="lit">43</span><span class="pun">);
 
-em.emit(e);
-em.emit!MyEvent(42);
+</span><span class="pln">em<wbr/></span><span class="pun">.</span><span class="pln">emit</span><span class="pun">(</span><span class="pln">e</span><span class="pun">);
+</span><span class="pln">em<wbr/></span><span class="pun">.</span><span class="pln">emit</span><span class="pun">!</span><span class="typ">MyEvent</span><span class="pun">(</span><span class="lit">42</span><span class="pun">);
 
-
-</code></pre>
+</span></code></pre>
 </section>
 
 			</section>

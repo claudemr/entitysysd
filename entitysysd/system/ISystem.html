@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<title>Function Entity.Id.opEquals</title>
+		<title>Interface ISystem</title>
 		<link rel="stylesheet" type="text/css" href="../../styles/ddox.css"/>
 		<link rel="stylesheet" href="../../prettify/prettify.css" type="text/css"/>
 		<script type="text/javascript" src="../../scripts/jquery.js">/**/</script>
@@ -15,13 +15,13 @@
 								<a href="#" class="package">entitysysd</a>
 						<ul class="tree-view">
 							<li>
-								<a href="../../entitysysd/entity.html" class="selected module">entity</a>
+								<a href="../../entitysysd/entity.html" class=" module">entity</a>
 							</li>
 							<li>
 								<a href="../../entitysysd/event.html" class=" module">event</a>
 							</li>
 							<li>
-								<a href="../../entitysysd/system.html" class=" module">system</a>
+								<a href="../../entitysysd/system.html" class="selected module">system</a>
 							</li>
 						</ul>
 							</li>
@@ -45,21 +45,48 @@ $('#symbolSearchPane').show();
 				</div>
 		</nav>
 		<div id="main-contents">
-			<h1>Function Entity.Id.opEquals</h1>
+			<h1>Interface ISystem</h1>
 			<section>
-				<p></p>
+				<p><code class="lang-d"><span class="typ">ISystem</span></code> interface. <a href="../../entitysysd/system/System.html"><code class="lang-d"><span class="typ">System</span></code></a> classes must derive from it and implement
+ <a href="../../entitysysd/system/ISystem.prepare.html"><code class="lang-d"><span class="pln">prepare</span></code></a>, <a href="../../entitysysd/system/ISystem.run.html"><code class="lang-d"><span class="pln">run</span></code></a> or <a href="../../entitysysd/system/ISystem.unprepare.html"><code class="lang-d"><span class="pln">unprepare</span></code></a>.
+</p>
 
 					<section>
-						<h3>Prototype</h3>
-						<div class="prototype">
-							<code class="lang-d">
-<span class="typ">bool</span> <span class="pln">opEquals</span><span class="pun">()</span><span class="pun">(</span>
-								<br/>
-&nbsp;&nbsp;<span class="kwd">auto const ref </span><a href="../../entitysysd/entity/Entity.Id.html"><span class="typ">Entity<wbr/></span><span class="pun">.<wbr/></span><span class="typ">Id</span></a> <span class="pln">lId</span>
-								<br/>
-<span class="pun">)</span><span class="pln"> </span><span class="kwd">const</span><span class="pun">;</span>
-							</code>
-						</div>
+						<h3>Methods</h3>
+						<table>
+							<col class="caption"/>
+							<tr>
+								<th>Name</th>
+								<th>Description</th>
+							</tr>
+							<tr>
+								<td>
+									<a href="../../entitysysd/system/ISystem.prepare.html" class="public">
+										<code>prepare</code>
+									</a>
+								</td>
+								<td>Prepare any data for the frame before a proper <a href="../../entitysysd/system/ISystem.run.html"><code class="lang-d"><span class="pln">run</span></code></a>.
+</td>
+							</tr>
+							<tr>
+								<td>
+									<a href="../../entitysysd/system/ISystem.run.html" class="public">
+										<code>run</code>
+									</a>
+								</td>
+								<td>Called by the system-manager anytime its method <code class="lang-d"><span class="pln">run</span></code> is called.
+</td>
+							</tr>
+							<tr>
+								<td>
+									<a href="../../entitysysd/system/ISystem.unprepare.html" class="public">
+										<code>unprepare</code>
+									</a>
+								</td>
+								<td>Unprepare any data for the frame after the <a href="../../entitysysd/system/ISystem.run.html"><code class="lang-d"><span class="pln">run</span></code></a>.
+</td>
+							</tr>
+						</table>
 					</section>
 
 			</section>

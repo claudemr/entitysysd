@@ -6,10 +6,9 @@
 		<link rel="stylesheet" type="text/css" href="../../styles/ddox.css"/>
 		<link rel="stylesheet" href="../../prettify/prettify.css" type="text/css"/>
 		<script type="text/javascript" src="../../scripts/jquery.js">/**/</script>
-		<script type="text/javascript" src="../../prettify/prettify.js">/**/</script>
 		<script type="text/javascript" src="../../scripts/ddox.js">/**/</script>
 	</head>
-	<body onload="prettyPrint(); setupDdox();">
+	<body onload="setupDdox();">
 		<nav id="main-nav">
 						<ul class="tree-view">
 							<li class=" tree-view">
@@ -48,17 +47,17 @@ $('#symbolSearchPane').show();
 		<div id="main-contents">
 			<h1>Function EntityManager.components</h1>
 			<section>
-				<p>Allows to browse through all the <a href="../../entitysysd/entity/EntityManager.valid.html"><code class="prettyprint lang-d">valid</code></a> instances of a component with
+				<p>Allows to browse through all the <a href="../../entitysysd/entity/EntityManager.valid.html"><code class="lang-d"><span class="pln">valid</span></code></a> instances of a component with
  a foreach loop.
 </p>
 
 					<section>
 						<h3>Prototype</h3>
 						<div class="prototype">
-							<code class="prettyprint lang-d">
-auto components(C)() @property
+							<code class="lang-d">
+auto <span class="pln">components<span class="pun">(</span><span class="pln">C</span><span class="pun">)</span><span class="pun">()</span><span class="pln"> </span><span class="pun">@</span><span class="pln">property</span>
 								<br/>
-if (isComponent!C);
+<span class="kwd">if</span> <span class="pun">(</span><span class="pln">isComponent</span><span class="pun">!</span><span class="pln">C</span><span class="pun">);</span>
 							</code>
 						</div>
 					</section>

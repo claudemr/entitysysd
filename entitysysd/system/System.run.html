@@ -6,10 +6,9 @@
 		<link rel="stylesheet" type="text/css" href="../../styles/ddox.css"/>
 		<link rel="stylesheet" href="../../prettify/prettify.css" type="text/css"/>
 		<script type="text/javascript" src="../../scripts/jquery.js">/**/</script>
-		<script type="text/javascript" src="../../prettify/prettify.js">/**/</script>
 		<script type="text/javascript" src="../../scripts/ddox.js">/**/</script>
 	</head>
-	<body onload="prettyPrint(); setupDdox();">
+	<body onload="setupDdox();">
 		<nav id="main-nav">
 						<ul class="tree-view">
 							<li class=" tree-view">
@@ -48,22 +47,22 @@ $('#symbolSearchPane').show();
 		<div id="main-contents">
 			<h1>Function System.run</h1>
 			<section>
-				<p>Called by the system-manager anytime its method <code class="prettyprint lang-d">run</code> is called.
+				<p>Called by the system-manager anytime its method <code class="lang-d"><span class="pln">run</span></code> is called.
 </p>
 
 					<section>
 						<h3>Prototype</h3>
 						<div class="prototype">
-							<code class="prettyprint lang-d">
-void run(
+							<code class="lang-d">
+<span class="typ">void</span> <span class="pln">run</span><span class="pun">(</span>
 								<br/>
-&nbsp;&nbsp;<a href="../../entitysysd/entity/EntityManager.html">EntityManager</a> entities,
+&nbsp;&nbsp;<a href="../../entitysysd/entity/EntityManager.html"><span class="typ">EntityManager</span></a> <span class="pln">entities</span><span class="pun">,</span>
 								<br/>
-&nbsp;&nbsp;<a href="../../entitysysd/event/EventManager.html">EventManager</a> events,
+&nbsp;&nbsp;<a href="../../entitysysd/event/EventManager.html"><span class="typ">EventManager</span></a> <span class="pln">events</span><span class="pun">,</span>
 								<br/>
-&nbsp;&nbsp;core.<wbr/>time.<wbr/>Duration dt
+&nbsp;&nbsp;<span class="pln">core<wbr/></span><span class="pun">.</span><span class="pln">time<wbr/></span><span class="pun">.</span><span class="typ">Duration</span> <span class="pln">dt</span>
 								<br/>
-);
+<span class="pun">)</span><span class="pun">;</span>
 							</code>
 						</div>
 					</section>

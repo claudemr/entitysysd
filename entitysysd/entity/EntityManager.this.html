@@ -6,10 +6,9 @@
 		<link rel="stylesheet" type="text/css" href="../../styles/ddox.css"/>
 		<link rel="stylesheet" href="../../prettify/prettify.css" type="text/css"/>
 		<script type="text/javascript" src="../../scripts/jquery.js">/**/</script>
-		<script type="text/javascript" src="../../prettify/prettify.js">/**/</script>
 		<script type="text/javascript" src="../../scripts/ddox.js">/**/</script>
 	</head>
-	<body onload="prettyPrint(); setupDdox();">
+	<body onload="setupDdox();">
 		<nav id="main-nav">
 						<ul class="tree-view">
 							<li class=" tree-view">
@@ -48,25 +47,25 @@ $('#symbolSearchPane').show();
 		<div id="main-contents">
 			<h1>Function EntityManager.this</h1>
 			<section>
-				<p>Constructor of the entity-manager. <a href="../../entitysysd/entity/EntityManager.this.html#eventManager"><code class="prettyprint lang-d">eventManager</code></a> may be used to notify
- about entity creation and component registration. <a href="../../entitysysd/entity/EntityManager.this.html#maxComponent"><code class="prettyprint lang-d">maxComponent</code></a> sets
- the maximum number of <a href="../../entitysysd/entity/EntityManager.components.html"><code class="prettyprint lang-d">components</code></a> supported by the whole manager. <a href="../../entitysysd/entity/EntityManager.this.html#poolSize"><code class="prettyprint lang-d">poolSize</code></a>
- is the chunk <a href="../../entitysysd/entity/EntityManager.size.html"><code class="prettyprint lang-d">size</code></a> in bytes for each <a href="../../entitysysd/entity/EntityManager.components.html"><code class="prettyprint lang-d">components</code></a>.
+				<p>Constructor of the entity-manager. <a href="../../entitysysd/entity/EntityManager.this.html#eventManager"><code class="lang-d"><span class="pln">eventManager</span></code></a> may be used to notify
+ about entity creation and component registration. <a href="../../entitysysd/entity/EntityManager.this.html#maxComponent"><code class="lang-d"><span class="pln">maxComponent</span></code></a> sets
+ the maximum number of <a href="../../entitysysd/entity/EntityManager.components.html"><code class="lang-d"><span class="pln">components</span></code></a> supported by the whole manager. <a href="../../entitysysd/entity/EntityManager.this.html#poolSize"><code class="lang-d"><span class="pln">poolSize</span></code></a>
+ is the chunk <a href="../../entitysysd/entity/EntityManager.size.html"><code class="lang-d"><span class="pln">size</span></code></a> in bytes for each <a href="../../entitysysd/entity/EntityManager.components.html"><code class="lang-d"><span class="pln">components</span></code></a>.
 </p>
 
 					<section>
 						<h3>Prototype</h3>
 						<div class="prototype">
-							<code class="prettyprint lang-d">
-this(
+							<code class="lang-d">
+<span class="pln">this</span><span class="pun">(</span>
 								<br/>
-&nbsp;&nbsp;<a href="../../entitysysd/event/EventManager.html">EventManager</a> eventManager,
+&nbsp;&nbsp;<a href="../../entitysysd/event/EventManager.html"><span class="typ">EventManager</span></a> <span class="pln">eventManager</span><span class="pun">,</span>
 								<br/>
-&nbsp;&nbsp;ulong maxComponent = 64LU,
+&nbsp;&nbsp;<span class="typ">ulong</span> <span class="pln">maxComponent</span> <span class="pun">=</span> <span class="lit">64LU</span><span class="pun">,</span>
 								<br/>
-&nbsp;&nbsp;ulong poolSize = 8192LU
+&nbsp;&nbsp;<span class="typ">ulong</span> <span class="pln">poolSize</span> <span class="pun">=</span> <span class="lit">8192LU</span>
 								<br/>
-);
+<span class="pun">)</span><span class="pun">;</span>
 							</code>
 						</div>
 					</section>

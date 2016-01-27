@@ -6,10 +6,9 @@
 		<link rel="stylesheet" type="text/css" href="../../styles/ddox.css"/>
 		<link rel="stylesheet" href="../../prettify/prettify.css" type="text/css"/>
 		<script type="text/javascript" src="../../scripts/jquery.js">/**/</script>
-		<script type="text/javascript" src="../../prettify/prettify.js">/**/</script>
 		<script type="text/javascript" src="../../scripts/ddox.js">/**/</script>
 	</head>
-	<body onload="prettyPrint(); setupDdox();">
+	<body onload="setupDdox();">
 		<nav id="main-nav">
 						<ul class="tree-view">
 							<li class=" tree-view">
@@ -48,32 +47,32 @@ $('#symbolSearchPane').show();
 		<div id="main-contents">
 			<h1>Function Entity.register</h1>
 			<section>
-				<p>Register a <a href="../../entitysysd/entity/Entity.component.html"><code class="prettyprint lang-d">component</code></a> C to an entity.
+				<p>Register a <a href="../../entitysysd/entity/Entity.component.html"><code class="lang-d"><span class="pln">component</span></code></a> C to an entity.
 </p>
 <section></section>
 
 					<section>
 						<h3>Prototype</h3>
 						<div class="prototype">
-							<code class="prettyprint lang-d">
-C* register(C, Args...)(
+							<code class="lang-d">
+<span class="pln">C</span><span class="pun">*</span> <span class="pln">register</span><span class="pun">(</span><span class="pln">C</span><span class="pun">, </span><span class="typ">Args</span><span class="pun">...)</span><span class="pun">(</span>
 								<br/>
-&nbsp;&nbsp;Args args
+&nbsp;&nbsp;<span class="typ">Args</span> <span class="pln">args</span>
 								<br/>
-)
+<span class="pun">)</span>
 								<br/>
-if (isComponent!C);
+<span class="kwd">if</span> <span class="pun">(</span><span class="pln">isComponent</span><span class="pun">!</span><span class="pln">C</span><span class="pun">);</span>
 							</code>
 						</div>
 					</section>
 <section><h3>Returns</h3>
-<p>A pointer on the <a href="../../entitysysd/entity/Entity.component.html"><code class="prettyprint lang-d">component</code></a> for this entity.
+<p>A pointer on the <a href="../../entitysysd/entity/Entity.component.html"><code class="lang-d"><span class="pln">component</span></code></a> for this entity.
 </p>
 </section>
 <section><h3>Throws</h3>
-<p>EntityException if the entity is <a href="../../entitysysd/entity/Entity.invalid.html"><code class="prettyprint lang-d">invalid</code></a>.
-         ComponentException if there is no room for that <a href="../../entitysysd/entity/Entity.component.html"><code class="prettyprint lang-d">component</code></a> or if
-                            if the <a href="../../entitysysd/entity/Entity.component.html"><code class="prettyprint lang-d">component</code></a> is already registered.
+<p>EntityException if the entity is <a href="../../entitysysd/entity/Entity.invalid.html"><code class="lang-d"><span class="pln">invalid</span></code></a>.
+         ComponentException if there is no room for that <a href="../../entitysysd/entity/Entity.component.html"><code class="lang-d"><span class="pln">component</span></code></a> or if
+                            if the <a href="../../entitysysd/entity/Entity.component.html"><code class="lang-d"><span class="pln">component</span></code></a> is already registered.
 </p>
 </section>
 

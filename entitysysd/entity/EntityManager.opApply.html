@@ -6,10 +6,9 @@
 		<link rel="stylesheet" type="text/css" href="../../styles/ddox.css"/>
 		<link rel="stylesheet" href="../../prettify/prettify.css" type="text/css"/>
 		<script type="text/javascript" src="../../scripts/jquery.js">/**/</script>
-		<script type="text/javascript" src="../../prettify/prettify.js">/**/</script>
 		<script type="text/javascript" src="../../scripts/ddox.js">/**/</script>
 	</head>
-	<body onload="prettyPrint(); setupDdox();">
+	<body onload="setupDdox();">
 		<nav id="main-nav">
 						<ul class="tree-view">
 							<li class=" tree-view">
@@ -48,19 +47,19 @@ $('#symbolSearchPane').show();
 		<div id="main-contents">
 			<h1>Function EntityManager.opApply</h1>
 			<section>
-				<p>Allows to browse through all the <a href="../../entitysysd/entity/EntityManager.valid.html"><code class="prettyprint lang-d">valid</code></a> entities of the manager with
+				<p>Allows to browse through all the <a href="../../entitysysd/entity/EntityManager.valid.html"><code class="lang-d"><span class="pln">valid</span></code></a> entities of the manager with
  a foreach loop.
 </p>
 
 					<section>
 						<h3>Prototype</h3>
 						<div class="prototype">
-							<code class="prettyprint lang-d">
-int opApply(
+							<code class="lang-d">
+<span class="typ">int</span> <span class="pln">opApply</span><span class="pun">(</span>
 								<br/>
-&nbsp;&nbsp;int delegate(<a href="../../entitysysd/entity/Entity.html">Entity</a>) dg
+&nbsp;&nbsp;<span class="typ">int</span> <span class="kwd">delegate</span><span class="pun">(</span><a href="../../entitysysd/entity/Entity.html"><span class="typ">Entity</span></a><span class="pun">)</span> <span class="pln">dg</span>
 								<br/>
-);
+<span class="pun">)</span><span class="pun">;</span>
 							</code>
 						</div>
 					</section>

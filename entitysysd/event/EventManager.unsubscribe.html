@@ -6,10 +6,9 @@
 		<link rel="stylesheet" type="text/css" href="../../styles/ddox.css"/>
 		<link rel="stylesheet" href="../../prettify/prettify.css" type="text/css"/>
 		<script type="text/javascript" src="../../scripts/jquery.js">/**/</script>
-		<script type="text/javascript" src="../../prettify/prettify.js">/**/</script>
 		<script type="text/javascript" src="../../scripts/ddox.js">/**/</script>
 	</head>
-	<body onload="prettyPrint(); setupDdox();">
+	<body onload="setupDdox();">
 		<nav id="main-nav">
 						<ul class="tree-view">
 							<li class=" tree-view">
@@ -48,27 +47,27 @@ $('#symbolSearchPane').show();
 		<div id="main-contents">
 			<h1>Function EventManager.unsubscribe</h1>
 			<section>
-				<p>Unsubscribe a <a href="../../entitysysd/event/EventManager.unsubscribe.html#receiver"><code class="prettyprint lang-d">receiver</code></a> class instance from an <a href="../../entitysysd/event/event.html"><code class="prettyprint lang-d">event</code></a>.
+				<p>Unsubscribe a <a href="../../entitysysd/event/EventManager.unsubscribe.html#receiver"><code class="lang-d"><span class="pln">receiver</span></code></a> class instance from an <a href="../../entitysysd/event/event.html"><code class="lang-d"><span class="pln">event</span></code></a>.
 </p>
 <section></section>
 
 					<section>
 						<h3>Prototype</h3>
 						<div class="prototype">
-							<code class="prettyprint lang-d">
-void unsubscribe(E)(
+							<code class="lang-d">
+<span class="typ">void</span> <span class="pln">unsubscribe</span><span class="pun">(</span><span class="pln">E</span><span class="pun">)</span><span class="pun">(</span>
 								<br/>
-&nbsp;&nbsp;<a href="../../entitysysd/event/Receiver.html">Receiver</a>!E receiver
+&nbsp;&nbsp;<a href="../../entitysysd/event/Receiver.html"><span class="typ">Receiver</span></a>!E <span class="pln">receiver</span>
 								<br/>
-)
+<span class="pun">)</span>
 								<br/>
-if (isEvent!E);
+<span class="kwd">if</span> <span class="pun">(</span><span class="pln">isEvent</span><span class="pun">!</span><span class="pln">E</span><span class="pun">);</span>
 							</code>
 						</div>
 					</section>
 <section><h3>Throws</h3>
-<p>EventException if the <a href="../../entitysysd/event/EventManager.unsubscribe.html#receiver"><code class="prettyprint lang-d">receiver</code></a> was not subscribed to that
-         <a href="../../entitysysd/event/event.html"><code class="prettyprint lang-d">event</code></a>.
+<p>EventException if the <a href="../../entitysysd/event/EventManager.unsubscribe.html#receiver"><code class="lang-d"><span class="pln">receiver</span></code></a> was not subscribed to that
+         <a href="../../entitysysd/event/event.html"><code class="lang-d"><span class="pln">event</span></code></a>.
 </p>
 </section>
 
