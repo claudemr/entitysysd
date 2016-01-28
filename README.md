@@ -207,6 +207,11 @@ Thread-safety adds too much complexity. And from a software architecture point
 of view, it makes more sense to manage resource synchronization at the highest
 level. **EntitySysD** is just a library.
 
+## Contributors
+
+* [Claude Merle](https://github.com/claudemr)
+* [Ryan Roden-Corrent](https://github.com/rcorre)
+
 ## Credits
 
 This engine is based on a D port inspired on **EntityX** in C++ of Alec Thomas.
