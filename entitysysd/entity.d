@@ -378,6 +378,11 @@ public:
                 int result = 0;
 
                 auto compId = entityManager.componentId!C();
+
+                // return if no such component has ever been registered
+                if (compId >= entityManager.mComponentPools.length)
+                    return 0;
+
                 Pool!C pool = cast(Pool!C)entityManager.mComponentPools[compId];
 
                 for (int i; i < pool.nbElements; i++)
@@ -712,4 +717,15 @@ unittest
 
     assert(ent0.component!Position.x == 1 && ent0.component!Position.y == 2);
     assert(ent1.component!Position.x == 7 && ent1.component!Position.y == 9);
+}
+
+// Ensure that em.components!T does not throw if no `T` has ever been registered
+unittest
+{
+    @component struct Dummy { }
+
+    auto em = new EntityManager(new EventManager());
+
+    foreach(pos ; em.components!Dummy)
+        assert(0, "Loop should never be entered");
 }
