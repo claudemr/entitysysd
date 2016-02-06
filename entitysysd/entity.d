@@ -364,56 +364,19 @@ public:
     auto components(C)() @property
         if (isComponent!C)
     {
-        struct ComponentView
-        {
-            this(EntityManager em)
-            {
-                mEntityManager = em;
-                mCompId = em.componentId!C();
+        import std.range : iota;
+        import std.algorithm : map, filter;
 
-                // if no such component has ever been registered, no pool will
-                // exist. use an empty pool so the range is immediately empty.
-                mPool = (mCompId >= em.mComponentPools.length) ?
-                    new Pool!C(0) :
-                    cast(Pool!C)em.mComponentPools[mCompId];
+        immutable compId = componentId!C();
 
-                walkToNextMatch();
-            }
+        // if no such component has ever been registered, no pool will exist.
+        auto pool = (compId < mComponentPools.length) ?
+            cast(Pool!C)mComponentPools[compId] : null;
 
-            bool empty()
-            {
-                return mIdx >= mPool.nbElements;
-            }
-
-            auto front()
-            {
-                assert(!empty);
-                return &mPool[mIdx];
-            }
-
-            void popFront()
-            {
-                ++mIdx;
-                walkToNextMatch();
-            }
-
-            private:
-            EntityManager mEntityManager;
-            size_t mCompId;
-            size_t mIdx;
-            Pool!C mPool;
-
-            void walkToNextMatch()
-            {
-                // step until the next component of type C, or the pool's end
-                while (!empty && !mEntityManager.mEntityComponentMask[mIdx][mCompId])
-                    ++mIdx;
-            }
-        }
-
-        return ComponentView(this);
+        return iota(0, (pool is null) ? 0 : pool.nbElements)
+            .filter!(i => mEntityComponentMask[i][compId])
+            .map!(i => &pool[i]);
     }
-
 
     /**
      * Allows to browse through the entities that have a required set of
