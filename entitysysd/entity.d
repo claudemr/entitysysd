@@ -359,48 +359,59 @@ public:
 
 
     /**
-     * Allows to browse through all the valid instances of a component with
-     * a foreach loop.
+     * Return a range of all the valid instances of a component.
      */
     auto components(C)() @property
         if (isComponent!C)
     {
-        struct ComponentView(C)
-            if (isComponent!C)
+        struct ComponentView
         {
             this(EntityManager em)
             {
-                entityManager = em;
+                mEntityManager = em;
+                mCompId = em.componentId!C();
+
+                // if no such component has ever been registered, no pool will
+                // exist. use an empty pool so the range is immediately empty.
+                mPool = (mCompId >= em.mComponentPools.length) ?
+                    new Pool!C(0) :
+                    cast(Pool!C)em.mComponentPools[mCompId];
+
+                walkToNextMatch();
             }
 
-            int opApply(int delegate(C* component) dg)
+            bool empty()
             {
-                int result = 0;
-
-                auto compId = entityManager.componentId!C();
-
-                // return if no such component has ever been registered
-                if (compId >= entityManager.mComponentPools.length)
-                    return 0;
-
-                Pool!C pool = cast(Pool!C)entityManager.mComponentPools[compId];
-
-                for (int i; i < pool.nbElements; i++)
-                {
-                    if (!entityManager.mEntityComponentMask[i][compId])
-                        continue;
-                    result = dg(&pool[i]);
-                    if (result)
-                        break;
-                }
-
-                return result;
+                return mIdx >= mPool.nbElements;
             }
 
-            EntityManager entityManager;
+            auto front()
+            {
+                assert(!empty);
+                return &mPool[mIdx];
+            }
+
+            void popFront()
+            {
+                ++mIdx;
+                walkToNextMatch();
+            }
+
+            private:
+            EntityManager mEntityManager;
+            size_t mCompId;
+            size_t mIdx;
+            Pool!C mPool;
+
+            void walkToNextMatch()
+            {
+                // step until the next component of type C, or the pool's end
+                while (!empty && !mEntityManager.mEntityComponentMask[mIdx][mCompId])
+                    ++mIdx;
+            }
         }
 
-        return ComponentView!C(this);
+        return ComponentView(this);
     }
 
 
@@ -728,4 +739,33 @@ unittest
 
     foreach(pos ; em.components!Dummy)
         assert(0, "Loop should never be entered");
+}
+
+// Test range interface for components!T
+unittest
+{
+    @component struct A
+    {
+        int a;
+    }
+
+    @component struct B
+    {
+        string b;
+    }
+
+    auto em = new EntityManager(new EventManager());
+
+    auto e1 = em.create();
+    auto e2 = em.create();
+    auto e3 = em.create();
+
+    e1.register!A(1);
+    e2.register!B("2");
+    e3.register!A(3);
+    e3.register!B("3");
+
+    import std.algorithm : map, equal;
+    assert(em.components!A.map!(x => x.a).equal([1, 3]));
+    assert(em.components!B.map!(x => x.b).equal(["2", "3"]));
 }
