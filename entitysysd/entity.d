@@ -359,50 +359,24 @@ public:
 
 
     /**
-     * Allows to browse through all the valid instances of a component with
-     * a foreach loop.
+     * Return a range of all the valid instances of a component.
      */
     auto components(C)() @property
         if (isComponent!C)
     {
-        struct ComponentView(C)
-            if (isComponent!C)
-        {
-            this(EntityManager em)
-            {
-                entityManager = em;
-            }
+        import std.range : iota;
+        import std.algorithm : map, filter;
 
-            int opApply(int delegate(C* component) dg)
-            {
-                int result = 0;
+        immutable compId = componentId!C();
 
-                auto compId = entityManager.componentId!C();
+        // if no such component has ever been registered, no pool will exist.
+        auto pool = (compId < mComponentPools.length) ?
+            cast(Pool!C)mComponentPools[compId] : null;
 
-                // return if no such component has ever been registered
-                if (compId >= entityManager.mComponentPools.length)
-                    return 0;
-
-                Pool!C pool = cast(Pool!C)entityManager.mComponentPools[compId];
-
-                for (int i; i < pool.nbElements; i++)
-                {
-                    if (!entityManager.mEntityComponentMask[i][compId])
-                        continue;
-                    result = dg(&pool[i]);
-                    if (result)
-                        break;
-                }
-
-                return result;
-            }
-
-            EntityManager entityManager;
-        }
-
-        return ComponentView!C(this);
+        return iota(0, (pool is null) ? 0 : pool.nbElements)
+            .filter!(i => mEntityComponentMask[i][compId])
+            .map!(i => &pool[i]);
     }
-
 
     /**
      * Allows to browse through the entities that have a required set of
@@ -728,4 +702,33 @@ unittest
 
     foreach(pos ; em.components!Dummy)
         assert(0, "Loop should never be entered");
+}
+
+// Test range interface for components!T
+unittest
+{
+    @component struct A
+    {
+        int a;
+    }
+
+    @component struct B
+    {
+        string b;
+    }
+
+    auto em = new EntityManager(new EventManager());
+
+    auto e1 = em.create();
+    auto e2 = em.create();
+    auto e3 = em.create();
+
+    e1.register!A(1);
+    e2.register!B("2");
+    e3.register!A(3);
+    e3.register!B("3");
+
+    import std.algorithm : map, equal;
+    assert(em.components!A.map!(x => x.a).equal([1, 3]));
+    assert(em.components!B.map!(x => x.b).equal(["2", "3"]));
 }
