@@ -370,10 +370,10 @@ public:
         immutable compId = componentId!C();
 
         // if no such component has ever been registered, no pool will exist.
-        auto pool = (compId < mComponentPools.length) ?
-            cast(Pool!C)mComponentPools[compId] : null;
+        auto pool = cast(Pool!C)mComponentPools[compId];
+        assert(pool !is null, "A component pool should never be null");
 
-        return iota(0, (pool is null) ? 0 : pool.nbElements)
+        return iota(0, pool.nbElements)
             .filter!(i => mEntityComponentMask[i][compId])
             .map!(i => &pool[i]);
     }
@@ -460,12 +460,8 @@ private:
         enforce!ComponentException(!mEntityComponentMask[uniqueId-1][compId]);
 
         // place new component into the pools
-        if (mComponentPools.length <= compId)
-        {
-            mComponentPools.length = compId + 1;
-            mComponentPools[compId] = new Pool!C(mIndexCounter);
-        }
         auto pool = cast(Pool!C)mComponentPools[compId];
+        assert(pool !is null, "A component pool should never be null");
 
         // Set the bit for this component.
         mEntityComponentMask[uniqueId-1][compId] = true;
@@ -514,7 +510,16 @@ private:
 
     size_t componentId(C)()
     {
-        return ComponentCounter!(C).getId();
+        immutable compId = ComponentCounter!(C).getId();
+
+        // ensure we have a pool to hold components of this type
+        if (mComponentPools.length <= compId)
+        {
+            mComponentPools.length = compId + 1;
+            mComponentPools[compId] = new Pool!C(mIndexCounter);
+        }
+
+        return compId;
     }
 
     void accomodateEntity()
@@ -702,6 +707,25 @@ unittest
 
     foreach(pos ; em.components!Dummy)
         assert(0, "Loop should never be entered");
+}
+
+// Validate fix for a bug where you could end up with uninitialized pools.
+// ent.isRegistered would create room for a pool without allocating it,
+// potentially creating null pools in the middle of the collection.
+// register was only checking the collection length, but did not ensure that the
+// pool it retrieved to store the component was non-null.
+unittest
+{
+    @component struct Dummy1 { }
+    @component struct Dummy2 { }
+
+    auto em = new EntityManager(new EventManager());
+    auto ent = em.create();
+
+    assert(!ent.isRegistered!Dummy1);
+    assert(!ent.isRegistered!Dummy2);
+    assert(ent.register!Dummy2);
+    assert(ent.register!Dummy1);
 }
 
 // Test range interface for components!T
