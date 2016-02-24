@@ -175,10 +175,12 @@ public:
     {
         auto eventId = EventCounter!E.getId();
 
-        if (mHandlers.length == 0) // no event-receiver registered yet
+        auto handlerGroup = eventId in mHandlers;
+
+        if (handlerGroup is null) // no event-receiver registered yet
             return;
 
-        foreach (rcv; mHandlers[eventId])
+        foreach (rcv; *handlerGroup)
         {
             // already subscribed
             if (rcv !is null)
@@ -350,4 +352,17 @@ unittest
     assert(testRcv0.str == "hello");
     assert(testRcv1.str == "123456");
     assert(testRcv2.str == "123world");
+}
+
+// validate that sending an event with no registered receivers does not crash
+unittest
+{
+    auto evtManager = new EventManager;
+
+    // registers a handler for StringEvent, but not IntEvent
+    auto testRcv0 = new TestReceiver0(evtManager);
+
+    // a bug caused this to fail when at least 1 receiver was registered but
+    // no receivers were registered for this event type
+    evtManager.emit!IntEvent(123);
 }
