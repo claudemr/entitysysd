@@ -30,6 +30,6 @@ doc:
 .PHONY: clean doc unittest help
 
 clean:
-	rm -rf out
-	rm doc/public/*.*
-	rm -rf doc/public/entitysysd
+	rm -rf out 2>/dev/null; true
+	rm doc/public/*.* 2>/dev/null; true
+	rm -rf doc/public/entitysysd 2>/dev/null; true
