@@ -49,15 +49,22 @@ $('#symbolSearchPane').show();
 			<section>
 				<p>Unregister a <a href="../../entitysysd/system/SystemManager.unregister.html#system"><code class="lang-d"><span class="pln">system</span></code></a>.
 </p>
-<section></section>
+<section><p>If <code class="lang-d">flag</code><code class="lang-d"> is </code><code class="lang-d">Yes.AutoSubscribe</code> (default), this will automatically
+ unsubscribe <code class="lang-d">system</code><code class="lang-d"> from any events for which it implements </code><code class="lang-d">Receiver</code>.
+ Note that this will not work if <code class="lang-d">system</code><code class="lang-d"> is passed as </code><code class="lang-d">ISystem</code> -- it
+ should be passed as its full type.
+</p>
+</section>
 
 					<section>
 						<h3>Prototype</h3>
 						<div class="prototype">
 							<code class="lang-d">
-<span class="typ">void</span> <span class="pln">unregister</span><span class="pun">(</span>
+<span class="typ">void</span> <span class="pln">unregister</span><span class="pun">(</span><span class="pln">T</span><span class="pun">)</span><span class="pun">(</span>
 								<br/>
-&nbsp;&nbsp;<a href="../../entitysysd/system/ISystem.html"><span class="typ">ISystem</span></a> <span class="pln">system</span>
+&nbsp;&nbsp;<span class="pln">T</span> <span class="pln">system</span><span class="pun">,</span>
+								<br/>
+&nbsp;&nbsp;<span class="typ">Flag</span>!"AutoSubscribe" <span class="pln">flag</span> <span class="pun">=</span> <span class="typ">Yes<wbr/></span><span class="pun">.</span><span class="typ">AutoSubscribe</span>
 								<br/>
 <span class="pun">)</span><span class="pun">;</span>
 							</code>
@@ -77,7 +84,7 @@ $('#symbolSearchPane').show();
 			</section>
 			<section>
 				<h2>Copyright</h2>
-<p>© 2015 Claude Merle
+<p>© 2015-2016 Claude Merle
 </p>
 
 			</section>

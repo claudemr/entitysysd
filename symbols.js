@@ -35,6 +35,7 @@ var symbols = [
 {name: 'entitysysd.event.event', kind: "enumdeclaration", path: './entitysysd/event/event.html', attributes: []},
 {name: 'entitysysd.event.EventManager', kind: "classdeclaration", path: './entitysysd/event/EventManager.html', attributes: []},
 {name: 'entitysysd.event.EventManager.emit', kind: "functiondeclaration", path: './entitysysd/event/EventManager.emit.html', attributes: []},
+{name: 'entitysysd.event.EventManager.isSubscribed', kind: "functiondeclaration", path: './entitysysd/event/EventManager.isSubscribed.html', attributes: []},
 {name: 'entitysysd.event.EventManager.subscribe', kind: "functiondeclaration", path: './entitysysd/event/EventManager.subscribe.html', attributes: []},
 {name: 'entitysysd.event.EventManager.unsubscribe', kind: "functiondeclaration", path: './entitysysd/event/EventManager.unsubscribe.html', attributes: []},
 {name: 'entitysysd.event.Receiver', kind: "interfacedeclaration", path: './entitysysd/event/Receiver.html', attributes: []},

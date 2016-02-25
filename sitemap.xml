@@ -38,6 +38,7 @@
 <url><loc>http://127.0.0.1/entitysysd/event/EventManager.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/event/EventManager.emit.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/event/EventManager.emit.html</loc></url>
+<url><loc>http://127.0.0.1/entitysysd/event/EventManager.isSubscribed.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/event/EventManager.subscribe.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/event/EventManager.unsubscribe.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/event/Receiver.html</loc></url>
