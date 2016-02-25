@@ -25,6 +25,7 @@ public import core.time;
 import std.algorithm;
 import std.container;
 import std.range;
+import std.typecons;
 
 import entitysysd.entity;
 import entitysysd.event;
@@ -99,25 +100,57 @@ public:
     /**
      * Register a new system.
      *
+     * If `subscribe` is `AutoSubscribe.yes` (default), this will automatically
+     * subscribe `system` to any events for which it implements `Receiver`.
+     * Note that this will not work if `system` is passed as `ISystem` -- it
+     * should be passed as its full type.
+     *
      * Throws: SystemException if the system was already registered.
      */
-    void register(ISystem system)
+    void register(T : ISystem)(T system, AutoSubscribe subscribe = AutoSubscribe.yes)
     {
         auto sysNode = mSystems[].find(system);
         enforce!SystemException(sysNode.empty);
         mSystems ~= system;
+
+        // auto-subscribe to events
+        if (subscribe)
+        {
+            import std.traits : InterfacesTuple;
+            foreach(Interface ; InterfacesTuple!T)
+            {
+                static if (is(Interface : Receiver!E, E))
+                    mEventManager.subscribe!E(system);
+            }
+        }
     }
 
     /**
      * Unregister a system.
      *
+     * If `subscribe` is `AutoSubscribe.yes` (default), this will automatically
+     * unsubscribe `system` from any events for which it implements `Receiver`.
+     * Note that this will not work if `system` is passed as `ISystem` -- it
+     * should be passed as its full type.
+     *
      * Throws: SystemException if the system was not registered.
      */
-    void unregister(ISystem system)
+    void unregister(T : ISystem)(T system, AutoSubscribe subscribe = AutoSubscribe.yes)
     {
         auto sysNode = mSystems[].find(system);
         enforce!SystemException(!sysNode.empty);
         mSystems.linearRemove(sysNode.take(1));
+
+        if (subscribe)
+        {
+            // auto-unsubscribe from events
+            import std.traits : InterfacesTuple;
+            foreach(Interface ; InterfacesTuple!T)
+            {
+                static if (is(Interface : Receiver!E, E))
+                    mEventManager.unsubscribe!E(system);
+            }
+        }
     }
 
     /**
@@ -167,4 +200,64 @@ private:
     EntityManager   mEntityManager;
     EventManager    mEventManager;
     DList!ISystem   mSystems;
+}
+
+/// Whether to (un)subscribe event handlers when (un)registering a `System`.
+alias AutoSubscribe = Flag!"AutoSubscribe";
+
+// validate event auto-subscription/unsubscription
+unittest
+{
+    @event struct EventA
+    {
+    }
+
+    @event struct EventB
+    {
+    }
+
+    class MySys : System, Receiver!EventA, Receiver!EventB
+    {
+        int eventCount;
+        void receive(EventA ev)
+        {
+            ++eventCount;
+        }
+        void receive(EventB ev)
+        {
+            ++eventCount;
+        }
+    }
+
+    auto events = new EventManager;
+    auto entities = new EntityManager(events);
+    auto systems = new SystemManager(entities, events);
+
+    auto sys = new MySys;
+
+    // regsitering the system should subscribe to MyEvent
+    systems.register(sys);
+    events.emit!EventA();
+    events.emit!EventB();
+    assert(sys.eventCount == 2);
+
+    // regsitering the system should unsubscribe from MyEvent
+    systems.unregister(sys);
+    events.emit!EventA();
+    events.emit!EventB();
+    assert(sys.eventCount == 2);
+
+    // explicitly disallow auto-subscription
+    systems.register(sys, AutoSubscribe.no);
+    events.emit!EventA();
+    events.emit!EventB();
+    assert(sys.eventCount == 2);
+
+    //// unregister without unsubscribing
+    systems.unregister(sys);
+    systems.register(sys, AutoSubscribe.yes);
+    systems.unregister(sys, AutoSubscribe.no);
+    events.emit!EventA();
+    events.emit!EventB();
+    assert(sys.eventCount == 4);
 }
