@@ -321,11 +321,6 @@ private:
 class ExplosionSystem : System, Receiver!CollisionEvent
 {
 public:
-    this(EventManager events)
-    {
-        events.subscribe!CollisionEvent(this);
-    }
-
     override void run(EntityManager es, EventManager events, Duration dt)
     {
         foreach (entity; mCollisions)
@@ -428,8 +423,8 @@ public:
         systems.register(new SpawnSystem(window, 20));
         systems.register(new MoveSystem(window));
         systems.register(new CollisionSystem(window));
-        systems.register(new ExplosionSystem(events));
-        systems.register(new ParticleSystem());
+        systems.register(new ExplosionSystem);
+        systems.register(new ParticleSystem);
         systems.register(new RenderSystem(renderer));
         systems.register(new ParticleRenderSystem(renderer));
     }
