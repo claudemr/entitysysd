@@ -21,9 +21,9 @@ along with EntitySysD. If not, see $(LINK http://www.gnu.org/licenses/).
 
 module entitysysd.event;
 
+import std.algorithm;
+import std.container;
 import std.typecons;
-
-import entitysysd.exception;
 
 
 /// UDA to use upon event struct's and union's.
@@ -111,19 +111,37 @@ class EventManager
 {
 public:
     /**
+     * Check whether a receiver class is subscribed to an event.
+     * Returns: true if it is subscribed, false otherwise.
+     */
+    bool isSubscribed(E)(Receiver!E receiver)
+        if (isEvent!E)
+    {
+        auto receive = cast(ReceiverDelegate)&receiver.receive;
+        auto eventId = EventCounter!E.getId();
+        auto handlerGroup = eventId in mHandlers;
+
+        if (handlerGroup is null)
+            return false;
+
+        if ((*handlerGroup).find(receive).length == 0)
+            return false;
+
+        return true;
+    }
+
+    /**
      * Subscribe a receiver class instance to an event.
-     *
-     * Throws: EventException if the receiver is already subscribed to that
-     *         event.
      */
     void subscribe(E)(Receiver!E receiver)
         if (isEvent!E)
     {
-        ReceiverDelegate receive = cast(ReceiverDelegate)&receiver.receive;
+        auto receive = cast(ReceiverDelegate)&receiver.receive;
         auto eventId = EventCounter!E.getId();
+        auto handlerGroup = eventId in mHandlers;
 
         // no subscriber for the event family, so create one, and we're done
-        if (!(eventId in mHandlers))
+        if (handlerGroup is null)
         {
             mHandlers[eventId] = [];
             mHandlers[eventId] ~= receive;
@@ -131,11 +149,11 @@ public:
         }
 
         // already subscribed?
-        foreach (ref rcv; mHandlers[eventId])
-            enforce!EventException(!(rcv == receive));
+        if ((*handlerGroup).find(receive).length != 0)
+            return;
 
         // look for empty spots
-        foreach (ref rcv; mHandlers[eventId])
+        foreach (ref rcv; *handlerGroup)
             if (rcv is null)
             {
                 rcv = receive;
@@ -143,26 +161,28 @@ public:
             }
 
         // else append the subscriber callback to the array
-        mHandlers[eventId] ~= receive;
+        *handlerGroup ~= receive;
     }
 
     /**
      * Unsubscribe a receiver class instance from an event.
-     *
-     * Throws: EventException if the receiver was not subscribed to that
-     *         event.
      */
     void unsubscribe(E)(Receiver!E receiver)
         if (isEvent!E)
     {
-        ReceiverDelegate receive = cast(ReceiverDelegate)&receiver.receive;
+        auto receive = cast(ReceiverDelegate)&receiver.receive;
         auto eventId = EventCounter!E.getId();
+        auto handlerGroup = eventId in mHandlers;
 
-        enforce!EventException(eventId in mHandlers);
+        if (handlerGroup is null)
+            return;
 
-        foreach (ref rcv; mHandlers[eventId])
+        foreach (ref rcv; *handlerGroup)
             if (rcv == receive)
+            {
                 rcv = null;
+                return; // there should be only one occurence of receive
+            }
     }
 
     /**
@@ -174,7 +194,6 @@ public:
         if (isEvent!E)
     {
         auto eventId = EventCounter!E.getId();
-
         auto handlerGroup = eventId in mHandlers;
 
         if (handlerGroup is null) // no event-receiver registered yet
@@ -217,7 +236,7 @@ public:
 
 private:
 
-    // For each id of event, we have a set of receiver-delegates
+    // For each id of event, we have a list of receiver-delegates
     ReceiverDelegate[][size_t] mHandlers;
 }
 
@@ -279,6 +298,8 @@ class TestReceiver2 : Receiver!TestEvent, Receiver!IntEvent
     this(EventManager evtManager)
     {
         evtManager.subscribe!TestEvent(this);
+        assert(evtManager.isSubscribed!TestEvent(this));
+        assert(!evtManager.isSubscribed!IntEvent(this));
         evtManager.subscribe!IntEvent(this);
     }
 

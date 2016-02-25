@@ -39,14 +39,6 @@ class ComponentException : Exception
     }
 }
 
-class EventException : Exception
-{
-    this(string msg, string file = null, size_t line = 0) @safe pure nothrow
-    {
-        super(msg, file, line);
-    }
-}
-
 class SystemException : Exception
 {
     this(string msg, string file = null, size_t line = 0) @safe pure nothrow

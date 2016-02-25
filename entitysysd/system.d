@@ -21,15 +21,15 @@ along with EntitySysD. If not, see $(LINK http://www.gnu.org/licenses/).
 
 module entitysysd.system;
 
+import entitysysd.entity;
+import entitysysd.event;
+import entitysysd.exception;
+
 public import core.time;
 import std.algorithm;
 import std.container;
 import std.range;
 import std.typecons;
-
-import entitysysd.entity;
-import entitysysd.event;
-import entitysysd.exception;
 
 
 /**
@@ -100,21 +100,22 @@ public:
     /**
      * Register a new system.
      *
-     * If `subscribe` is `AutoSubscribe.yes` (default), this will automatically
+     * If `flag` is `Yes.AutoSubscribe` (default), this will automatically
      * subscribe `system` to any events for which it implements `Receiver`.
      * Note that this will not work if `system` is passed as `ISystem` -- it
      * should be passed as its full type.
      *
      * Throws: SystemException if the system was already registered.
      */
-    void register(T : ISystem)(T system, AutoSubscribe subscribe = AutoSubscribe.yes)
+    void register(T : ISystem)(T system,
+                               Flag!"AutoSubscribe" flag = Yes.AutoSubscribe)
     {
         auto sysNode = mSystems[].find(system);
         enforce!SystemException(sysNode.empty);
         mSystems ~= system;
 
         // auto-subscribe to events
-        if (subscribe)
+        if (flag)
         {
             import std.traits : InterfacesTuple;
             foreach(Interface ; InterfacesTuple!T)
@@ -128,22 +129,23 @@ public:
     /**
      * Unregister a system.
      *
-     * If `subscribe` is `AutoSubscribe.yes` (default), this will automatically
+     * If `flag` is `Yes.AutoSubscribe` (default), this will automatically
      * unsubscribe `system` from any events for which it implements `Receiver`.
      * Note that this will not work if `system` is passed as `ISystem` -- it
      * should be passed as its full type.
      *
      * Throws: SystemException if the system was not registered.
      */
-    void unregister(T : ISystem)(T system, AutoSubscribe subscribe = AutoSubscribe.yes)
+    void unregister(T : ISystem)(T system,
+                                 Flag!"AutoSubscribe" flag = Yes.AutoSubscribe)
     {
         auto sysNode = mSystems[].find(system);
         enforce!SystemException(!sysNode.empty);
         mSystems.linearRemove(sysNode.take(1));
 
-        if (subscribe)
+        // auto-unsubscribe from events
+        if (flag)
         {
-            // auto-unsubscribe from events
             import std.traits : InterfacesTuple;
             foreach(Interface ; InterfacesTuple!T)
             {
@@ -202,8 +204,6 @@ private:
     DList!ISystem   mSystems;
 }
 
-/// Whether to (un)subscribe event handlers when (un)registering a `System`.
-alias AutoSubscribe = Flag!"AutoSubscribe";
 
 // validate event auto-subscription/unsubscription
 unittest
@@ -248,15 +248,15 @@ unittest
     assert(sys.eventCount == 2);
 
     // explicitly disallow auto-subscription
-    systems.register(sys, AutoSubscribe.no);
+    systems.register(sys, No.AutoSubscribe);
     events.emit!EventA();
     events.emit!EventB();
     assert(sys.eventCount == 2);
 
     //// unregister without unsubscribing
     systems.unregister(sys);
-    systems.register(sys, AutoSubscribe.yes);
-    systems.unregister(sys, AutoSubscribe.no);
+    systems.register(sys, Yes.AutoSubscribe);
+    systems.unregister(sys, No.AutoSubscribe);
     events.emit!EventA();
     events.emit!EventB();
     assert(sys.eventCount == 4);
