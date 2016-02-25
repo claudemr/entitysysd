@@ -283,6 +283,9 @@ class TestReceiver1 : Receiver!IntEvent
     this(EventManager evtManager)
     {
         evtManager.subscribe!IntEvent(this);
+        // do it aagain, it should silently return without subscribing it
+        // a second time
+        evtManager.subscribe!IntEvent(this);
     }
 
     void receive(IntEvent event)
