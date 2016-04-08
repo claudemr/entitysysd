@@ -32,34 +32,12 @@ import std.range;
 import std.typecons;
 
 
-/**
- * ISystem interface. System classes must derive from it and implement
- * $(D prepare), $(D run) or $(D unprepare).
- */
-interface ISystem
-{
-    /**
-     * Prepare any data for the frame before a proper run.
-     */
-    void prepare(EntityManager entities, EventManager events, Duration dt);
-
-    /**
-     * Called by the system-manager anytime its method run is called.
-     */
-    void run(EntityManager entities, EventManager events, Duration dt);
-
-    /**
-     * Unprepare any data for the frame after the run.
-     */
-    void unprepare(EntityManager entities, EventManager events, Duration dt);
-}
-
 
 /**
  * System abstract class. System classes may derive from it and override
  * $(D prepare), $(D run) or $(D unprepare).
  */
-abstract class System : ISystem
+abstract class System
 {
     /**
      * Prepare any data for the frame before a proper run.
@@ -102,12 +80,12 @@ public:
      *
      * If `flag` is `Yes.AutoSubscribe` (default), this will automatically
      * subscribe `system` to any events for which it implements `Receiver`.
-     * Note that this will not work if `system` is passed as `ISystem` -- it
+     * Note that this will not work if `system` is passed as `System` -- it
      * should be passed as its full type.
      *
      * Throws: SystemException if the system was already registered.
      */
-    void register(T : ISystem)(T system,
+    void register(T : System)(T system,
                                Flag!"AutoSubscribe" flag = Yes.AutoSubscribe)
     {
         auto sysNode = mSystems[].find(system);
@@ -118,7 +96,7 @@ public:
         if (flag)
         {
             import std.traits : InterfacesTuple;
-            foreach(Interface ; InterfacesTuple!T)
+            foreach (Interface ; InterfacesTuple!T)
             {
                 static if (is(Interface : IReceiver!E, E))
                     mEventManager.subscribe!E(system);
@@ -131,12 +109,12 @@ public:
      *
      * If `flag` is `Yes.AutoSubscribe` (default), this will automatically
      * unsubscribe `system` from any events for which it implements `Receiver`.
-     * Note that this will not work if `system` is passed as `ISystem` -- it
+     * Note that this will not work if `system` is passed as `System` -- it
      * should be passed as its full type.
      *
      * Throws: SystemException if the system was not registered.
      */
-    void unregister(T : ISystem)(T system,
+    void unregister(T : System)(T system,
                                  Flag!"AutoSubscribe" flag = Yes.AutoSubscribe)
     {
         auto sysNode = mSystems[].find(system);
@@ -147,7 +125,7 @@ public:
         if (flag)
         {
             import std.traits : InterfacesTuple;
-            foreach(Interface ; InterfacesTuple!T)
+            foreach (Interface ; InterfacesTuple!T)
             {
                 static if (is(Interface : Receiver!E, E))
                     mEventManager.unsubscribe!E(system);
@@ -198,7 +176,23 @@ public:
         unprepare(dt);
     }
 
-    // todo opApply to browse through systems
+    /**
+     * Browse through the registered systems.
+     */
+    int opApply(int delegate(System) dg)
+    {
+        int result = 0;
+
+        foreach (system; mSystems)
+        {
+            result = dg(system);
+            if (result != 0)
+                break;
+        }
+
+        return result;
+    }
+
     // todo Reorder systems with priorities. Can be absolute (signed integer)
     //      with special values such as "top", or "bottom". Can be relative to
     //      an already registered system "Above", "Behind".
@@ -215,7 +209,7 @@ public:
 private:
     EntityManager   mEntityManager;
     EventManager    mEventManager;
-    DList!ISystem   mSystems;
+    DList!System    mSystems;
 }
 
 
