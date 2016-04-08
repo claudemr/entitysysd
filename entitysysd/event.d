@@ -71,7 +71,7 @@ private:
  * Any receiver class needs to derive from this interface using a specific event
  * type and implement receive.
  */
-interface Receiver(E)
+interface IReceiver(E)
     if (isEvent!E)
 {
     /**
@@ -88,7 +88,7 @@ unittest
         int data;
     }
 
-    class MySystem : Receiver!MyEvent
+    class MySystem : IReceiver!MyEvent
     {
         this(EventManager evtManager)
         {
@@ -114,7 +114,7 @@ public:
      * Check whether a receiver class is subscribed to an event.
      * Returns: true if it is subscribed, false otherwise.
      */
-    bool isSubscribed(E)(Receiver!E receiver)
+    bool isSubscribed(E)(IReceiver!E receiver)
         if (isEvent!E)
     {
         auto receive = cast(ReceiverDelegate)&receiver.receive;
@@ -133,7 +133,7 @@ public:
     /**
      * Subscribe a receiver class instance to an event.
      */
-    void subscribe(E)(Receiver!E receiver)
+    void subscribe(E)(IReceiver!E receiver)
         if (isEvent!E)
     {
         auto receive = cast(ReceiverDelegate)&receiver.receive;
@@ -167,7 +167,7 @@ public:
     /**
      * Unsubscribe a receiver class instance from an event.
      */
-    void unsubscribe(E)(Receiver!E receiver)
+    void unsubscribe(E)(IReceiver!E receiver)
         if (isEvent!E)
     {
         auto receive = cast(ReceiverDelegate)&receiver.receive;

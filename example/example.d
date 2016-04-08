@@ -318,7 +318,7 @@ private:
 
 
 // For any two colliding bodies, destroys the bodies and emits a bunch of bodgy explosion particles.
-class ExplosionSystem : System, Receiver!CollisionEvent
+class ExplosionSystem : System, IReceiver!CollisionEvent
 {
 public:
     override void run(EntityManager es, EventManager events, Duration dt)

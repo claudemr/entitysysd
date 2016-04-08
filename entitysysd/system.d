@@ -120,7 +120,7 @@ public:
             import std.traits : InterfacesTuple;
             foreach(Interface ; InterfacesTuple!T)
             {
-                static if (is(Interface : Receiver!E, E))
+                static if (is(Interface : IReceiver!E, E))
                     mEventManager.subscribe!E(system);
             }
         }
@@ -197,6 +197,20 @@ public:
         run(dt);
         unprepare(dt);
     }
+
+    // todo opApply to browse through systems
+    // todo Reorder systems with priorities. Can be absolute (signed integer)
+    //      with special values such as "top", or "bottom". Can be relative to
+    //      an already registered system "Above", "Behind".
+    // todo Statistics module, allow to measure time consumed by a system.
+    //      Measure the whole (runFull) loop, measure only run's of every
+    //      systems and measure each individual system's run (skip prepare and
+    //      unprepare which should never hold big processing routines).
+    //      So SystemManager has 2 Stat instances, and each System may have 1
+    //      that can be turned on/off.
+    //      Stat interface provides an updateRate property, which will give a
+    //      period of time where the delay's will be sum to get an average, min
+    //      and max. A delegate may be given to be called-back when it updates.
 
 private:
     EntityManager   mEntityManager;
