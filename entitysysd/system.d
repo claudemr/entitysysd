@@ -32,6 +32,40 @@ import std.range;
 import std.typecons;
 
 
+/**
+ * Enum allowing to give special order of a system when registering it to the
+ * $(D SystemManager).
+ * $(D Order.first) places it first in the list.
+ * $(D Order.last) places it last in the list.
+ * $(D Order.before(mySystem) places it before mySystem in the list.
+ * $(D Order.after(mySystem) places it after mySystem in the list.
+ * For $(D before) and $(D after), it assumes mySystem is already registered.
+ */
+struct Order
+{
+public:
+    static auto first() @property
+    {
+        return Order(true, null);
+    }
+    static auto last() @property
+    {
+        return Order(false, null);
+    }
+    static auto before(S : System)(S system)
+    {
+        return Order(true, cast(System)system);
+    }
+    static auto after(S : System)(S system)
+    {
+        return Order(false, cast(System)system);
+    }
+
+private:
+    bool   mIsFirstOrBefore;
+    System mSystem;
+}
+
 
 /**
  * System abstract class. System classes may derive from it and override
@@ -39,6 +73,7 @@ import std.typecons;
  */
 abstract class System
 {
+protected:
     /**
      * Prepare any data for the frame before a proper run.
      */
@@ -59,6 +94,15 @@ abstract class System
     void unprepare(EntityManager entities, EventManager events, Duration dt)
     {
     }
+
+public:
+    final void reOrder(O)(Order!O order)
+    {
+        //todo
+    }
+
+private:
+    SystemManager mManager;
 }
 
 
@@ -85,18 +129,36 @@ public:
      *
      * Throws: SystemException if the system was already registered.
      */
-    void register(T : System)(T system,
-                               Flag!"AutoSubscribe" flag = Yes.AutoSubscribe)
+    void register(S : System)
+                 (S system,
+                  Order order = Order.last,
+                  Flag!"AutoSubscribe" flag = Yes.AutoSubscribe)
     {
+        // Check system is not already registered
         auto sysNode = mSystems[].find(system);
         enforce!SystemException(sysNode.empty);
+
+        // Set priority, and insert in list
+        /*switch (order)
+        {
+        case Order.first:
+            mSystems.insertFront(cast(System)system);
+            break;
+
+        case Order.last:
+            mSystems.insertBack(cast(System)system);
+            break;
+
+        case Order.before:
+        case Order.after:
+        }*/
         mSystems ~= system;
 
         // auto-subscribe to events
         if (flag)
         {
             import std.traits : InterfacesTuple;
-            foreach (Interface ; InterfacesTuple!T)
+            foreach (Interface ; InterfacesTuple!S)
             {
                 static if (is(Interface : IReceiver!E, E))
                     mEventManager.subscribe!E(system);
@@ -115,7 +177,7 @@ public:
      * Throws: SystemException if the system was not registered.
      */
     void unregister(T : System)(T system,
-                                 Flag!"AutoSubscribe" flag = Yes.AutoSubscribe)
+                                Flag!"AutoSubscribe" flag = Yes.AutoSubscribe)
     {
         auto sysNode = mSystems[].find(system);
         enforce!SystemException(!sysNode.empty);
@@ -127,7 +189,7 @@ public:
             import std.traits : InterfacesTuple;
             foreach (Interface ; InterfacesTuple!T)
             {
-                static if (is(Interface : Receiver!E, E))
+                static if (is(Interface : IReceiver!E, E))
                     mEventManager.unsubscribe!E(system);
             }
         }
@@ -193,9 +255,9 @@ public:
         return result;
     }
 
-    // todo Reorder systems with priorities. Can be absolute (signed integer)
-    //      with special values such as "top", or "bottom". Can be relative to
-    //      an already registered system "Above", "Behind".
+    // todo Reorder systems with order. Can be absolute (signed integer)
+    //      with special values such as "first", or "last". Can be relative to
+    //      an already registered system "after", "before".
     // todo Statistics module, allow to measure time consumed by a system.
     //      Measure the whole (runFull) loop, measure only run's of every
     //      systems and measure each individual system's run (skip prepare and
@@ -224,7 +286,7 @@ unittest
     {
     }
 
-    class MySys : System, Receiver!EventA, Receiver!EventB
+    class MySys : System, IReceiver!EventA, IReceiver!EventB
     {
         int eventCount;
         void receive(EventA ev)
@@ -256,14 +318,14 @@ unittest
     assert(sys.eventCount == 2);
 
     // explicitly disallow auto-subscription
-    systems.register(sys, No.AutoSubscribe);
+    systems.register(sys, Order.last, No.AutoSubscribe);
     events.emit!EventA();
     events.emit!EventB();
     assert(sys.eventCount == 2);
 
-    //// unregister without unsubscribing
+    // unregister without unsubscribing
     systems.unregister(sys);
-    systems.register(sys, Yes.AutoSubscribe);
+    systems.register(sys, Order.last, Yes.AutoSubscribe);
     systems.unregister(sys, No.AutoSubscribe);
     events.emit!EventA();
     events.emit!EventB();

@@ -261,7 +261,7 @@ import std.stdio;
     int data;
 }
 
-class TestReceiver0 : Receiver!TestEvent
+class TestReceiver0 : IReceiver!TestEvent
 {
     string str;
 
@@ -276,7 +276,7 @@ class TestReceiver0 : Receiver!TestEvent
     }
 }
 
-class TestReceiver1 : Receiver!IntEvent
+class TestReceiver1 : IReceiver!IntEvent
 {
     string str;
 
@@ -294,7 +294,7 @@ class TestReceiver1 : Receiver!IntEvent
     }
 }
 
-class TestReceiver2 : Receiver!TestEvent, Receiver!IntEvent
+class TestReceiver2 : IReceiver!TestEvent, IReceiver!IntEvent
 {
     string str;
 
