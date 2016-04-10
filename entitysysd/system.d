@@ -135,24 +135,38 @@ public:
                   Flag!"AutoSubscribe" flag = Yes.AutoSubscribe)
     {
         // Check system is not already registered
-        auto sysNode = mSystems[].find(system);
-        enforce!SystemException(sysNode.empty);
+        auto sr = mSystems[].find(system);
+        enforce!SystemException(sr.empty);
 
         // Set priority, and insert in list
-        /*switch (order)
+        if (order == Order.first)
         {
-        case Order.first:
             mSystems.insertFront(cast(System)system);
-            break;
-
-        case Order.last:
+        }
+        else if (order == Order.last)
+        {
             mSystems.insertBack(cast(System)system);
-            break;
+        }
+        else if (order.mIsFirstOrBefore)
+        {
+            auto or = mSystems[].find(order.mSystem);
+            enforce!SystemException(!or.empty);
+            mSystems.insertBefore(or, cast(System)system);
+        }
+        else //if (!order.mIsFirstOrBefore)
+        {
+            auto or = mSystems[];
+            enforce!SystemException(!or.empty);
+            //xxx dodgy, but DList's are tricky
+            while (or.back != order.mSystem)
+            {
+                or.popBack();
+                enforce!SystemException(!or.empty);
+            }
+            mSystems.insertAfter(or, cast(System)system);
+        }
 
-        case Order.before:
-        case Order.after:
-        }*/
-        mSystems ~= system;
+        system.mManager = this;
 
         // auto-subscribe to events
         if (flag)
@@ -179,9 +193,9 @@ public:
     void unregister(T : System)(T system,
                                 Flag!"AutoSubscribe" flag = Yes.AutoSubscribe)
     {
-        auto sysNode = mSystems[].find(system);
-        enforce!SystemException(!sysNode.empty);
-        mSystems.linearRemove(sysNode.take(1));
+        auto sr = mSystems[].find(system);
+        enforce!SystemException(!sr.empty);
+        mSystems.linearRemove(sr.take(1));
 
         // auto-unsubscribe from events
         if (flag)
@@ -255,9 +269,11 @@ public:
         return result;
     }
 
-    // todo Reorder systems with order. Can be absolute (signed integer)
-    //      with special values such as "first", or "last". Can be relative to
-    //      an already registered system "after", "before".
+    auto opSlice()
+    {
+        return mSystems[];
+    }
+
     // todo Statistics module, allow to measure time consumed by a system.
     //      Measure the whole (runFull) loop, measure only run's of every
     //      systems and measure each individual system's run (skip prepare and
@@ -305,13 +321,13 @@ unittest
 
     auto sys = new MySys;
 
-    // regsitering the system should subscribe to MyEvent
+    // registering the system should subscribe to MyEvent
     systems.register(sys);
     events.emit!EventA();
     events.emit!EventB();
     assert(sys.eventCount == 2);
 
-    // regsitering the system should unsubscribe from MyEvent
+    // registering the system should unsubscribe from MyEvent
     systems.unregister(sys);
     events.emit!EventA();
     events.emit!EventB();
@@ -330,4 +346,77 @@ unittest
     events.emit!EventA();
     events.emit!EventB();
     assert(sys.eventCount == 4);
+}
+
+
+// validate ordering
+unittest
+{
+    class MySys0 : System
+    {
+    }
+
+    class MySys1 : System
+    {
+    }
+
+    auto events = new EventManager;
+    auto entities = new EntityManager(events);
+    auto systems = new SystemManager(entities, events);
+
+    auto sys0 = new MySys0;
+    auto sys1 = new MySys1;
+    auto sys2 = new MySys0;
+    auto sys3 = new MySys1;
+    auto sys4 = new MySys0;
+    auto sys5 = new MySys1;
+    auto sys6 = new MySys0;
+    auto sys7 = new MySys1;
+
+    // registering the systems
+    systems.register(sys0);
+    systems.register(sys1, Order.last);
+    systems.register(sys2, Order.first);
+    systems.register(sys3, Order.first);
+    systems.register(sys4, Order.after(sys2));
+    systems.register(sys5, Order.before(sys3));
+    systems.register(sys6, Order.after(sys1));
+    systems.register(sys7, Order.before(sys4));
+
+    // check order is correct
+    auto sysRange = systems[];
+    assert(sysRange.front == sys5);
+    sysRange.popFront();
+    assert(sysRange.front == sys3);
+    sysRange.popFront();
+    assert(sysRange.front == sys2);
+    sysRange.popFront();
+    assert(sysRange.front == sys7);
+    sysRange.popFront();
+    assert(sysRange.front == sys4);
+    sysRange.popFront();
+    assert(sysRange.front == sys0);
+    sysRange.popFront();
+    assert(sysRange.front == sys1);
+    sysRange.popFront();
+    assert(sysRange.front == sys6);
+    sysRange.popFront();
+    assert(sysRange.empty);
+
+    // check exceptions
+    auto sysNA = new MySys0;
+    auto sysNB = new MySys1;
+
+    assert(collectException!SystemException(
+            systems.register(sys1))
+            !is null);
+    assert(collectException!SystemException(
+            systems.unregister(sysNA))
+            !is null);
+    assert(collectException!SystemException(
+            systems.register(sysNA, Order.after(sysNB)))
+            !is null);
+    assert(collectException!SystemException(
+            systems.register(sysNA, Order.before(sysNB)))
+            !is null);
 }
