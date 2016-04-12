@@ -21,13 +21,14 @@ along with EntitySysD. If not, see $(LINK http://www.gnu.org/licenses/).
 
 module entitysysd.system;
 
+public import entitysysd.stat;
+
 import entitysysd.entity;
 import entitysysd.event;
 import entitysysd.exception;
-
-public import core.time;
 import std.algorithm;
 import std.container;
+import std.format;
 import std.range;
 import std.typecons;
 
@@ -96,13 +97,26 @@ protected:
     }
 
 public:
+/*
     final void reOrder(O)(Order!O order)
     {
         //todo
+    }*/
+
+    final string name() @property const
+    {
+        return mName;
+    }
+
+    final ref const(Stat) stat() @property const
+    {
+        return mStat;
     }
 
 private:
+    string        mName;
     SystemManager mManager;
+    Stat          mStat;
 }
 
 
@@ -138,34 +152,9 @@ public:
         auto sr = mSystems[].find(system);
         enforce!SystemException(sr.empty);
 
-        // Set priority, and insert in list
-        if (order == Order.first)
-        {
-            mSystems.insertFront(cast(System)system);
-        }
-        else if (order == Order.last)
-        {
-            mSystems.insertBack(cast(System)system);
-        }
-        else if (order.mIsFirstOrBefore)
-        {
-            auto or = mSystems[].find(order.mSystem);
-            enforce!SystemException(!or.empty);
-            mSystems.insertBefore(or, cast(System)system);
-        }
-        else //if (!order.mIsFirstOrBefore)
-        {
-            auto or = mSystems[];
-            enforce!SystemException(!or.empty);
-            //xxx dodgy, but DList's are tricky
-            while (or.back != order.mSystem)
-            {
-                or.popBack();
-                enforce!SystemException(!or.empty);
-            }
-            mSystems.insertAfter(or, cast(System)system);
-        }
+        insert(system, order);
 
+        system.mName    = S.stringof ~ format("@%04x", cast(ushort)cast(void*)system);
         system.mManager = this;
 
         // auto-subscribe to events
@@ -195,7 +184,10 @@ public:
     {
         auto sr = mSystems[].find(system);
         enforce!SystemException(!sr.empty);
+
         mSystems.linearRemove(sr.take(1));
+
+        system.mManager = null;
 
         // auto-unsubscribe from events
         if (flag)
@@ -227,8 +219,20 @@ public:
      */
     void run(Duration dt)
     {
-        foreach (s; mSystems)
-            s.run(mEntityManager, mEventManager, dt);
+        if (mStatEnabled)
+            mStatRun.start();
+
+        foreach (sys; mSystems)
+        {
+            if (mStatEnabled)
+                sys.mStat.start();
+            sys.run(mEntityManager, mEventManager, dt);
+            if (mStatEnabled)
+                sys.mStat.stop();
+        }
+
+        if (mStatEnabled)
+            mStatRun.stop();
     }
 
     /**
@@ -247,32 +251,67 @@ public:
      */
     void runFull(Duration dt)
     {
+        if (mStatEnabled)
+            mStatAll.start();
+
         prepare(dt);
         run(dt);
         unprepare(dt);
-    }
 
-    /**
-     * Browse through the registered systems.
-     */
-    int opApply(int delegate(System) dg)
-    {
-        int result = 0;
-
-        foreach (system; mSystems)
+        if (mStatEnabled)
         {
-            result = dg(system);
-            if (result != 0)
-                break;
-        }
+            mStatAll.stop();
 
-        return result;
+            if (mStatAll.elapsedTime >= mStatRate)
+            {
+                mStatRun.update();
+                mStatAll.update();
+                foreach (sys; mSystems)
+                    sys.mStat.update();
+
+                if (mStatDg !is null)
+                    mStatDg();
+            }
+        }
     }
 
     auto opSlice()
     {
         return mSystems[];
     }
+
+    final ref const(Stat) statRun() @property const
+    {
+        return mStatRun;
+    }
+
+    final ref const(Stat) statAll() @property const
+    {
+        return mStatAll;
+    }
+
+    void enableStat(Duration rate = seconds(0), void delegate() dg = null)
+    {
+        mStatEnabled = true;
+        mStatRate    = rate;
+        mStatDg      = dg;
+    }
+
+    void disableStat()
+    {
+        mStatEnabled = false;
+        mStatRun.clear();
+        mStatAll.clear();
+        foreach (sys; mSystems)
+            sys.mStat.clear();
+    }
+
+    bool statEnabled() @property const
+    {
+        return mStatEnabled;
+    }
+
+
 
     // todo Statistics module, allow to measure time consumed by a system.
     //      Measure the whole (runFull) loop, measure only run's of every
@@ -285,10 +324,46 @@ public:
     //      and max. A delegate may be given to be called-back when it updates.
 
 private:
+    void insert(System system, Order order)
+    {
+        if (order == Order.first)
+        {
+            mSystems.insertFront(cast(System)system);
+        }
+        else if (order == Order.last)
+        {
+            mSystems.insertBack(cast(System)system);
+        }
+        else if (order.mIsFirstOrBefore)
+        {
+            auto or = mSystems[].find(order.mSystem);
+            enforce!SystemException(!or.empty);
+            mSystems.insertBefore(or, cast(System)system);
+        }
+        else //if (!order.mIsFirstOrBefore)
+        {
+            auto or = mSystems[];
+            enforce!SystemException(!or.empty);
+            //xxx dodgy, but DList's are tricky
+            while (or.back != order.mSystem)
+            {
+                or.popBack();
+                enforce!SystemException(!or.empty);
+            }
+            mSystems.insertAfter(or, cast(System)system);
+        }
+    }
+
     EntityManager   mEntityManager;
     EventManager    mEventManager;
     DList!System    mSystems;
+    bool            mStatEnabled;
+    Duration        mStatRate;
+    void delegate() mStatDg;
+    Stat            mStatAll;
+    Stat            mStatRun;
 }
+
 
 
 // validate event auto-subscription/unsubscription
