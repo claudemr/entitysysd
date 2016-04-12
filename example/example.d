@@ -443,7 +443,8 @@ void main()
     if (SDL_Init(SDL_INIT_EVERYTHING) == -1)
         return;
 
-    SDL_Window* window = SDL_CreateWindow("Example", 0, 0, 640, 480, 0);
+    SDL_Window* window = SDL_CreateWindow("EntitySysD example",
+                                          0, 0, 640, 480, 0);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
     SDL_RenderSetLogicalSize(renderer, 640, 480);
 

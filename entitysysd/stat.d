@@ -29,7 +29,7 @@ public import core.time;
  */
 struct Stat
 {
-public:
+package:
     void start()
     {
         mLastTime = MonoTime.currTime;
@@ -71,7 +71,11 @@ public:
         mRunCount = 0;
     }
 
-
+public:
+    /**
+     * Elapsed time since the last update (defined by rate parameter in the
+     * statistic enabling function of the system-manager).
+     */
     Duration elapsedTime() @property const
     {
         return mFirstTime == MonoTime.zero
@@ -79,21 +83,40 @@ public:
              : MonoTime.currTime - mFirstTime;
     }
 
+    /**
+     * Average duration of the profiled function (during the time defined by the
+     * rate parameter in the statistic enabling function of the system-manager).
+     */
     Duration averageDuration() @property const
     {
         return mAvg;
     }
 
+    /**
+     * Minimum measured duration of the profiled function (during the time
+     * defined by the rate parameter in the statistic enabling function of
+     * the system-manager).
+     */
     Duration minDuration() @property const
     {
         return mMin;
     }
 
+    /**
+     * Maximum measured duration of the profiled function (during the time
+     * defined by the rate parameter in the statistic enabling function of
+     * the system-manager).
+     */
     Duration maxDuration() @property const
     {
         return mMax;
     }
 
+    /**
+     * Number of times the profiled function was called (during the time
+     * defined by the rate parameter in the statistic enabling function of
+     * the system-manager).
+     */
     ulong runCount() @property const
     {
         return mRunCount;

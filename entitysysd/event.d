@@ -382,6 +382,11 @@ unittest
     assert(testRcv2.str == "123world");
 }
 
+
+//******************************************************************************
+//***** UNIT-TESTS
+//******************************************************************************
+
 // validate that sending an event with no registered receivers does not crash
 unittest
 {

@@ -85,7 +85,7 @@ public:
     }
 
     /**
-     * Destroy the entity.
+     * Destroy the entity (unregister all attached components).
      *
      * Throws: EntityException if the entity is invalid.
      */
@@ -561,6 +561,7 @@ private template Pointers(T...)
     private alias PtrTo(U) = U*;
     alias Pointers = staticMap!(PtrTo, T);
 }
+
 
 //******************************************************************************
 //***** UNIT-TESTS

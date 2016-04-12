@@ -100,9 +100,16 @@ protected:
     }
 
 public:
+    /**
+     * Change ordering of the system in the system-manager list.
+     *
+     * Throw:
+     * - A $(D SystemException) if the system is not registered.
+     */
     final void reorder(Order order)
     {
         enforce!SystemException(mManager !is null);
+
         auto sr = mManager.mSystems[].find(this);
         enforce!SystemException(!sr.empty);
 
@@ -111,11 +118,17 @@ public:
         mManager.insert(this, order);
     }
 
+    /**
+     * Name of system (given once at the registration by the system-manager).
+     */
     final string name() @property const
     {
         return mName;
     }
 
+    /**
+     * Reference on the system statistics.
+     */
     final ref const(Stat) stat() @property const
     {
         return mStat;
@@ -162,7 +175,8 @@ public:
 
         insert(system, order);
 
-        system.mName    = S.stringof ~ format("@%04x", cast(ushort)cast(void*)system);
+        system.mName    = S.stringof
+                        ~ format("@%04x", cast(ushort)cast(void*)system);
         system.mManager = this;
 
         // auto-subscribe to events
@@ -290,21 +304,38 @@ public:
         }
     }
 
+
+    /**
+     * Return a bidirectional range on the list of the registered systems.
+     */
     auto opSlice()
     {
         return mSystems[];
     }
 
+    /**
+     * Reference on profiling statistics of all the system's run.
+     */
     final ref const(Stat) statRun() @property const
     {
         return mStatRun;
     }
 
+    /**
+     * Reference on profiling statistics of all the system's prepare, unprepare
+     * and run.
+     */
     final ref const(Stat) statAll() @property const
     {
         return mStatAll;
     }
 
+    /**
+     * Enable statistics profiling on the system-manager and all its
+     * registered systems.
+     * A delegate $(D dg) can be given, the $(D rate) at which it will be called
+     * to provide significant stat's.
+     */
     void enableStat(Duration rate = seconds(0), void delegate() dg = null)
     {
         mStatEnabled = true;
@@ -312,6 +343,10 @@ public:
         mStatDg      = dg;
     }
 
+    /**
+     * Disable statistics profiling on the system-manager and all its
+     * registered systems.
+     */
     void disableStat()
     {
         mStatEnabled = false;
@@ -321,22 +356,13 @@ public:
             sys.mStat.clear();
     }
 
+    /**
+     * Tells whether statistics profiling is enabled or not.
+     */
     bool statEnabled() @property const
     {
         return mStatEnabled;
     }
-
-
-
-    // todo Statistics module, allow to measure time consumed by a system.
-    //      Measure the whole (runFull) loop, measure only run's of every
-    //      systems and measure each individual system's run (skip prepare and
-    //      unprepare which should never hold big processing routines).
-    //      So SystemManager has 2 Stat instances, and each System may have 1
-    //      that can be turned on/off.
-    //      Stat interface provides an updateRate property, which will give a
-    //      period of time where the delay's will be sum to get an average, min
-    //      and max. A delegate may be given to be called-back when it updates.
 
 private:
     void insert(System system, Order order)
@@ -380,6 +406,9 @@ private:
 }
 
 
+//******************************************************************************
+//***** UNIT-TESTS
+//******************************************************************************
 
 // validate event auto-subscription/unsubscription
 unittest

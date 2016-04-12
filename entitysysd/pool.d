@@ -116,7 +116,9 @@ class Pool(T, size_t ChunkSize = 8192) : BasePool
 }
 
 
-//dmd -main -unittest entitysysd/pool.d
+//******************************************************************************
+//***** UNIT-TESTS
+//******************************************************************************
 unittest
 {
     static struct TestComponent
