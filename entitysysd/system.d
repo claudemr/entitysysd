@@ -68,6 +68,9 @@ private:
 }
 
 
+deprecated("Please, use the abstract class `System` instead.")
+alias ISystem = System;
+
 /**
  * System abstract class. System classes may derive from it and override
  * $(D prepare), $(D run) or $(D unprepare).
@@ -167,6 +170,13 @@ public:
                     mEventManager.subscribe!E(system);
             }
         }
+    }
+
+    /// ditto
+    void register(S : System)
+                 (S system, Flag!"AutoSubscribe" flag)
+    {
+        register(system, Order.last, flag);
     }
 
     /**
@@ -416,7 +426,7 @@ unittest
 
     // unregister without unsubscribing
     systems.unregister(sys);
-    systems.register(sys, Order.last, Yes.AutoSubscribe);
+    systems.register(sys, Yes.AutoSubscribe);
     systems.unregister(sys, No.AutoSubscribe);
     events.emit!EventA();
     events.emit!EventB();

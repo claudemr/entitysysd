@@ -67,6 +67,10 @@ private:
     BaseEventCounter mBaseEventCounter;
 }
 
+
+deprecated("Please, use the name `IReceiver` instead.")
+alias Receiver = IReceiver;
+
 /**
  * Any receiver class needs to derive from this interface using a specific event
  * type and implement receive.
