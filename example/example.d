@@ -431,7 +431,7 @@ public:
 
     void run(Duration dt)
     {
-        systems.run(dt);
+        systems.runFull(dt);
     }
 }
 
@@ -443,7 +443,7 @@ void main()
     if (SDL_Init(SDL_INIT_EVERYTHING) == -1)
         return;
 
-    SDL_Window* window = SDL_CreateWindow("Server", 0, 0, 640, 480, 0);
+    SDL_Window* window = SDL_CreateWindow("Example", 0, 0, 640, 480, 0);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
     SDL_RenderSetLogicalSize(renderer, 640, 480);
 
@@ -451,6 +451,20 @@ void main()
 
     bool loop = true;
     MonoTime timestamp = MonoTime.currTime;
+
+    void dispTime()
+    {
+        writefln("All: %d/16000µs",
+                 app.systems.statAll.averageDuration.total!"usecs");
+        foreach (sys; app.systems[])
+            writefln("    - %s: %d/16000µs",
+                     sys.name, sys.stat.averageDuration.total!"usecs");
+    }
+
+    static if (true)
+    {
+        app.systems.enableStat(seconds(5), &dispTime);
+    }
 
     while (loop)
     {

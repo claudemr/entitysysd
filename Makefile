@@ -1,4 +1,4 @@
-_OBJ = component.o entity.o exception.o event.o package.o pool.o system.o
+_OBJ = component.o entity.o exception.o event.o package.o pool.o stat.o system.o
 OBJ = $(patsubst %,out/%,$(_OBJ))
 DDOX = ../ddox/ddox
 
