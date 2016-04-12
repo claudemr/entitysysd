@@ -100,11 +100,16 @@ protected:
     }
 
 public:
-/*
-    final void reOrder(O)(Order!O order)
+    final void reorder(Order order)
     {
-        //todo
-    }*/
+        enforce!SystemException(mManager !is null);
+        auto sr = mManager.mSystems[].find(this);
+        enforce!SystemException(!sr.empty);
+
+        mManager.mSystems.linearRemove(sr.take(1));
+
+        mManager.insert(this, order);
+    }
 
     final string name() @property const
     {
@@ -487,6 +492,18 @@ unittest
     assert(sysRange.front == sys6);
     sysRange.popFront();
     assert(sysRange.empty);
+
+    // check re-ordering works
+    sys3.reorder(Order.first);
+
+    sysRange = systems[];
+    assert(sysRange.front == sys3);
+    sysRange.popFront();
+    assert(sysRange.front == sys5);
+    sysRange.popFront();
+    assert(sysRange.front == sys2);
+    sysRange.popFront();
+    assert(!sysRange.empty);
 
     // check exceptions
     auto sysNA = new MySys0;
