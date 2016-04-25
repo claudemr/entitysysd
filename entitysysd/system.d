@@ -175,9 +175,9 @@ public:
 
         insert(system, order);
 
-        system.mName    = S.stringof
-                        ~ format("@%04x", cast(ushort)cast(void*)system);
-        system.mManager = this;
+        auto s = cast(System)system;
+        s.mName = S.stringof ~ format("@%04x", cast(ushort)cast(void*)system);
+        s.mManager = this;
 
         // auto-subscribe to events
         if (flag)
@@ -208,7 +208,7 @@ public:
      *
      * Throws: SystemException if the system was not registered.
      */
-    void unregister(T : System)(T system,
+    void unregister(S : System)(S system,
                                 Flag!"AutoSubscribe" flag = Yes.AutoSubscribe)
     {
         auto sr = mSystems[].find(system);
@@ -216,13 +216,14 @@ public:
 
         mSystems.linearRemove(sr.take(1));
 
-        system.mManager = null;
+        auto s = cast(System)system;
+        s.mManager = null;
 
         // auto-unsubscribe from events
         if (flag)
         {
             import std.traits : InterfacesTuple;
-            foreach (Interface ; InterfacesTuple!T)
+            foreach (Interface ; InterfacesTuple!S)
             {
                 static if (is(Interface : IReceiver!E, E))
                     mEventManager.unsubscribe!E(system);
