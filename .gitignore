@@ -1,4 +1,5 @@
 .dub
+.project
 entitysysd_example
 *.a
 out/*

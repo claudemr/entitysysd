@@ -36,27 +36,26 @@ import std.typecons;
 /**
  * Enum allowing to give special order of a system when registering it to the
  * $(D SystemManager).
- * $(D Order.first) places it first in the list.
- * $(D Order.last) places it last in the list.
- * $(D Order.before(mySystem) places it before mySystem in the list.
- * $(D Order.after(mySystem) places it after mySystem in the list.
- * For $(D before) and $(D after), it assumes mySystem is already registered.
  */
 struct Order
 {
 public:
+    /// Fisrt place in the list.
     static auto first() @property
     {
         return Order(true, null);
     }
+    /// Last place in the list.
     static auto last() @property
     {
         return Order(false, null);
     }
+    /// Place before $(D system) in the list.
     static auto before(S : System)(S system)
     {
         return Order(true, cast(System)system);
     }
+    /// Place after $(D system) in the list.
     static auto after(S : System)(S system)
     {
         return Order(false, cast(System)system);
@@ -67,7 +66,10 @@ private:
     System mSystem;
 }
 
-
+/**
+ * Deprecated. Alias to keep relative backward compatibility with older
+ * interface.
+ */
 deprecated("Please, use the abstract class `System` instead.")
 alias ISystem = System;
 
