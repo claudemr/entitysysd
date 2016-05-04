@@ -11,9 +11,12 @@
 	<body onload="setupDdox();">
 		<nav id="main-nav">
 						<ul class="tree-view">
-							<li class=" tree-view">
+							<li class="tree-view">
 								<a href="#" class="package">entitysysd</a>
 						<ul class="tree-view">
+							<li>
+								<a href="../../entitysysd.html" class=" module">Package members</a>
+							</li>
 							<li>
 								<a href="../../entitysysd/entity.html" class="selected module">entity</a>
 							</li>
@@ -21,12 +24,12 @@
 								<a href="../../entitysysd/event.html" class=" module">event</a>
 							</li>
 							<li>
+								<a href="../../entitysysd/stat.html" class=" module">stat</a>
+							</li>
+							<li>
 								<a href="../../entitysysd/system.html" class=" module">system</a>
 							</li>
 						</ul>
-							</li>
-							<li>
-								<a href="../../entitysysd.html" class=" module">entitysysd</a>
 							</li>
 						</ul>
 				<noscript>
@@ -47,9 +50,9 @@ $('#symbolSearchPane').show();
 		<div id="main-contents">
 			<h1>Struct Entity</h1>
 			<section>
-				<p><code class="lang-d"><span class="typ"><span class="typ">Entity</span></span></code> structure.
+				<p>Entity structure.
 </p>
-<section><p>This is the combination of two 32-bits <a href="../../entitysysd/entity/Entity.id.html"><code class="lang-d"><span class="pln">id</span></code></a>: a unique-<a href="../../entitysysd/entity/Entity.id.html"><code class="lang-d"><span class="pln">id</span></code></a> and a version-<a href="../../entitysysd/entity/Entity.id.html"><code class="lang-d"><span class="pln">id</span></code></a>.
+<section><p>This is the combination of two 32-bits id: a unique-id and a version-id.
 </p>
 </section>
 
@@ -86,7 +89,7 @@ $('#symbolSearchPane').show();
 									<span class="tableEntryAnnotation">[get]</span>
 								</td>
 								<td class="typecol"><code class="prettyprint lang-d"><span class="pln">C</span><span class="pun">*</span></code></td>
-								<td>Get a <code class="lang-d"><span class="pln">component</span></code> pointer of the entity.
+								<td>Get a component pointer of the entity.
 </td>
 							</tr>
 							<tr>
@@ -95,7 +98,7 @@ $('#symbolSearchPane').show();
 									<span class="tableEntryAnnotation">[set]</span>
 								</td>
 								<td class="typecol"><code class="prettyprint lang-d"><span class="pln">C</span></code></td>
-								<td>Set the value of a <a href="../../entitysysd/entity/Entity.component.html"><code class="lang-d"><span class="pln">component</span></code></a> of the entity.
+								<td>Set the value of a component of the entity.
 </td>
 							</tr>
 							<tr>
@@ -104,7 +107,7 @@ $('#symbolSearchPane').show();
 									<span class="tableEntryAnnotation">[get]</span>
 								</td>
 								<td class="typecol"><code class="prettyprint lang-d"><a href="../../entitysysd/entity/Entity.Id.html"><span class="typ">Entity<wbr/></span><span class="pun">.<wbr/></span><span class="typ">Id</span></a></code></td>
-								<td>Returns the <code class="lang-d"><span class="pln">id</span></code> of the entity.
+								<td>Returns the id of the entity.
 </td>
 							</tr>
 							<tr>
@@ -113,7 +116,7 @@ $('#symbolSearchPane').show();
 									<span class="tableEntryAnnotation">[get]</span>
 								</td>
 								<td class="typecol"><code class="prettyprint lang-d"><span class="typ">bool</span></code></td>
-								<td>Tells whether the entity is <code class="lang-d"><span class="pln"><span class="pln">valid</span></span></code>.
+								<td>Tells whether the entity is valid.
 </td>
 							</tr>
 						</table>
@@ -132,7 +135,7 @@ $('#symbolSearchPane').show();
 										<code>destroy</code>
 									</a>
 								</td>
-								<td>Destroy the entity.
+								<td>Destroy the entity (unregister all attached components).
 </td>
 							</tr>
 							<tr>
@@ -141,7 +144,7 @@ $('#symbolSearchPane').show();
 										<code>invalidate</code>
 									</a>
 								</td>
-								<td>Invalidate the entity instance (but does not <a href="../../entitysysd/entity/Entity.destroy.html"><code class="lang-d"><span class="pln">destroy</span></code></a> it).
+								<td>Invalidate the entity instance (but does not destroy it).
 </td>
 							</tr>
 							<tr>
@@ -150,7 +153,7 @@ $('#symbolSearchPane').show();
 										<code>isRegistered</code>
 									</a>
 								</td>
-								<td>Set the value of a <a href="../../entitysysd/entity/Entity.component.html"><code class="lang-d"><span class="pln"><a href="../../entitysysd/entity/Entity.component.html"><span class="pln">component</span></a></span></code></a> of the entity.
+								<td>Set the value of a component of the entity.
 </td>
 							</tr>
 							<tr>
@@ -159,7 +162,7 @@ $('#symbolSearchPane').show();
 										<code>opEquals</code>
 									</a>
 								</td>
-								<td>Compare two entities and tells whether they are the same (same <a href="../../entitysysd/entity/Entity.id.html"><code class="lang-d"><span class="pln"><a href="../../entitysysd/entity/Entity.id.html"><span class="pln">id</span></a></span></code></a>).
+								<td>Compare two entities and tells whether they are the same (same id).
 </td>
 							</tr>
 							<tr>
@@ -168,7 +171,7 @@ $('#symbolSearchPane').show();
 										<code>register</code>
 									</a>
 								</td>
-								<td>Register a <a href="../../entitysysd/entity/Entity.component.html"><code class="lang-d"><span class="pln">component</span></code></a> C to an entity.
+								<td>Register a component C to an entity.
 </td>
 							</tr>
 							<tr>
@@ -186,7 +189,7 @@ $('#symbolSearchPane').show();
 										<code>unregister</code>
 									</a>
 								</td>
-								<td>Unregister a <a href="../../entitysysd/entity/Entity.component.html"><code class="lang-d"><span class="pln"><a href="../../entitysysd/entity/Entity.component.html"><span class="pln">component</span></a></span></code></a> C from an entity.
+								<td>Unregister a component C from an entity.
 </td>
 							</tr>
 						</table>
@@ -210,12 +213,12 @@ $('#symbolSearchPane').show();
 						</table>
 					</section>
 <section><h3>Example</h3>
-<pre class="code"><code class="lang-d"><span class="pun">@<a href="../../entitysysd/entity/Entity.component.html"></span><span class="pln">component</a> </span><span class="kwd">struct </span><span class="typ">Position
+<pre class="code"><code class="lang-d"><span class="pun">@<a href="../../entitysysd/entity/Entity.component.html"></span><span class="pln">component</span></a><span class="pln"> </span><span class="kwd">struct </span><span class="typ">Position
 </span><span class="pun">{
     </span><span class="typ">float </span><span class="pln">x</span><span class="pun">, </span><span class="pln">y</span><span class="pun">;
 }
 
-</span><span class="kwd">auto </span><span class="pln">em </span><span class="pun">= </span><span class="kwd">new <a href="../../entitysysd/entity/EntityManager.html"></span><span class="typ">EntityManager</a></span><span class="pun">(</span><span class="kwd">new </span><span class="typ">EventManager</span><span class="pun">);
+</span><span class="kwd">auto </span><span class="pln">em </span><span class="pun">= </span><span class="kwd">new <a href="../../entitysysd/entity/EntityManager.html"></span><span class="typ">EntityManager</span></a><span class="pun">(</span><span class="kwd">new </span><span class="typ">EventManager</span><span class="pun">);
 </span><span class="kwd">auto </span><span class="pln">entity </span><span class="pun">= </span><span class="pln">em<wbr/></span><span class="pun">.</span><span class="pln">create</span><span class="pun">();
 </span><span class="kwd">auto </span><span class="pln">posCompPtr </span><span class="pun">= </span><span class="pln">entity<wbr/></span><span class="pun">.</span><span class="pln">register</span><span class="pun">!</span><span class="typ">Position</span><span class="pun">(</span><span class="lit">2.0</span><span class="pun">, </span><span class="lit">3.0</span><span class="pun">);
 

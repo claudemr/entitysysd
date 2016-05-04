@@ -11,9 +11,12 @@
 	<body onload="setupDdox();">
 		<nav id="main-nav">
 						<ul class="tree-view">
-							<li class=" tree-view">
+							<li class="tree-view">
 								<a href="#" class="package">entitysysd</a>
 						<ul class="tree-view">
+							<li>
+								<a href="../../entitysysd.html" class=" module">Package members</a>
+							</li>
 							<li>
 								<a href="../../entitysysd/entity.html" class="selected module">entity</a>
 							</li>
@@ -21,12 +24,12 @@
 								<a href="../../entitysysd/event.html" class=" module">event</a>
 							</li>
 							<li>
+								<a href="../../entitysysd/stat.html" class=" module">stat</a>
+							</li>
+							<li>
 								<a href="../../entitysysd/system.html" class=" module">system</a>
 							</li>
 						</ul>
-							</li>
-							<li>
-								<a href="../../entitysysd.html" class=" module">entitysysd</a>
 							</li>
 						</ul>
 				<noscript>
@@ -73,10 +76,10 @@ $('#symbolSearchPane').show();
 										<code>this</code>
 									</a>
 								</td>
-								<td>Constructor of the entity-manager. <a href="../../entitysysd/entity/EntityManager.this.html#eventManager"><code class="lang-d"><span class="pln"><a href="../../entitysysd/entity/EntityManager.this.html#eventManager"><span class="pln">eventManager</span></a></span></code></a> may be used to notify
- about entity creation and component registration. <a href="../../entitysysd/entity/EntityManager.this.html#maxComponent"><code class="lang-d"><span class="pln"><a href="../../entitysysd/entity/EntityManager.this.html#maxComponent"><span class="pln">maxComponent</span></a></span></code></a> sets
- the maximum number of <a href="../../entitysysd/entity/EntityManager.components.html"><code class="lang-d"><span class="pln"><a href="../../entitysysd/entity/EntityManager.components.html"><span class="pln">components</span></a></span></code></a> supported by the whole manager. <a href="../../entitysysd/entity/EntityManager.this.html#poolSize"><code class="lang-d"><span class="pln"><a href="../../entitysysd/entity/EntityManager.this.html#poolSize"><span class="pln">poolSize</span></a></span></code></a>
- is the chunk <a href="../../entitysysd/entity/EntityManager.size.html"><code class="lang-d"><span class="pln"><a href="../../entitysysd/entity/EntityManager.size.html"><span class="pln">size</span></a></span></code></a> in bytes for each <a href="../../entitysysd/entity/EntityManager.components.html"><code class="lang-d"><span class="pln"><a href="../../entitysysd/entity/EntityManager.components.html"><span class="pln">components</span></a></span></code></a>.
+								<td>Constructor of the entity-manager. eventManager may be used to notify
+ about entity creation and component registration. maxComponent sets
+ the maximum number of components supported by the whole manager. poolSize
+ is the chunk size in bytes for each components.
 </td>
 							</tr>
 						</table>
@@ -96,7 +99,7 @@ $('#symbolSearchPane').show();
 									<span class="tableEntryAnnotation">[get]</span>
 								</td>
 								<td class="typecol"><code class="prettyprint lang-d"><span class="typ">ulong</span></code></td>
-								<td>Current <code class="lang-d"><span class="pln"><span class="pln">capacity</span></span></code> entity.
+								<td>Current capacity entity.
 </td>
 							</tr>
 							<tr>
@@ -105,7 +108,7 @@ $('#symbolSearchPane').show();
 									<span class="tableEntryAnnotation">[get]</span>
 								</td>
 								<td class="typecol"><code class="prettyprint lang-d"></code></td>
-								<td>Return a range of all the <a href="../../entitysysd/entity/EntityManager.valid.html"><code class="lang-d"><span class="pln">valid</span></code></a> instances of a component.
+								<td>Return a range of all the valid instances of a component.
 </td>
 							</tr>
 							<tr>
@@ -115,7 +118,7 @@ $('#symbolSearchPane').show();
 								</td>
 								<td class="typecol"><code class="prettyprint lang-d"></code></td>
 								<td>Allows to browse through the entities that have a required set of
- <a href="../../entitysysd/entity/EntityManager.components.html"><code class="lang-d"><span class="pln"><a href="../../entitysysd/entity/EntityManager.components.html"><span class="pln">components</span></a></span></code></a>.
+ components.
 </td>
 							</tr>
 							<tr>
@@ -152,7 +155,7 @@ $('#symbolSearchPane').show();
 										<code>getEntity</code>
 									</a>
 								</td>
-								<td>Returns an entity from an an entity-<a href="../../entitysysd/entity/EntityManager.getEntity.html#id"><code class="lang-d"><span class="pln"><a href="../../entitysysd/entity/EntityManager.getEntity.html#id"><span class="pln">id</span></a></span></code></a>
+								<td>Returns an entity from an an entity-id
 </td>
 							</tr>
 							<tr>
@@ -161,7 +164,7 @@ $('#symbolSearchPane').show();
 										<code>opApply</code>
 									</a>
 								</td>
-								<td>Allows to browse through all the <a href="../../entitysysd/entity/EntityManager.valid.html"><code class="lang-d"><span class="pln"><a href="../../entitysysd/entity/EntityManager.valid.html"><span class="pln">valid</span></a></span></code></a> entities of the manager with
+								<td>Allows to browse through all the valid entities of the manager with
  a foreach loop.
 </td>
 							</tr>
@@ -171,7 +174,7 @@ $('#symbolSearchPane').show();
 										<code>valid</code>
 									</a>
 								</td>
-								<td>Return true if the given entity ID is still <code class="lang-d"><span class="pln">valid</span></code>.
+								<td>Return true if the given entity ID is still valid.
 </td>
 							</tr>
 						</table>

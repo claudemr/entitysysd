@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<title>Interface Receiver</title>
+		<title>Alias Receiver</title>
 		<link rel="stylesheet" type="text/css" href="../../styles/ddox.css"/>
 		<link rel="stylesheet" href="../../prettify/prettify.css" type="text/css"/>
 		<script type="text/javascript" src="../../scripts/jquery.js">/**/</script>
@@ -11,9 +11,12 @@
 	<body onload="setupDdox();">
 		<nav id="main-nav">
 						<ul class="tree-view">
-							<li class=" tree-view">
+							<li class="tree-view">
 								<a href="#" class="package">entitysysd</a>
 						<ul class="tree-view">
+							<li>
+								<a href="../../entitysysd.html" class=" module">Package members</a>
+							</li>
 							<li>
 								<a href="../../entitysysd/entity.html" class=" module">entity</a>
 							</li>
@@ -21,12 +24,12 @@
 								<a href="../../entitysysd/event.html" class="selected module">event</a>
 							</li>
 							<li>
+								<a href="../../entitysysd/stat.html" class=" module">stat</a>
+							</li>
+							<li>
 								<a href="../../entitysysd/system.html" class=" module">system</a>
 							</li>
 						</ul>
-							</li>
-							<li>
-								<a href="../../entitysysd.html" class=" module">entitysysd</a>
 							</li>
 						</ul>
 				<noscript>
@@ -45,53 +48,18 @@ $('#symbolSearchPane').show();
 				</div>
 		</nav>
 		<div id="main-contents">
-			<h1>Interface Receiver</h1>
+			<h1>Alias Receiver</h1>
 			<section>
-				<p>Any receiver class needs to derive from this interface using a specific <a href="../entitysysd/event/event.html"><code class="lang-d"><span class="pln"><a href="../../entitysysd/event/event.html"><span class="pln">event</span></a></span></code></a>
- type and implement <a href="../entitysysd/event/Receiver.receive.html"><code class="lang-d"><span class="pln"><a href="../../entitysysd/event/Receiver.receive.html"><span class="pln">receive</span></a></span></code></a>.
-</p>
+				<p></p>
 
 					<section>
-						<h3>Methods</h3>
-						<table>
-							<col class="caption"/>
-							<tr>
-								<th>Name</th>
-								<th>Description</th>
-							</tr>
-							<tr>
-								<td>
-									<a href="../../entitysysd/event/Receiver.receive.html" class="public">
-										<code>receive</code>
-									</a>
-								</td>
-								<td>Will be called each time an <a href="../../entitysysd/event/Receiver.receive.html#event"><code class="lang-d"><span class="pln"><a href="../../entitysysd/event/Receiver.receive.html#event"><span class="pln">event</span></a></span></code></a> of type E is emitted.
-</td>
-							</tr>
-						</table>
+						<h3>Declaration</h3>
+						<div class="prototype">
+							<code class="lang-d">
+<span class="kwd">alias</span> <span class="kwd">deprecated </span><span class="pln">Receiver</span><span class="pun">;</span>
+							</code>
+						</div>
 					</section>
-<section><h3>Example</h3>
-<pre class="code"><code class="lang-d"><span class="pun">@<a href="../../entitysysd/event/event.html"></span><span class="pln">event</a> </span><span class="kwd">struct </span><span class="typ">MyEvent
-</span><span class="pun">{
-    </span><span class="typ">int </span><span class="pln">data</span><span class="pun">;
-}
-
-</span><span class="kwd">class </span><span class="typ">MySystem </span><span class="pun">: </span><span class="typ">Receiver</span><span class="pun">!</span><span class="typ">MyEvent
-</span><span class="pun">{
-    </span><span class="kwd">this</span><span class="pun">(<a href="../../entitysysd/event/EventManager.html"></span><span class="typ">EventManager</a> </span><span class="pln">evtManager</span><span class="pun">)
-    {
-        </span><span class="pln">evtManager<wbr/></span><span class="pun">.</span><span class="pln">subscribe</span><span class="pun">!</span><span class="typ">MyEvent</span><span class="pun">(</span><span class="kwd">this</span><span class="pun">);
-    }
-
-    </span><span class="typ">void <a href="../../entitysysd/event/Receiver.receive.html"></span><span class="pln">receive</a></span><span class="pun">(</span><span class="typ">MyEvent <a href="../../entitysysd/event/event.html"></span><span class="pln">event</a></span><span class="pun">)
-    {
-        </span><span class="kwd">import </span><span class="pln">std<wbr/></span><span class="pun">.</span><span class="pln">stdio </span><span class="pun">: </span><span class="pln">write</span><span class="pun">;
-        </span><span class="com">// do something with event
-        </span><span class="pln">write</span><span class="pun">(</span><span class="pln">event<wbr/></span><span class="pun">.</span><span class="pln">data</span><span class="pun">);
-    }
-}
-</span></code></pre>
-</section>
 
 			</section>
 			<section>

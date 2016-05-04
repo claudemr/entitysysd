@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<title>Function System.run</title>
+		<title>Function System.name</title>
 		<link rel="stylesheet" type="text/css" href="../../styles/ddox.css"/>
 		<link rel="stylesheet" href="../../prettify/prettify.css" type="text/css"/>
 		<script type="text/javascript" src="../../scripts/jquery.js">/**/</script>
@@ -11,9 +11,12 @@
 	<body onload="setupDdox();">
 		<nav id="main-nav">
 						<ul class="tree-view">
-							<li class=" tree-view">
+							<li class="tree-view">
 								<a href="#" class="package">entitysysd</a>
 						<ul class="tree-view">
+							<li>
+								<a href="../../entitysysd.html" class=" module">Package members</a>
+							</li>
 							<li>
 								<a href="../../entitysysd/entity.html" class=" module">entity</a>
 							</li>
@@ -21,12 +24,12 @@
 								<a href="../../entitysysd/event.html" class=" module">event</a>
 							</li>
 							<li>
+								<a href="../../entitysysd/stat.html" class=" module">stat</a>
+							</li>
+							<li>
 								<a href="../../entitysysd/system.html" class="selected module">system</a>
 							</li>
 						</ul>
-							</li>
-							<li>
-								<a href="../../entitysysd.html" class=" module">entitysysd</a>
 							</li>
 						</ul>
 				<noscript>
@@ -45,24 +48,16 @@ $('#symbolSearchPane').show();
 				</div>
 		</nav>
 		<div id="main-contents">
-			<h1>Function System.run</h1>
+			<h1>Function System.name</h1>
 			<section>
-				<p>Called by the system-manager anytime its method <code class="lang-d"><span class="pln">run</span></code> is called.
+				<p>Name of system (given once at the registration by the system-manager).
 </p>
 
 					<section>
 						<h3>Prototype</h3>
 						<div class="prototype">
 							<code class="lang-d">
-<span class="typ">void</span> <span class="pln">run</span><span class="pun">(</span>
-								<br/>
-&nbsp;&nbsp;<a href="../../entitysysd/entity/EntityManager.html"><span class="typ">EntityManager</span></a> <span class="pln">entities</span><span class="pun">,</span>
-								<br/>
-&nbsp;&nbsp;<a href="../../entitysysd/event/EventManager.html"><span class="typ">EventManager</span></a> <span class="pln">events</span><span class="pun">,</span>
-								<br/>
-&nbsp;&nbsp;<span class="pln">core<wbr/></span><span class="pun">.</span><span class="pln">time<wbr/></span><span class="pun">.</span><span class="typ">Duration</span> <span class="pln">dt</span>
-								<br/>
-<span class="pun">)</span><span class="pun">;</span>
+<span class="kwd">final </span><span class="typ">string</span> <span class="pln">name<span class="pun">()</span><span class="pln"> </span><span class="kwd">@property const</span><span class="pun">;</span>
 							</code>
 						</div>
 					</section>

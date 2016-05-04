@@ -11,9 +11,12 @@
 	<body onload="setupDdox();">
 		<nav id="main-nav">
 						<ul class="tree-view">
-							<li class=" tree-view">
+							<li class="tree-view">
 								<a href="#" class="package">entitysysd</a>
 						<ul class="tree-view">
+							<li>
+								<a href="../entitysysd.html" class=" module">Package members</a>
+							</li>
 							<li>
 								<a href="../entitysysd/entity.html" class=" module">entity</a>
 							</li>
@@ -21,12 +24,12 @@
 								<a href="../entitysysd/event.html" class=" module">event</a>
 							</li>
 							<li>
+								<a href="../entitysysd/stat.html" class=" module">stat</a>
+							</li>
+							<li>
 								<a href="../entitysysd/system.html" class="selected module">system</a>
 							</li>
 						</ul>
-							</li>
-							<li>
-								<a href="../entitysysd.html" class=" module">entitysysd</a>
 							</li>
 						</ul>
 				<noscript>
@@ -46,31 +49,11 @@ $('#symbolSearchPane').show();
 		</nav>
 		<div id="main-contents">
 			<h1>Module entitysysd.system</h1>
-			<p><a href="./entitysysd/system/System.html"><code class="lang-d"><span class="typ"><a href="../entitysysd/system/System.html"><span class="typ">System</span></a></span></code></a> management module.
+			<p>System management module.
 </p>
 <section></section>
 
 			<section></section>
-			<section>
-				<h2>Interfaces</h2>
-				<table>
-					<col class="caption"/>
-					<tr>
-						<th>Name</th>
-						<th>Description</th>
-					</tr>
-					<tr>
-						<td>
-							<a id="ISystem" class="public" href="../entitysysd/system/ISystem.html">
-								<code>ISystem</code>
-							</a>
-						</td>
-						<td><code class="lang-d"><span class="typ">ISystem</span></code> interface. <a href="../entitysysd/system/System.html"><code class="lang-d"><span class="typ">System</span></code></a> classes must derive from it and implement
- <a href="../entitysysd/system/ISystem.prepare.html"><code class="lang-d"><span class="pln">prepare</span></code></a>, <a href="../entitysysd/system/ISystem.run.html"><code class="lang-d"><span class="pln">run</span></code></a> or <a href="../entitysysd/system/ISystem.unprepare.html"><code class="lang-d"><span class="pln">unprepare</span></code></a>.
-</td>
-					</tr>
-				</table>
-			</section>
 			<section>
 				<h2>Classes</h2>
 				<table>
@@ -85,8 +68,8 @@ $('#symbolSearchPane').show();
 								<code>System</code>
 							</a>
 						</td>
-						<td><code class="lang-d"><span class="typ">System</span></code> abstract class. <code class="lang-d"><span class="typ">System</span></code> classes may derive from it and override
- <a href="../entitysysd/system/System.prepare.html"><code class="lang-d"><span class="pln">prepare</span></code></a>, <a href="../entitysysd/system/System.run.html"><code class="lang-d"><span class="pln">run</span></code></a> or <a href="../entitysysd/system/System.unprepare.html"><code class="lang-d"><span class="pln">unprepare</span></code></a>.
+						<td>System abstract class. System classes may derive from it and override
+ <code class="lang-d"><span class="pln">prepare</span></code>, <code class="lang-d"><span class="pln">run</span></code> or <code class="lang-d"><span class="pln">unprepare</span></code>.
 </td>
 					</tr>
 					<tr>
@@ -95,8 +78,55 @@ $('#symbolSearchPane').show();
 								<code>SystemManager</code>
 							</a>
 						</td>
-						<td>Entry point for systems. Allow to <a href="../entitysysd/system/SystemManager.register.html"><code class="lang-d"><span class="pln">register</span></code></a> systems.
+						<td>Entry point for systems. Allow to register systems.
 </td>
+					</tr>
+				</table>
+			</section>
+			<section>
+				<h2>Structs</h2>
+				<table>
+					<col class="caption"/>
+					<tr>
+						<th>Name</th>
+						<th>Description</th>
+					</tr>
+					<tr>
+						<td>
+							<a id="Order" class="public" href="../entitysysd/system/Order.html">
+								<code>Order</code>
+							</a>
+						</td>
+						<td>Enum allowing to give special order of a system when registering it to the
+ <code class="lang-d"><a href="../entitysysd/system/SystemManager.html"><span class="typ">SystemManager</span></a></code>.
+ <code class="lang-d"><a href="../entitysysd/system/Order.first.html"><span class="typ">Order<wbr/></span><span class="pun">.</span><span class="pln">first</span></a></code> places it first in the list.
+ <code class="lang-d"><a href="../entitysysd/system/Order.last.html"><span class="typ">Order<wbr/></span><span class="pun">.</span><span class="pln">last</span></a></code> places it last in the list.
+ (D Order.before(mySystem) places it before mySystem in the list.
+ (D Order.after(mySystem) places it after mySystem in the list.
+ For <code class="lang-d"><a href="../entitysysd/system/Order.before.html"><span class="pln">before</span></a></code> and <code class="lang-d"><a href="../entitysysd/system/Order.after.html"><span class="pln">after</span></a></code>, it assumes mySystem is already registered.
+</td>
+					</tr>
+				</table>
+			</section>
+			<section>
+				<h2>Aliases</h2>
+				<table>
+					<col class="caption"/>
+					<tr>
+						<th>Name</th>
+						<th>Type</th>
+						<th>Description</th>
+					</tr>
+					<tr>
+						<td>
+							<a id="ISystem" class="public" href="../entitysysd/system/ISystem.html">
+								<code>ISystem</code>
+							</a>
+						</td>
+						<td>
+<code class="prettyprint lang-d"><a href="../entitysysd/system/System.html"><span class="typ">System</span></a></code>
+						</td>
+						<td></td>
 					</tr>
 				</table>
 			</section>

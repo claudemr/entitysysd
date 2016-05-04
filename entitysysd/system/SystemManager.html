@@ -11,9 +11,12 @@
 	<body onload="setupDdox();">
 		<nav id="main-nav">
 						<ul class="tree-view">
-							<li class=" tree-view">
+							<li class="tree-view">
 								<a href="#" class="package">entitysysd</a>
 						<ul class="tree-view">
+							<li>
+								<a href="../../entitysysd.html" class=" module">Package members</a>
+							</li>
 							<li>
 								<a href="../../entitysysd/entity.html" class=" module">entity</a>
 							</li>
@@ -21,12 +24,12 @@
 								<a href="../../entitysysd/event.html" class=" module">event</a>
 							</li>
 							<li>
+								<a href="../../entitysysd/stat.html" class=" module">stat</a>
+							</li>
+							<li>
 								<a href="../../entitysysd/system.html" class="selected module">system</a>
 							</li>
 						</ul>
-							</li>
-							<li>
-								<a href="../../entitysysd.html" class=" module">entitysysd</a>
 							</li>
 						</ul>
 				<noscript>
@@ -47,7 +50,7 @@ $('#symbolSearchPane').show();
 		<div id="main-contents">
 			<h1>Class SystemManager</h1>
 			<section>
-				<p>Entry point for systems. Allow to <a href="../entitysysd/system/SystemManager.register.html"><code class="lang-d"><span class="pln"><a href="../../entitysysd/system/SystemManager.register.html"><span class="pln">register</span></a></span></code></a> systems.
+				<p>Entry point for systems. Allow to register systems.
 </p>
 
 					<section>
@@ -78,12 +81,82 @@ $('#symbolSearchPane').show();
 						</table>
 					</section>
 					<section>
+						<h3>Properties</h3>
+						<table>
+							<col class="caption"/>
+							<tr>
+								<th>Name</th>
+								<th>Type</th>
+								<th>Description</th>
+							</tr>
+							<tr>
+								<td>
+									<a href="../../entitysysd/system/SystemManager.statAll.html" class="public property"><code>statAll</code></a>
+									<span class="tableEntryAnnotation">[get]</span>
+								</td>
+								<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../entitysysd/stat/Stat.html"><span class="typ">Stat</span></a><span class="pun">)</span></code></td>
+								<td>Reference on profiling statistics of all the system's prepare, unprepare
+ and run.
+</td>
+							</tr>
+							<tr>
+								<td>
+									<a href="../../entitysysd/system/SystemManager.statEnabled.html" class="public property"><code>statEnabled</code></a>
+									<span class="tableEntryAnnotation">[get]</span>
+								</td>
+								<td class="typecol"><code class="prettyprint lang-d"><span class="typ">bool</span></code></td>
+								<td>Tells whether statistics profiling is enabled or not.
+</td>
+							</tr>
+							<tr>
+								<td>
+									<a href="../../entitysysd/system/SystemManager.statRun.html" class="public property"><code>statRun</code></a>
+									<span class="tableEntryAnnotation">[get]</span>
+								</td>
+								<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../entitysysd/stat/Stat.html"><span class="typ">Stat</span></a><span class="pun">)</span></code></td>
+								<td>Reference on profiling statistics of all the system's run.
+</td>
+							</tr>
+						</table>
+					</section>
+					<section>
 						<h3>Methods</h3>
 						<table>
 							<col class="caption"/>
 							<tr>
 								<th>Name</th>
 								<th>Description</th>
+							</tr>
+							<tr>
+								<td>
+									<a href="../../entitysysd/system/SystemManager.disableStat.html" class="public">
+										<code>disableStat</code>
+									</a>
+								</td>
+								<td>Disable statistics profiling on the system-manager and all its
+ registered systems.
+</td>
+							</tr>
+							<tr>
+								<td>
+									<a href="../../entitysysd/system/SystemManager.enableStat.html" class="public">
+										<code>enableStat</code>
+									</a>
+								</td>
+								<td>Enable statistics profiling on the system-manager and all its
+ registered systems.
+ A delegate <code class="lang-d"><a href="../../entitysysd/system/SystemManager.enableStat.html#dg"><span class="pln">dg</span></a></code> can be given, the <code class="lang-d"><a href="../../entitysysd/system/SystemManager.enableStat.html#rate"><span class="pln">rate</span></a></code> at which it will be called
+ to provide significant stat's.
+</td>
+							</tr>
+							<tr>
+								<td>
+									<a href="../../entitysysd/system/SystemManager.opSlice.html" class="public">
+										<code>opSlice</code>
+									</a>
+								</td>
+								<td>Return a bidirectional range on the list of the registered systems.
+</td>
 							</tr>
 							<tr>
 								<td>
@@ -100,7 +173,7 @@ $('#symbolSearchPane').show();
 										<code>register</code>
 									</a>
 								</td>
-								<td>Register a new <a href="../../entitysysd/system/SystemManager.register.html#system"><code class="lang-d"><span class="pln"><a href="../../entitysysd/system/SystemManager.register.html#system"><span class="pln">system</span></a></span></code></a>.
+								<td>Register a new system.
 </td>
 							</tr>
 							<tr>
@@ -118,7 +191,7 @@ $('#symbolSearchPane').show();
 										<code>runFull</code>
 									</a>
 								</td>
-								<td>Prepare, <a href="../../entitysysd/system/SystemManager.run.html"><code class="lang-d"><span class="pln">run</span></code></a> and <a href="../../entitysysd/system/SystemManager.unprepare.html"><code class="lang-d"><span class="pln">unprepare</span></code></a> all the registered systems.
+								<td>Prepare, run and unprepare all the registered systems.
 </td>
 							</tr>
 							<tr>
@@ -136,7 +209,7 @@ $('#symbolSearchPane').show();
 										<code>unregister</code>
 									</a>
 								</td>
-								<td>Unregister a <a href="../../entitysysd/system/SystemManager.unregister.html#system"><code class="lang-d"><span class="pln"><a href="../../entitysysd/system/SystemManager.unregister.html#system"><span class="pln">system</span></a></span></code></a>.
+								<td>Unregister a system.
 </td>
 							</tr>
 						</table>

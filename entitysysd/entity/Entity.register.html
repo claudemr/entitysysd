@@ -11,9 +11,12 @@
 	<body onload="setupDdox();">
 		<nav id="main-nav">
 						<ul class="tree-view">
-							<li class=" tree-view">
+							<li class="tree-view">
 								<a href="#" class="package">entitysysd</a>
 						<ul class="tree-view">
+							<li>
+								<a href="../../entitysysd.html" class=" module">Package members</a>
+							</li>
 							<li>
 								<a href="../../entitysysd/entity.html" class="selected module">entity</a>
 							</li>
@@ -21,12 +24,12 @@
 								<a href="../../entitysysd/event.html" class=" module">event</a>
 							</li>
 							<li>
+								<a href="../../entitysysd/stat.html" class=" module">stat</a>
+							</li>
+							<li>
 								<a href="../../entitysysd/system.html" class=" module">system</a>
 							</li>
 						</ul>
-							</li>
-							<li>
-								<a href="../../entitysysd.html" class=" module">entitysysd</a>
 							</li>
 						</ul>
 				<noscript>
@@ -47,7 +50,7 @@ $('#symbolSearchPane').show();
 		<div id="main-contents">
 			<h1>Function Entity.register</h1>
 			<section>
-				<p>Register a <a href="../../entitysysd/entity/Entity.component.html"><code class="lang-d"><span class="pln"><a href="../../entitysysd/entity/Entity.component.html"><span class="pln">component</span></a></span></code></a> C to an entity.
+				<p>Register a component C to an entity.
 </p>
 <section></section>
 
@@ -66,13 +69,13 @@ $('#symbolSearchPane').show();
 						</div>
 					</section>
 <section><h3>Returns</h3>
-<p>A pointer on the <a href="../../entitysysd/entity/Entity.component.html"><code class="lang-d"><span class="pln">component</span></code></a> for this entity.
+<p>A pointer on the component for this entity.
 </p>
 </section>
 <section><h3>Throws</h3>
-<p>EntityException if the entity is <a href="../../entitysysd/entity/Entity.invalid.html"><code class="lang-d"><span class="pln">invalid</span></code></a>.
-         ComponentException if there is no room for that <a href="../../entitysysd/entity/Entity.component.html"><code class="lang-d"><span class="pln">component</span></code></a> or if
-                            if the <a href="../../entitysysd/entity/Entity.component.html"><code class="lang-d"><span class="pln">component</span></code></a> is already registered.
+<p>EntityException if the entity is invalid.
+         ComponentException if there is no room for that component or if
+                            if the component is already registered.
 </p>
 </section>
 

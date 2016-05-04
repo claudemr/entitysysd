@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<title>Function Receiver.receive</title>
+		<title>Function Order.after</title>
 		<link rel="stylesheet" type="text/css" href="../../styles/ddox.css"/>
 		<link rel="stylesheet" href="../../prettify/prettify.css" type="text/css"/>
 		<script type="text/javascript" src="../../scripts/jquery.js">/**/</script>
@@ -11,22 +11,25 @@
 	<body onload="setupDdox();">
 		<nav id="main-nav">
 						<ul class="tree-view">
-							<li class=" tree-view">
+							<li class="tree-view">
 								<a href="#" class="package">entitysysd</a>
 						<ul class="tree-view">
+							<li>
+								<a href="../../entitysysd.html" class=" module">Package members</a>
+							</li>
 							<li>
 								<a href="../../entitysysd/entity.html" class=" module">entity</a>
 							</li>
 							<li>
-								<a href="../../entitysysd/event.html" class="selected module">event</a>
+								<a href="../../entitysysd/event.html" class=" module">event</a>
 							</li>
 							<li>
-								<a href="../../entitysysd/system.html" class=" module">system</a>
+								<a href="../../entitysysd/stat.html" class=" module">stat</a>
+							</li>
+							<li>
+								<a href="../../entitysysd/system.html" class="selected module">system</a>
 							</li>
 						</ul>
-							</li>
-							<li>
-								<a href="../../entitysysd.html" class=" module">entitysysd</a>
 							</li>
 						</ul>
 				<noscript>
@@ -45,18 +48,18 @@ $('#symbolSearchPane').show();
 				</div>
 		</nav>
 		<div id="main-contents">
-			<h1>Function Receiver.receive</h1>
+			<h1>Function Order.after</h1>
 			<section>
-				<p>Will be called each time an <a href="../../entitysysd/event/Receiver.receive.html#event"><code class="lang-d"><span class="pln">event</span></code></a> of type E is emitted.
+				<p>Place after <code class="lang-d"><a href="../../entitysysd/system/Order.after.html#system"><span class="pln">system</span></a></code> in the list.
 </p>
 
 					<section>
 						<h3>Prototype</h3>
 						<div class="prototype">
 							<code class="lang-d">
-<span class="typ">void</span> <span class="pln">receive</span><span class="pun">(</span>
+<span class="kwd">auto</span> <span class="pln">after</span><span class="pun">(</span><span class="pln">S</span><span class="pun">)</span><span class="pun">(</span>
 								<br/>
-&nbsp;&nbsp;<span class="pln">E</span> <span class="pln">event</span>
+&nbsp;&nbsp;<span class="pln">S</span> <span class="pln">system</span>
 								<br/>
 <span class="pun">)</span><span class="pun">;</span>
 							</code>

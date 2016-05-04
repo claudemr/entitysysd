@@ -11,9 +11,12 @@
 	<body onload="setupDdox();">
 		<nav id="main-nav">
 						<ul class="tree-view">
-							<li class=" tree-view">
+							<li class="tree-view">
 								<a href="#" class="package">entitysysd</a>
 						<ul class="tree-view">
+							<li>
+								<a href="../../entitysysd.html" class=" module">Package members</a>
+							</li>
 							<li>
 								<a href="../../entitysysd/entity.html" class=" module">entity</a>
 							</li>
@@ -21,12 +24,12 @@
 								<a href="../../entitysysd/event.html" class=" module">event</a>
 							</li>
 							<li>
+								<a href="../../entitysysd/stat.html" class=" module">stat</a>
+							</li>
+							<li>
 								<a href="../../entitysysd/system.html" class="selected module">system</a>
 							</li>
 						</ul>
-							</li>
-							<li>
-								<a href="../../entitysysd.html" class=" module">entitysysd</a>
 							</li>
 						</ul>
 				<noscript>
@@ -47,11 +50,11 @@ $('#symbolSearchPane').show();
 		<div id="main-contents">
 			<h1>Function SystemManager.unregister</h1>
 			<section>
-				<p>Unregister a <a href="../../entitysysd/system/SystemManager.unregister.html#system"><code class="lang-d"><span class="pln">system</span></code></a>.
+				<p>Unregister a system.
 </p>
-<section><p>If <code class="lang-d">flag</code><code class="lang-d"> is </code><code class="lang-d">Yes.AutoSubscribe</code> (default), this will automatically
- unsubscribe <code class="lang-d">system</code><code class="lang-d"> from any events for which it implements </code><code class="lang-d">Receiver</code>.
- Note that this will not work if <code class="lang-d">system</code><code class="lang-d"> is passed as </code><code class="lang-d">ISystem</code> -- it
+<section><p>If <code class="lang-d"><a href="../../entitysysd/system/SystemManager.unregister.html#flag"><span class="pln">flag</span></a></code> is <code class="lang-d"><span class="typ">Yes<wbr/></span><span class="pun">.</span><span class="typ">AutoSubscribe</span></code> (default), this will automatically
+ unsubscribe <code class="lang-d"><a href="../../entitysysd/system/SystemManager.unregister.html#system"><span class="pln">system</span></a></code> from any events for which it implements <code class="lang-d"><span class="typ">Receiver</span></code>.
+ Note that this will not work if <code class="lang-d"><a href="../../entitysysd/system/SystemManager.unregister.html#system"><span class="pln">system</span></a></code> is passed as <code class="lang-d"><a href="../../entitysysd/system/System.html"><span class="typ">System</span></a></code> -- it
  should be passed as its full type.
 </p>
 </section>
@@ -60,9 +63,9 @@ $('#symbolSearchPane').show();
 						<h3>Prototype</h3>
 						<div class="prototype">
 							<code class="lang-d">
-<span class="typ">void</span> <span class="pln">unregister</span><span class="pun">(</span><span class="pln">T</span><span class="pun">)</span><span class="pun">(</span>
+<span class="typ">void</span> <span class="pln">unregister</span><span class="pun">(</span><span class="pln">S</span><span class="pun">)</span><span class="pun">(</span>
 								<br/>
-&nbsp;&nbsp;<span class="pln">T</span> <span class="pln">system</span><span class="pun">,</span>
+&nbsp;&nbsp;<span class="pln">S</span> <span class="pln">system</span><span class="pun">,</span>
 								<br/>
 &nbsp;&nbsp;<span class="typ">Flag</span>!"AutoSubscribe" <span class="pln">flag</span> <span class="pun">=</span> <span class="typ">Yes<wbr/></span><span class="pun">.</span><span class="typ">AutoSubscribe</span>
 								<br/>
@@ -71,7 +74,7 @@ $('#symbolSearchPane').show();
 						</div>
 					</section>
 <section><h3>Throws</h3>
-<p>SystemException if the <a href="../../entitysysd/system/SystemManager.unregister.html#system"><code class="lang-d"><span class="pln">system</span></code></a> was not registered.
+<p>SystemException if the system was not registered.
 </p>
 </section>
 

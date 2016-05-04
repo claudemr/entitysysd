@@ -11,9 +11,12 @@
 	<body onload="setupDdox();">
 		<nav id="main-nav">
 						<ul class="tree-view">
-							<li class=" tree-view">
+							<li class="tree-view">
 								<a href="#" class="package">entitysysd</a>
 						<ul class="tree-view">
+							<li>
+								<a href="../../entitysysd.html" class=" module">Package members</a>
+							</li>
 							<li>
 								<a href="../../entitysysd/entity.html" class=" module">entity</a>
 							</li>
@@ -21,12 +24,12 @@
 								<a href="../../entitysysd/event.html" class=" module">event</a>
 							</li>
 							<li>
+								<a href="../../entitysysd/stat.html" class=" module">stat</a>
+							</li>
+							<li>
 								<a href="../../entitysysd/system.html" class="selected module">system</a>
 							</li>
 						</ul>
-							</li>
-							<li>
-								<a href="../../entitysysd.html" class=" module">entitysysd</a>
 							</li>
 						</ul>
 				<noscript>
@@ -47,8 +50,8 @@ $('#symbolSearchPane').show();
 		<div id="main-contents">
 			<h1>Class System</h1>
 			<section>
-				<p><code class="lang-d"><span class="typ"><span class="typ">System</span></span></code> abstract class. <code class="lang-d"><span class="typ"><span class="typ">System</span></span></code> classes may derive from it and override
- <a href="../entitysysd/system/System.prepare.html"><code class="lang-d"><span class="pln"><a href="../../entitysysd/system/System.prepare.html"><span class="pln">prepare</span></a></span></code></a>, <a href="../entitysysd/system/System.run.html"><code class="lang-d"><span class="pln"><a href="../../entitysysd/system/System.run.html"><span class="pln">run</span></a></span></code></a> or <a href="../entitysysd/system/System.unprepare.html"><code class="lang-d"><span class="pln"><a href="../../entitysysd/system/System.unprepare.html"><span class="pln">unprepare</span></a></span></code></a>.
+				<p>System abstract class. System classes may derive from it and override
+ <code class="lang-d"><span class="pln">prepare</span></code>, <code class="lang-d"><span class="pln">run</span></code> or <code class="lang-d"><span class="pln">unprepare</span></code>.
 </p>
 
 					<section>
@@ -58,10 +61,36 @@ $('#symbolSearchPane').show();
 								<code class="prettyprint lang-d"><span class="typ">Object</span></code>
  (base class)
 							</li>
-							<li>
-								<code class="prettyprint lang-d"><a href="../../entitysysd/system/ISystem.html"><span class="typ">ISystem</span></a></code>
-							</li>
 						</ul>
+					</section>
+					<section>
+						<h3>Properties</h3>
+						<table>
+							<col class="caption"/>
+							<tr>
+								<th>Name</th>
+								<th>Type</th>
+								<th>Description</th>
+							</tr>
+							<tr>
+								<td>
+									<a href="../../entitysysd/system/System.name.html" class="public property"><code>name</code></a>
+									<span class="tableEntryAnnotation">[get]</span>
+								</td>
+								<td class="typecol"><code class="prettyprint lang-d"><span class="typ">string</span></code></td>
+								<td>Name of system (given once at the registration by the system-manager).
+</td>
+							</tr>
+							<tr>
+								<td>
+									<a href="../../entitysysd/system/System.stat.html" class="public property"><code>stat</code></a>
+									<span class="tableEntryAnnotation">[get]</span>
+								</td>
+								<td class="typecol"><code class="prettyprint lang-d"><span class="kwd">const</span><span class="pun">(</span><a href="../../entitysysd/stat/Stat.html"><span class="typ">Stat</span></a><span class="pun">)</span></code></td>
+								<td>Reference on the system statistics.
+</td>
+							</tr>
+						</table>
 					</section>
 					<section>
 						<h3>Methods</h3>
@@ -73,29 +102,11 @@ $('#symbolSearchPane').show();
 							</tr>
 							<tr>
 								<td>
-									<a href="../../entitysysd/system/System.prepare.html" class="public">
-										<code>prepare</code>
+									<a href="../../entitysysd/system/System.reorder.html" class="public">
+										<code>reorder</code>
 									</a>
 								</td>
-								<td>Prepare any data for the frame before a proper <a href="../../entitysysd/system/System.run.html"><code class="lang-d"><span class="pln">run</span></code></a>.
-</td>
-							</tr>
-							<tr>
-								<td>
-									<a href="../../entitysysd/system/System.run.html" class="public">
-										<code>run</code>
-									</a>
-								</td>
-								<td>Called by the system-manager anytime its method <code class="lang-d"><span class="pln"><span class="pln">run</span></span></code> is called.
-</td>
-							</tr>
-							<tr>
-								<td>
-									<a href="../../entitysysd/system/System.unprepare.html" class="public">
-										<code>unprepare</code>
-									</a>
-								</td>
-								<td>Unprepare any data for the frame after the <a href="../../entitysysd/system/System.run.html"><code class="lang-d"><span class="pln"><a href="../../entitysysd/system/System.run.html"><span class="pln">run</span></a></span></code></a>.
+								<td>Change ordering of the system in the system-manager list.
 </td>
 							</tr>
 						</table>
