@@ -1,6 +1,7 @@
 .dub
 .project
 entitysysd_example
+__test__library__
 *.a
 out/*
 doc/*.html
