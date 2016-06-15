@@ -435,6 +435,20 @@ public:
     }
 }
 
+
+class StatReceiver : IReceiver!StatEvent
+{
+    void receive(StatEvent event)
+    {
+        auto systems = event.systemManager;
+        writefln("All: %d/16000µs",
+                 systems.statAll.average.total!"usecs");
+        foreach (sys; systems[])
+            writefln("    - %s: %d/16000µs",
+                     sys.name, sys.stat.average.total!"usecs");
+    }
+}
+
 void main()
 {
     DerelictSDL2.load();
@@ -453,18 +467,9 @@ void main()
     bool loop = true;
     MonoTime timestamp = MonoTime.currTime;
 
-    void dispTime()
-    {
-        writefln("All: %d/16000µs",
-                 app.systems.statAll.averageDuration.total!"usecs");
-        foreach (sys; app.systems[])
-            writefln("    - %s: %d/16000µs",
-                     sys.name, sys.stat.averageDuration.total!"usecs");
-    }
-
     static if (true)
     {
-        app.systems.enableStat(seconds(5), &dispTime);
+        app.events.subscribe!StatEvent(new StatReceiver);
     }
 
     while (loop)
