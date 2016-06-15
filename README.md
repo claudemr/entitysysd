@@ -35,12 +35,13 @@ your dub.json:
 }
 ```
 
-To build and run all the unit-tests a *Makefile* is used:
+To build and run all the unit-tests:
 ```
-make unittest
+dub test
 ```
 
-To generate the documentation:
+To generate the documentation (ddox repo should be cloned and built in the
+parent directory):
 ```
 make doc
 ```
@@ -240,7 +241,18 @@ See COPYING.txt and COPYING.LESSER.txt for more information.
 
 ## History
 
-### v2.x.x
+### v2.4.x
+
+Changes:
+* `ISystem` interface deprecated. Methods added to `System` abstract class
+(potentilly an API breaking change, but very unlikely in practise). 
+* Allow to register systems in a certain ordering (absolute or relative to an
+already registered system). 
+
+Add:
+* Statistics added: module `stat`.
+
+### v2.0.x
 
 Change:
 * `System` interface is renamed to `ISystem` and becomes an abstract class.
@@ -273,8 +285,3 @@ further enhancements may be programmed.
 
 It has been tested on GNU-Linux environment using DMD64 D Compiler v2.068.x and
 v2.069.x.
-
-### Todo
-* Implement ranges.
-* Implement dependencies.
-* Check field qualifiers for events.
