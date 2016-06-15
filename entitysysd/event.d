@@ -115,6 +115,19 @@ class EventManager
 {
 public:
     /**
+     * Check whether an event has any subscription at all.
+     */
+    bool hasSubscription(E)() @property const
+        if (isEvent!E)
+    {
+        auto eventId = EventCounter!E.getId();
+        auto handlerGroup = eventId in mHandlers;
+
+        return handlerGroup !is null;
+    }
+
+
+    /**
      * Check whether a receiver class is subscribed to an event.
      * Returns: true if it is subscribed, false otherwise.
      */
@@ -320,7 +333,7 @@ class TestReceiver2 : IReceiver!TestEvent, IReceiver!IntEvent
     }
 }
 
-}
+} // version(unittest)
 
 unittest
 {
@@ -382,10 +395,6 @@ unittest
     assert(testRcv2.str == "123world");
 }
 
-
-//******************************************************************************
-//***** UNIT-TESTS
-//******************************************************************************
 
 // validate that sending an event with no registered receivers does not crash
 unittest

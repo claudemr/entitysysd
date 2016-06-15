@@ -36,6 +36,7 @@ package:
         if (mFirstTime == MonoTime.zero)
         {
             mFirstTime = mLastTime;
+            mMin = mMax = seconds(0);
             mRunCount = 0;
         }
     }
@@ -83,11 +84,18 @@ public:
              : MonoTime.currTime - mFirstTime;
     }
 
+    deprecated("Please, use `average` instead.")
+    alias averageDuration = average;
+    deprecated("Please, use `min` instead.")
+    alias minDuration = min;
+    deprecated("Please, use `max` instead.")
+    alias maxDuration = max;
+
     /**
      * Average duration of the profiled function (during the time defined by the
      * rate parameter in the statistic enabling function of the system-manager).
      */
-    Duration averageDuration() @property const
+    Duration average() @property const
     {
         return mAvg;
     }
@@ -97,7 +105,7 @@ public:
      * defined by the rate parameter in the statistic enabling function of
      * the system-manager).
      */
-    Duration minDuration() @property const
+    Duration min() @property const
     {
         return mMin;
     }
@@ -107,7 +115,7 @@ public:
      * defined by the rate parameter in the statistic enabling function of
      * the system-manager).
      */
-    Duration maxDuration() @property const
+    Duration max() @property const
     {
         return mMax;
     }

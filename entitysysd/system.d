@@ -34,6 +34,21 @@ import std.typecons;
 
 
 /**
+ * Default rate at which $(D StatEvent) events are sent.
+ */
+private immutable Duration defaultStatRate = seconds(5);
+
+
+/**
+ * Event sent regularly (depending of statRate) to display diverse statistics
+ * about the $(D SystemManager).
+ */
+@event struct StatEvent
+{
+    SystemManager systemManager;
+}
+
+/**
  * Enum allowing to give special order of a system when registering it to the
  * $(D SystemManager).
  */
@@ -154,6 +169,7 @@ public:
     {
         mEntityManager = entityManager;
         mEventManager  = eventManager;
+        mStatRate      = defaultStatRate;
     }
 
     /**
@@ -251,19 +267,19 @@ public:
      */
     void run(Duration dt)
     {
-        if (mStatEnabled)
+        if (mStatEnabled || mEventManager.hasSubscription!StatEvent)
             mStatRun.start();
 
         foreach (sys; mSystems)
         {
-            if (mStatEnabled)
+            if (mStatEnabled || mEventManager.hasSubscription!StatEvent)
                 sys.mStat.start();
             sys.run(mEntityManager, mEventManager, dt);
-            if (mStatEnabled)
+            if (mStatEnabled || mEventManager.hasSubscription!StatEvent)
                 sys.mStat.stop();
         }
 
-        if (mStatEnabled)
+        if (mStatEnabled || mEventManager.hasSubscription!StatEvent)
             mStatRun.stop();
     }
 
@@ -283,14 +299,14 @@ public:
      */
     void runFull(Duration dt)
     {
-        if (mStatEnabled)
+        if (mStatEnabled || mEventManager.hasSubscription!StatEvent)
             mStatAll.start();
 
         prepare(dt);
         run(dt);
         unprepare(dt);
 
-        if (mStatEnabled)
+        if (mStatEnabled || mEventManager.hasSubscription!StatEvent)
         {
             mStatAll.stop();
 
@@ -303,6 +319,7 @@ public:
 
                 if (mStatDg !is null)
                     mStatDg();
+                mEventManager.emit!StatEvent(this);
             }
         }
     }
@@ -339,6 +356,8 @@ public:
      * A delegate $(D dg) can be given, the $(D rate) at which it will be called
      * to provide significant stat's.
      */
+    deprecated("Please, use `subscribe` with `StatEvent` to enable stat "
+               "notifications. And use `statRate` to control the rate.")
     void enableStat(Duration rate = seconds(0), void delegate() dg = null)
     {
         mStatEnabled = true;
@@ -350,6 +369,8 @@ public:
      * Disable statistics profiling on the system-manager and all its
      * registered systems.
      */
+    deprecated("Please, use `unsubscribe` with `StatEvent` to disable stat "
+               "notifications.")
     void disableStat()
     {
         mStatEnabled = false;
@@ -364,7 +385,21 @@ public:
      */
     bool statEnabled() @property const
     {
-        return mStatEnabled;
+        return mStatEnabled || mEventManager.hasSubscription!StatEvent;
+    }
+
+    /**
+     * Set/get rate at which $(D StatEvent) events are sent.
+     */
+    auto statRate() const @property
+    {
+        return mStatRate;
+    }
+
+    /// ditto
+    void statRate(Duration rate) @property
+    {
+        mStatRate = rate;
     }
 
 private:
@@ -401,9 +436,9 @@ private:
     EntityManager   mEntityManager;
     EventManager    mEventManager;
     DList!System    mSystems;
-    bool            mStatEnabled;
+    bool            mStatEnabled;   //todo deprecated
     Duration        mStatRate;
-    void delegate() mStatDg;
+    void delegate() mStatDg;        //todo deprecated
     Stat            mStatAll;
     Stat            mStatRun;
 }
