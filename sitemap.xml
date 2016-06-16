@@ -38,6 +38,7 @@
 <url><loc>http://127.0.0.1/entitysysd/event/EventManager.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/event/EventManager.emit.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/event/EventManager.emit.html</loc></url>
+<url><loc>http://127.0.0.1/entitysysd/event/EventManager.hasSubscription.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/event/EventManager.isSubscribed.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/event/EventManager.subscribe.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/event/EventManager.unsubscribe.html</loc></url>
@@ -46,9 +47,12 @@
 <url><loc>http://127.0.0.1/entitysysd/event/Receiver.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/stat.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/stat/Stat.html</loc></url>
+<url><loc>http://127.0.0.1/entitysysd/stat/Stat.average.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/stat/Stat.averageDuration.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/stat/Stat.elapsedTime.html</loc></url>
+<url><loc>http://127.0.0.1/entitysysd/stat/Stat.max.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/stat/Stat.maxDuration.html</loc></url>
+<url><loc>http://127.0.0.1/entitysysd/stat/Stat.min.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/stat/Stat.minDuration.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/stat/Stat.runCount.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/system.html</loc></url>
@@ -58,6 +62,8 @@
 <url><loc>http://127.0.0.1/entitysysd/system/Order.before.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/system/Order.first.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/system/Order.last.html</loc></url>
+<url><loc>http://127.0.0.1/entitysysd/system/StatEvent.html</loc></url>
+<url><loc>http://127.0.0.1/entitysysd/system/StatEvent.systemManager.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/system/System.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/system/System.name.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/system/System.reorder.html</loc></url>
@@ -73,6 +79,8 @@
 <url><loc>http://127.0.0.1/entitysysd/system/SystemManager.runFull.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/system/SystemManager.statAll.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/system/SystemManager.statEnabled.html</loc></url>
+<url><loc>http://127.0.0.1/entitysysd/system/SystemManager.statRate.html</loc></url>
+<url><loc>http://127.0.0.1/entitysysd/system/SystemManager.statRate.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/system/SystemManager.statRun.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/system/SystemManager.this.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/system/SystemManager.unprepare.html</loc></url>

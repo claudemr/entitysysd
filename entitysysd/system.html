@@ -99,11 +99,16 @@ $('#symbolSearchPane').show();
 						</td>
 						<td>Enum allowing to give special order of a system when registering it to the
  <code class="lang-d"><a href="../entitysysd/system/SystemManager.html"><span class="typ">SystemManager</span></a></code>.
- <code class="lang-d"><a href="../entitysysd/system/Order.first.html"><span class="typ">Order<wbr/></span><span class="pun">.</span><span class="pln">first</span></a></code> places it first in the list.
- <code class="lang-d"><a href="../entitysysd/system/Order.last.html"><span class="typ">Order<wbr/></span><span class="pun">.</span><span class="pln">last</span></a></code> places it last in the list.
- (D Order.before(mySystem) places it before mySystem in the list.
- (D Order.after(mySystem) places it after mySystem in the list.
- For <code class="lang-d"><a href="../entitysysd/system/Order.before.html"><span class="pln">before</span></a></code> and <code class="lang-d"><a href="../entitysysd/system/Order.after.html"><span class="pln">after</span></a></code>, it assumes mySystem is already registered.
+</td>
+					</tr>
+					<tr>
+						<td>
+							<a id="StatEvent" class="public" href="../entitysysd/system/StatEvent.html">
+								<code>StatEvent</code>
+							</a>
+						</td>
+						<td>Event sent regularly (depending of statRate) to display diverse statistics
+ about the <code class="lang-d"><a href="../entitysysd/system/SystemManager.html"><span class="typ">SystemManager</span></a></code>.
 </td>
 					</tr>
 				</table>
@@ -126,7 +131,9 @@ $('#symbolSearchPane').show();
 						<td>
 <code class="prettyprint lang-d"><a href="../entitysysd/system/System.html"><span class="typ">System</span></a></code>
 						</td>
-						<td></td>
+						<td>Deprecated. Alias to keep relative backward compatibility with older
+ interface.
+</td>
 					</tr>
 				</table>
 			</section>
