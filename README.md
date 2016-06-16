@@ -40,17 +40,13 @@ To build and run all the unit-tests:
 dub test
 ```
 
-To generate the documentation (ddox repo should be cloned and built in the
-parent directory):
-```
-make doc
-```
+To generate the documentation, see doc/README.md.
 
 
 ### API documentation
 
 The complete reference API is there (generated with
-[ddox](https://github.com/rejectedsoftware/ddox)) (v0.11.5):
+[ddox](https://github.com/rejectedsoftware/ddox)):
 > [Reference API](https://claudemr.github.io/entitysysd/)
 
 
