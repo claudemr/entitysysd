@@ -184,7 +184,7 @@ public:
     }
 
     /**
-     * Set the value of a component of the entity.
+     * Tell whether a component is registered to the entity.
      *
      * Returns: true if the component is registered to the entity,
      *          false otherwise.
