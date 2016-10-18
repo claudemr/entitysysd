@@ -48,7 +48,7 @@ public:
             mMaxElements = (mNbChunks * mChunkSize) / mElementSize;
         }
 
-        if (mData.length != mNbChunks * mChunkSize)
+        if (mData.length < mNbChunks * mChunkSize)
             mData.length = mNbChunks * mChunkSize;
         mNbElements  = nbElements;
     }
@@ -63,13 +63,21 @@ public:
         return mNbChunks;
     }
 
+    void* getPtr(size_t n)
+    {
+        if (n >= mNbElements)
+            return null;
+        size_t offset = n * mElementSize;
+        return &mData[offset];
+    }
+
 private:
     size_t  mElementSize;
     size_t  mChunkSize;
     size_t  mNbChunks;
     size_t  mMaxElements;
     size_t  mNbElements;
-    ubyte[] mData;
+    void[]  mData;
 }
 
 class Pool(T, size_t ChunkSize = 8192) : BasePool
@@ -82,14 +90,14 @@ class Pool(T, size_t ChunkSize = 8192) : BasePool
 
     ref T opIndex(size_t n)
     {
-        return *getPtr(n);
+        return *cast(T*)getPtr(n);
     }
 
     static if (!hasConst!T)
     {
         T opIndexAssign(T t, size_t n)
         {
-            *getPtr(n) = t;
+            *cast(T*)getPtr(n) = t;
             return t;
         }
     }
@@ -97,22 +105,8 @@ class Pool(T, size_t ChunkSize = 8192) : BasePool
     void initN(size_t n)
     {
         import std.conv : emplace;
-        emplace(getPtr(n));
+        emplace(&this[n]);
     }
-
-    T* getPtr(in size_t n)
-    {
-        if (n >= mNbElements)
-            return null;
-        size_t offset = n * mElementSize;
-        return cast(T*)&mData[offset];
-    }
-
-    T* ptr() @property
-    {
-        return cast(T*)mData.ptr;
-    }
-
 }
 
 
@@ -146,5 +140,4 @@ unittest
 
     pool1[1999] = 325;
     assert(pool1[1999] == 325);
-
 }

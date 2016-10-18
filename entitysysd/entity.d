@@ -199,6 +199,18 @@ public:
     }
 
     /**
+     * Iterate over the components registered to the entity. It calls the
+     * iterator delegate that has been set to each component.
+     *
+     * Throws: EntityException if the entity is invalid.
+     */
+    void iterate()
+    {
+        enforce!EntityException(valid);
+        mManager.iterate(this);
+    }
+
+    /**
      * Compare two entities and tells whether they are the same (same id).
      */
     bool opEquals()(auto const ref Entity lEntity) const
@@ -437,6 +449,57 @@ public:
         return EntitiesWithView!(CList)(this);
     }
 
+    alias CompIterator = void delegate(Entity e, void* pc);
+
+    /**
+     * Set an iterator delegate for a component.
+     *
+     * Params:
+     *   C  = Component to which the iterator delegate will be set.
+     *   dg = Delegate that will be called when using $(D Entity.iterate).
+     */
+    void setIterator(C)(void delegate(Entity e, C* pc) dg)
+    {
+        immutable compId = ComponentCounter!(C).getId();
+        // Make sure the delegate array is large enough
+        if (mComponentIterators.length <= compId)
+            mComponentIterators.length = compId + 1;
+        mComponentIterators[compId] = cast(CompIterator)dg;
+    }
+
+    /**
+     * Clears an iterator delegate for a component.
+     *
+     * Params:
+     *   C  = Component to which the iterator delegate will be cleared.
+     */
+    void clearIterator(C)()
+    {
+        immutable compId = ComponentCounter!(C).getId();
+        // If this Make sure the delegate array is large enough
+        if (mComponentIterators.length <= compId)
+            return;
+        mComponentIterators[compId] = null;
+    }
+
+    /**
+     * Get the iterator delegte assigned to a component.
+     *
+     * Params:
+     *   C  = Component from which the iterator delegate will be retreived.
+     *
+     * Returns:
+     *   The iterator delegate; null if it has never been set or if the
+     *   component is missing.
+     */
+    void delegate(Entity e, C* pc) getIterator(C)()
+    {
+        immutable compId = ComponentCounter!(C).getId();
+        if (mComponentIterators.length <= compId)
+            return null;
+        return cast(void delegate(Entity e, C* pc))mComponentIterators[compId];
+    }
+
 private:
     void destroy(Entity.Id id)
     {
@@ -535,6 +598,23 @@ private:
         }
     }
 
+    void iterate(Entity entity)
+    {
+        const auto uniqueId = entity.id.uniqueId;
+
+        // Iterate over all components registered to that entity
+        foreach (compId; 0..mComponentIterators.length)
+        {
+            // If the component is registered and has a delegate
+            if (mEntityComponentMask[uniqueId-1][compId])
+                if (mComponentIterators[compId] !is null)
+                {
+                    auto compPtr = mComponentPools[compId].getPtr(uniqueId-1);
+                    mComponentIterators[compId](entity, compPtr);
+                }
+        }
+    }
+
     // Current number of Entities
     uint            mIndexCounter = 0;
     size_t          mMaxComponent;
@@ -543,9 +623,11 @@ private:
     EventManager    mEventManager;
     // Array of pools for each component types
     BasePool[]      mComponentPools;
-    // Bitmask of components for each entities.
-    // Index into the vector is the Entity.Id.
+    // Bitmask of components for each entities
+    // Index into the vector is the Entity.Id
     BitArray[]      mEntityComponentMask;
+    // Array of delegates for each component
+    CompIterator[]  mComponentIterators;
     // Vector of entity version id's
     // Incremented each time an entity is destroyed
     uint[]          mEntityVersions;
@@ -654,8 +736,9 @@ unittest
     // Check const fields are properly handled
     @component struct ConstComp
     {
-        int         a, b;
-        const float cFloat = 5.0;
+        int           a, b;
+        const float   cFloat = 5.0;
+        immutable int iInt = 5;
     }
 
     ent0.register!ConstComp();
@@ -665,10 +748,11 @@ unittest
     @component struct ImmutableComp
     {
         int             a, b;
-        immutable float iFloat = 5.0;
+        shared    float sFloat = 5.0;
+        __gshared float gsFloat = 5.0;
     }
 
-    // Check it will NOT compile if a field is immutable
+    // Check it will NOT compile if a field is shared
     assert(!__traits(compiles, ent0.register!ImmutableComp()));
 }
 
@@ -756,4 +840,59 @@ unittest
     import std.algorithm : map, equal;
     assert(em.components!A.map!(x => x.a).equal([1, 3]));
     assert(em.components!B.map!(x => x.b).equal(["2", "3"]));
+}
+
+
+// Test component iterators
+unittest
+{
+    import std.conv;
+    string output;
+
+    @component struct A
+    {
+        int i;
+    }
+
+    @component struct B
+    {
+        string str;
+    }
+
+    auto em = new EntityManager(new EventManager());
+
+    auto e1 = em.create();
+    auto e2 = em.create();
+    auto e3 = em.create();
+
+    e1.register!A(1);
+    e2.register!B("hello");
+    e3.register!A(3);
+    e3.register!B("world");
+
+    void iteratorForA(Entity e, A* a)
+    {
+        assert(e == e1 || e == e3);
+        output ~= a.i.to!string;
+    }
+
+    void iteratorForB(Entity e, B* b)
+    {
+        assert(e == e2 || e == e3);
+        output ~= b.str;
+    }
+
+    em.setIterator!A(&iteratorForA);
+    em.setIterator!B(&iteratorForB);
+
+    e1.iterate();
+    assert(output == "1");
+
+    output = "";
+    e2.iterate();
+    assert(output == "hello");
+
+    output = "";
+    e3.iterate();
+    assert(output == "3world");
 }

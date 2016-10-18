@@ -28,19 +28,18 @@ enum component;
  * To be a valid component, $(D C) must:
  * - be a $(D struct) or $(D union)
  * - have the UDA $(D component)
- * - must contain only mutable or const fields (no $(D immutable), $(D inout) or
- *   $(D shared) qualifiers)
+ * - must contain fields without $(D shared) qualifier)
  */
 template isComponent(C)
 {
     import std.meta : allSatisfy;
     import std.traits : RepresentationTypeTuple, isMutable, hasUDA;
 
-    enum bool isMutableOrConst(F) = isMutable!F || is(F == const);
+    enum bool isNotShared(F) = !is(F == shared);
     static if (__traits(compiles, hasUDA!(C, component)))
         enum bool isComponent = (is(C == struct) || is(C == union)) &&
                                 hasUDA!(C, component) &&
-                                allSatisfy!(isMutableOrConst,
+                                allSatisfy!(isNotShared,
                                             RepresentationTypeTuple!C);
     else
         enum bool isComponent = false;
