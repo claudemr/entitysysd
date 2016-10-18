@@ -126,6 +126,11 @@ public:
     /**
      * Register a component C to an entity.
      *
+     * Params:
+     *   C    = Component to register.
+     *   args = List of arguments to initialize the component, will be passed to
+     *          its constructor. Optional.
+     *
      * Returns: A pointer on the component for this entity.
      *
      * Throws: EntityException if the entity is invalid.
@@ -145,6 +150,9 @@ public:
     /**
      * Unregister a component C from an entity.
      *
+     * Params:
+     *   C  = Component to unregister.
+     *
      * Throws: EntityException if the entity is invalid.
      *         ComponentException if the component is not registered.
      */
@@ -157,6 +165,9 @@ public:
 
     /**
      * Get a component pointer of the entity.
+     *
+     * Params:
+     *   C  = Component for the entity.
      *
      * Returns: A pointer on the component for this entity.
      *
@@ -173,6 +184,9 @@ public:
     /**
      * Set the value of a component of the entity.
      *
+     * Params:
+     *   C  = Component to set.
+     *
      * Throws: EntityException if the entity is invalid.
      *         ComponentException if the component is not registered.
      */
@@ -185,6 +199,9 @@ public:
 
     /**
      * Tell whether a component is registered to the entity.
+     *
+     * Params:
+     *   C  = Component to test.
      *
      * Returns: true if the component is registered to the entity,
      *          false otherwise.
@@ -213,9 +230,9 @@ public:
     /**
      * Compare two entities and tells whether they are the same (same id).
      */
-    bool opEquals()(auto const ref Entity lEntity) const
+    bool opEquals()(auto const ref Entity e) const
     {
-        return id == lEntity.id;
+        return id == e.id;
     }
 
     /**
@@ -345,6 +362,12 @@ public:
     /**
      * Allows to browse through all the valid entities of the manager with
      * a foreach loop.
+     *
+     * Examples:
+     * --------------------
+     * foreach (entity; entityManager)
+     * { ... }
+     * --------------------
      */
     int opApply(int delegate(Entity entity) dg)
     {
@@ -393,6 +416,12 @@ public:
     /**
      * Allows to browse through the entities that have a required set of
      * components.
+     *
+     * Examples:
+     * --------------------
+     * foreach (entity; entityManager.entitiesWith!(CompA, CompB))
+     * { ... }
+     * --------------------
      */
     auto entitiesWith(CList...)() @property
         if (areComponents!CList)
@@ -483,7 +512,7 @@ public:
     }
 
     /**
-     * Get the iterator delegte assigned to a component.
+     * Get the iterator delegate assigned to a component.
      *
      * Params:
      *   C  = Component from which the iterator delegate will be retreived.
