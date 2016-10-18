@@ -17,6 +17,7 @@
 <url><loc>http://127.0.0.1/entitysysd/entity/Entity.invalid.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/entity/Entity.invalidate.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/entity/Entity.isRegistered.html</loc></url>
+<url><loc>http://127.0.0.1/entitysysd/entity/Entity.iterate.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/entity/Entity.opEquals.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/entity/Entity.register.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/entity/Entity.this.html</loc></url>
@@ -25,11 +26,15 @@
 <url><loc>http://127.0.0.1/entitysysd/entity/Entity.valid.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/entity/EntityManager.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/entity/EntityManager.capacity.html</loc></url>
+<url><loc>http://127.0.0.1/entitysysd/entity/EntityManager.clearIterator.html</loc></url>
+<url><loc>http://127.0.0.1/entitysysd/entity/EntityManager.CompIterator.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/entity/EntityManager.components.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/entity/EntityManager.create.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/entity/EntityManager.entitiesWith.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/entity/EntityManager.getEntity.html</loc></url>
+<url><loc>http://127.0.0.1/entitysysd/entity/EntityManager.getIterator.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/entity/EntityManager.opApply.html</loc></url>
+<url><loc>http://127.0.0.1/entitysysd/entity/EntityManager.setIterator.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/entity/EntityManager.size.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/entity/EntityManager.this.html</loc></url>
 <url><loc>http://127.0.0.1/entitysysd/entity/EntityManager.valid.html</loc></url>

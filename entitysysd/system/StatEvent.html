@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<title>Function Entity.unregister</title>
+		<title>Struct StatEvent</title>
 		<link rel="stylesheet" type="text/css" href="../../styles/ddox.css"/>
 		<link rel="stylesheet" href="../../prettify/prettify.css" type="text/css"/>
 		<script type="text/javascript" src="../../scripts/jquery.js">/**/</script>
@@ -18,7 +18,7 @@
 								<a href="../../entitysysd.html" class=" module">Package members</a>
 							</li>
 							<li>
-								<a href="../../entitysysd/entity.html" class="selected module">entity</a>
+								<a href="../../entitysysd/entity.html" class=" module">entity</a>
 							</li>
 							<li>
 								<a href="../../entitysysd/event.html" class=" module">event</a>
@@ -27,7 +27,7 @@
 								<a href="../../entitysysd/stat.html" class=" module">stat</a>
 							</li>
 							<li>
-								<a href="../../entitysysd/system.html" class=" module">system</a>
+								<a href="../../entitysysd/system.html" class="selected module">system</a>
 							</li>
 						</ul>
 							</li>
@@ -48,32 +48,30 @@ $('#symbolSearchPane').show();
 				</div>
 		</nav>
 		<div id="main-contents">
-			<h1>Function Entity.unregister</h1>
+			<h1>Struct StatEvent</h1>
 			<section>
-				<p>Unregister a component C from an entity.
+				<p>Event sent regularly (depending of statRate) to display diverse statistics
+ about the <code class="lang-d"><a href="../../entitysysd/system/SystemManager.html"><span class="typ">SystemManager</span></a></code>.
 </p>
-<section></section>
 
 					<section>
-						<h3>Prototype</h3>
-						<div class="prototype">
-							<code class="lang-d">
-<span class="typ">void</span> <span class="pln">unregister<span class="pun">(</span><span class="pln">C</span><span class="pun">)</span><span class="pun">()</span>
-								<br/>
-<span class="kwd">if</span> <span class="pun">(</span><span class="pln">isComponent</span><span class="pun">!</span><span class="pln">C</span><span class="pun">);</span>
-							</code>
-						</div>
+						<h3>Fields</h3>
+						<table>
+							<col class="caption"/>
+							<tr>
+								<th>Name</th>
+								<th>Type</th>
+								<th>Description</th>
+							</tr>
+							<tr>
+								<td>
+									<a href="../../entitysysd/system/StatEvent.systemManager.html" class="public"><code>systemManager</code></a>
+								</td>
+								<td class="typecol"><code class="prettyprint lang-d"><a href="../../entitysysd/system/SystemManager.html"><span class="typ">SystemManager</span></a></code></td>
+								<td></td>
+							</tr>
+						</table>
 					</section>
-<section><h3>Parameters</h3>
-<table><col class="caption"><tr><th>Name</th><th>Description</th></tr>
-<tr><td id="C">C</td><td> Component to unregister.</td></tr>
-</table>
-</section>
-<section><h3>Throws</h3>
-<p>EntityException if the entity is invalid.
-         ComponentException if the component is not registered.
-</p>
-</section>
 
 			</section>
 			<section>

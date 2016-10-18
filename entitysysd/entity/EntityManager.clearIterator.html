@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<title>Function Entity.unregister</title>
+		<title>Function EntityManager.clearIterator</title>
 		<link rel="stylesheet" type="text/css" href="../../styles/ddox.css"/>
 		<link rel="stylesheet" href="../../prettify/prettify.css" type="text/css"/>
 		<script type="text/javascript" src="../../scripts/jquery.js">/**/</script>
@@ -48,9 +48,9 @@ $('#symbolSearchPane').show();
 				</div>
 		</nav>
 		<div id="main-contents">
-			<h1>Function Entity.unregister</h1>
+			<h1>Function EntityManager.clearIterator</h1>
 			<section>
-				<p>Unregister a component C from an entity.
+				<p>Clears an iterator delegate for a component.
 </p>
 <section></section>
 
@@ -58,21 +58,14 @@ $('#symbolSearchPane').show();
 						<h3>Prototype</h3>
 						<div class="prototype">
 							<code class="lang-d">
-<span class="typ">void</span> <span class="pln">unregister<span class="pun">(</span><span class="pln">C</span><span class="pun">)</span><span class="pun">()</span>
-								<br/>
-<span class="kwd">if</span> <span class="pun">(</span><span class="pln">isComponent</span><span class="pun">!</span><span class="pln">C</span><span class="pun">);</span>
+<span class="typ">void</span> <span class="pln">clearIterator<span class="pun">(</span><span class="pln">C</span><span class="pun">)</span><span class="pun">()</span><span class="pun">;</span>
 							</code>
 						</div>
 					</section>
 <section><h3>Parameters</h3>
 <table><col class="caption"><tr><th>Name</th><th>Description</th></tr>
-<tr><td id="C">C</td><td> Component to unregister.</td></tr>
+<tr><td id="C">C</td><td> Component to which the iterator delegate will be cleared.</td></tr>
 </table>
-</section>
-<section><h3>Throws</h3>
-<p>EntityException if the entity is invalid.
-         ComponentException if the component is not registered.
-</p>
 </section>
 
 			</section>
