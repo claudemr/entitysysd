@@ -133,9 +133,9 @@ public:
      *
      * Returns: A pointer on the component for this entity.
      *
-     * Throws: EntityException if the entity is invalid.
-     *         ComponentException if there is no room for that component or if
-     *                            if the component is already registered.
+     * Throws: $(D EntityException) if the entity is invalid.
+     *         $(D ComponentException) if there is no room for that component or
+     *                                 if the component is already registered.
      */
     C* register(C, Args...)(Args args)
         if (isComponent!C)
@@ -151,10 +151,10 @@ public:
      * Unregister a component C from an entity.
      *
      * Params:
-     *   C  = Component to unregister.
+     *   C = Component to unregister.
      *
-     * Throws: EntityException if the entity is invalid.
-     *         ComponentException if the component is not registered.
+     * Throws: $(D EntityException) if the entity is invalid.
+     *         $(D ComponentException) if the component is not registered.
      */
     void unregister(C)()
         if (isComponent!C)
@@ -167,12 +167,12 @@ public:
      * Get a component pointer of the entity.
      *
      * Params:
-     *   C  = Component for the entity.
+     *   C = Component for the entity.
      *
      * Returns: A pointer on the component for this entity.
      *
-     * Throws: EntityException if the entity is invalid.
-     *         ComponentException if the component is not registered.
+     * Throws: $(D EntityException) if the entity is invalid.
+     *         $(D ComponentException) if the component is not registered.
      */
     C* component(C)() @property
         if (isComponent!C)
@@ -185,10 +185,10 @@ public:
      * Set the value of a component of the entity.
      *
      * Params:
-     *   C  = Component to set.
+     *   C = Component to set.
      *
-     * Throws: EntityException if the entity is invalid.
-     *         ComponentException if the component is not registered.
+     * Throws: $(D EntityException) if the entity is invalid.
+     *         $(D ComponentException) if the component is not registered.
      */
     void component(C)(auto ref C c) @property
         if (isComponent!C)
@@ -201,10 +201,10 @@ public:
      * Tell whether a component is registered to the entity.
      *
      * Params:
-     *   C  = Component to test.
+     *   C = Component to test.
      *
-     * Returns: true if the component is registered to the entity,
-     *          false otherwise.
+     * Returns: $(D true) if the component is registered to the entity,
+     *          $(D false) otherwise.
      *
      * Throws: EntityException if the entity is invalid.
      */
@@ -219,7 +219,7 @@ public:
      * Iterate over the components registered to the entity. It calls the
      * accessor delegate that has been set to each component.
      *
-     * Throws: EntityException if the entity is invalid.
+     * Throws: $(D EntityException) if the entity is invalid.
      */
     void iterate()
     {
@@ -275,10 +275,13 @@ class EntityManager
 {
 public:
     /**
-     * Constructor of the entity-manager. eventManager may be used to notify
-     * about entity creation and component registration. maxComponent sets
-     * the maximum number of components supported by the whole manager. poolSize
-     * is the chunk size in bytes for each components.
+     * Constructor of the entity-manager.
+     * Params:
+     *   eventManager = May be used to notify about entity creation and
+     *                  component registration.
+     *   maxComponent = Maximum number of components supported by the whole
+     *                  manager.
+     *   poolSize     = Chunk size in bytes for each components.
      */
     this(EventManager eventManager,
          size_t maxComponent = 64,
@@ -486,29 +489,20 @@ public:
      * Params:
      *   C  = Component to which the accessor delegate will be set.
      *   dg = Delegate that will be called when using $(D Entity.iterate).
+     *        Use $(D null) to clear the accessor.
      */
-    void setAccessor(C)(void delegate(Entity e, C* pc) dg)
+    void accessor(C)(void delegate(Entity e, C* pc) dg) @property
     {
         immutable compId = ComponentCounter!(C).getId();
         // Make sure the delegate array is large enough
         if (mComponentAccessors.length <= compId)
-            mComponentAccessors.length = compId + 1;
+        {
+            if (dg is null)
+                return;
+            else
+                mComponentAccessors.length = compId + 1;
+        }
         mComponentAccessors[compId] = cast(CompAccessor)dg;
-    }
-
-    /**
-     * Clears an accessor delegate for a component.
-     *
-     * Params:
-     *   C  = Component to which the accessor delegate will be cleared.
-     */
-    void clearAccessor(C)()
-    {
-        immutable compId = ComponentCounter!(C).getId();
-        // If this Make sure the delegate array is large enough
-        if (mComponentAccessors.length <= compId)
-            return;
-        mComponentAccessors[compId] = null;
     }
 
     /**
@@ -518,10 +512,10 @@ public:
      *   C  = Component from which the accessor delegate will be retreived.
      *
      * Returns:
-     *   The accessor delegate; null if it has never been set or if the
-     *   component is missing.
+     *   The accessor delegate; null if it has never been set, if it was cleared
+     *   or if the component is missing.
      */
-    void delegate(Entity e, C* pc) getAccessor(C)()
+    void delegate(Entity e, C* pc) accessor(C)() @property
     {
         immutable compId = ComponentCounter!(C).getId();
         if (mComponentAccessors.length <= compId)
@@ -905,8 +899,9 @@ unittest
         output ~= a.i.to!string;
     }
 
-    em.setAccessor!A(&accessorForA);
-    em.setAccessor!B((e, b) { output ~= b.str; }); // use lambda
+    em.accessor!A = &accessorForA;
+    assert(em.accessor!A == &accessorForA);
+    em.accessor!B = (e, b) { output ~= b.str; }; // use lambda
 
     e1.iterate();
     assert(output == "1");
