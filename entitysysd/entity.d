@@ -217,7 +217,7 @@ public:
 
     /**
      * Iterate over the components registered to the entity. It calls the
-     * iterator delegate that has been set to each component.
+     * accessor delegate that has been set to each component.
      *
      * Throws: EntityException if the entity is invalid.
      */
@@ -478,55 +478,55 @@ public:
         return EntitiesWithView!(CList)(this);
     }
 
-    alias CompIterator = void delegate(Entity e, void* pc);
+    alias CompAccessor = void delegate(Entity e, void* pc);
 
     /**
-     * Set an iterator delegate for a component.
+     * Set an accessor delegate for a component.
      *
      * Params:
-     *   C  = Component to which the iterator delegate will be set.
+     *   C  = Component to which the accessor delegate will be set.
      *   dg = Delegate that will be called when using $(D Entity.iterate).
      */
-    void setIterator(C)(void delegate(Entity e, C* pc) dg)
+    void setAccessor(C)(void delegate(Entity e, C* pc) dg)
     {
         immutable compId = ComponentCounter!(C).getId();
         // Make sure the delegate array is large enough
-        if (mComponentIterators.length <= compId)
-            mComponentIterators.length = compId + 1;
-        mComponentIterators[compId] = cast(CompIterator)dg;
+        if (mComponentAccessors.length <= compId)
+            mComponentAccessors.length = compId + 1;
+        mComponentAccessors[compId] = cast(CompAccessor)dg;
     }
 
     /**
-     * Clears an iterator delegate for a component.
+     * Clears an accessor delegate for a component.
      *
      * Params:
-     *   C  = Component to which the iterator delegate will be cleared.
+     *   C  = Component to which the accessor delegate will be cleared.
      */
-    void clearIterator(C)()
+    void clearAccessor(C)()
     {
         immutable compId = ComponentCounter!(C).getId();
         // If this Make sure the delegate array is large enough
-        if (mComponentIterators.length <= compId)
+        if (mComponentAccessors.length <= compId)
             return;
-        mComponentIterators[compId] = null;
+        mComponentAccessors[compId] = null;
     }
 
     /**
-     * Get the iterator delegate assigned to a component.
+     * Get the accessor delegate assigned to a component.
      *
      * Params:
-     *   C  = Component from which the iterator delegate will be retreived.
+     *   C  = Component from which the accessor delegate will be retreived.
      *
      * Returns:
-     *   The iterator delegate; null if it has never been set or if the
+     *   The accessor delegate; null if it has never been set or if the
      *   component is missing.
      */
-    void delegate(Entity e, C* pc) getIterator(C)()
+    void delegate(Entity e, C* pc) getAccessor(C)()
     {
         immutable compId = ComponentCounter!(C).getId();
-        if (mComponentIterators.length <= compId)
+        if (mComponentAccessors.length <= compId)
             return null;
-        return cast(void delegate(Entity e, C* pc))mComponentIterators[compId];
+        return cast(void delegate(Entity e, C* pc))mComponentAccessors[compId];
     }
 
 private:
@@ -632,14 +632,14 @@ private:
         const auto uniqueId = entity.id.uniqueId;
 
         // Iterate over all components registered to that entity
-        foreach (compId; 0..mComponentIterators.length)
+        foreach (compId; 0..mComponentAccessors.length)
         {
             // If the component is registered and has a delegate
             if (mEntityComponentMask[uniqueId-1][compId])
-                if (mComponentIterators[compId] !is null)
+                if (mComponentAccessors[compId] !is null)
                 {
                     auto compPtr = mComponentPools[compId].getPtr(uniqueId-1);
-                    mComponentIterators[compId](entity, compPtr);
+                    mComponentAccessors[compId](entity, compPtr);
                 }
         }
     }
@@ -656,7 +656,7 @@ private:
     // Index into the vector is the Entity.Id
     BitArray[]      mEntityComponentMask;
     // Array of delegates for each component
-    CompIterator[]  mComponentIterators;
+    CompAccessor[]  mComponentAccessors;
     // Vector of entity version id's
     // Incremented each time an entity is destroyed
     uint[]          mEntityVersions;
@@ -872,7 +872,7 @@ unittest
 }
 
 
-// Test component iterators
+// Test component accessors
 unittest
 {
     import std.conv;
@@ -899,20 +899,20 @@ unittest
     e3.register!A(3);
     e3.register!B("world");
 
-    void iteratorForA(Entity e, A* a)
+    void accessorForA(Entity e, A* a)
     {
         assert(e == e1 || e == e3);
         output ~= a.i.to!string;
     }
 
-    void iteratorForB(Entity e, B* b)
+    void accessorForB(Entity e, B* b)
     {
         assert(e == e2 || e == e3);
         output ~= b.str;
     }
 
-    em.setIterator!A(&iteratorForA);
-    em.setIterator!B(&iteratorForB);
+    em.setAccessor!A(&accessorForA);
+    em.setAccessor!B(&accessorForB);
 
     e1.iterate();
     assert(output == "1");
