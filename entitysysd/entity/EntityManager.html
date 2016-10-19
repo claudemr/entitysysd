@@ -76,10 +76,7 @@ $('#symbolSearchPane').show();
 										<code>this</code>
 									</a>
 								</td>
-								<td>Constructor of the entity-manager. eventManager may be used to notify
- about entity creation and component registration. maxComponent sets
- the maximum number of components supported by the whole manager. poolSize
- is the chunk size in bytes for each components.
+								<td>Constructor of the entity-manager.
 </td>
 							</tr>
 						</table>
@@ -92,6 +89,24 @@ $('#symbolSearchPane').show();
 								<th>Name</th>
 								<th>Type</th>
 								<th>Description</th>
+							</tr>
+							<tr>
+								<td>
+									<a href="../../entitysysd/entity/EntityManager.accessor.html" class="public property"><code>accessor</code></a>
+									<span class="tableEntryAnnotation">[set]</span>
+								</td>
+								<td class="typecol"><code class="prettyprint lang-d"><span class="typ">void</span> <span class="kwd">delegate</span><span class="pun">(</span><a href="../../entitysysd/entity/Entity.html"><span class="typ">Entity</span></a> e<span class="pun">, </span><span class="pln">C</span><span class="pun">*</span> pc<span class="pun">)</span></code></td>
+								<td>Set an accessor delegate for a component.
+</td>
+							</tr>
+							<tr>
+								<td>
+									<a href="../../entitysysd/entity/EntityManager.accessor.html" class="public property"><code>accessor</code></a>
+									<span class="tableEntryAnnotation">[get]</span>
+								</td>
+								<td class="typecol"><code class="prettyprint lang-d"><span class="typ">void</span> <span class="kwd">delegate</span><span class="pun">(</span><a href="../../entitysysd/entity/Entity.html"><span class="typ">Entity</span></a> e<span class="pun">, </span><span class="pln">C</span><span class="pun">*</span> pc<span class="pun">)</span></code></td>
+								<td>Get the accessor delegate assigned to a component.
+</td>
 							</tr>
 							<tr>
 								<td>
@@ -142,29 +157,11 @@ $('#symbolSearchPane').show();
 							</tr>
 							<tr>
 								<td>
-									<a href="../../entitysysd/entity/EntityManager.clearAccessor.html" class="public">
-										<code>clearAccessor</code>
-									</a>
-								</td>
-								<td>Clears an accessor delegate for a component.
-</td>
-							</tr>
-							<tr>
-								<td>
 									<a href="../../entitysysd/entity/EntityManager.create.html" class="public">
 										<code>create</code>
 									</a>
 								</td>
 								<td>Create an entity.
-</td>
-							</tr>
-							<tr>
-								<td>
-									<a href="../../entitysysd/entity/EntityManager.getAccessor.html" class="public">
-										<code>getAccessor</code>
-									</a>
-								</td>
-								<td>Get the accessor delegate assigned to a component.
 </td>
 							</tr>
 							<tr>
@@ -184,15 +181,6 @@ $('#symbolSearchPane').show();
 								</td>
 								<td>Allows to browse through all the valid entities of the manager with
  a foreach loop.
-</td>
-							</tr>
-							<tr>
-								<td>
-									<a href="../../entitysysd/entity/EntityManager.setAccessor.html" class="public">
-										<code>setAccessor</code>
-									</a>
-								</td>
-								<td>Set an accessor delegate for a component.
 </td>
 							</tr>
 							<tr>

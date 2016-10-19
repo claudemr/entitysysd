@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<title>Function EntityManager.setAccessor</title>
+		<title>EntityManager.accessor - multiple declarations</title>
 		<link rel="stylesheet" type="text/css" href="../../styles/ddox.css"/>
 		<link rel="stylesheet" href="../../prettify/prettify.css" type="text/css"/>
 		<script type="text/javascript" src="../../scripts/jquery.js">/**/</script>
@@ -48,8 +48,13 @@ $('#symbolSearchPane').show();
 				</div>
 		</nav>
 		<div id="main-contents">
-			<h1>Function EntityManager.setAccessor</h1>
+			<h1>EntityManager.accessor - multiple declarations</h1>
+			<ul>
+				<li>Function EntityManager.accessor</li>
+				<li>Function EntityManager.accessor</li>
+			</ul>
 			<section>
+				<h2>Function EntityManager.accessor</h2>
 				<p>Set an accessor delegate for a component.
 </p>
 <section></section>
@@ -58,19 +63,46 @@ $('#symbolSearchPane').show();
 						<h3>Prototype</h3>
 						<div class="prototype">
 							<code class="lang-d">
-<span class="typ">void</span> <span class="pln">setAccessor</span><span class="pun">(</span><span class="pln">C</span><span class="pun">)</span><span class="pun">(</span>
+<span class="typ">void</span> <span class="pln">accessor</span><span class="pun">(</span><span class="pln">C</span><span class="pun">)</span><span class="pun">(</span>
 								<br/>
 &nbsp;&nbsp;<span class="typ">void</span> <span class="kwd">delegate</span><span class="pun">(</span><a href="../../entitysysd/entity/Entity.html"><span class="typ">Entity</span></a> e<span class="pun">, </span><span class="pln">C</span><span class="pun">*</span> pc<span class="pun">)</span> <span class="pln">dg</span>
 								<br/>
-<span class="pun">)</span><span class="pun">;</span>
+<span class="pun">)</span><span class="pln"> </span><span class="kwd">@property</span><span class="pun">;</span>
 							</code>
 						</div>
 					</section>
 <section><h3>Parameters</h3>
 <table><col class="caption"><tr><th>Name</th><th>Description</th></tr>
 <tr><td id="C">C</td><td> Component to which the accessor delegate will be set.</td></tr>
-<tr><td id="dg">dg</td><td> Delegate that will be called when using <code class="lang-d"><a href="../../entitysysd/entity/Entity.iterate.html"><span class="typ">Entity<wbr/></span><span class="pun">.</span><span class="pln">iterate</span></a></code>.</td></tr>
+<tr><td id="dg">dg</td><td> Delegate that will be called when using <code class="lang-d"><a href="../../entitysysd/entity/Entity.iterate.html"><span class="typ">Entity<wbr/></span><span class="pun">.</span><span class="pln">iterate</span></a></code>.
+        Use <code class="lang-d"><span class="kwd">null</span></code> to clear the accessor.</td></tr>
 </table>
+</section>
+
+			</section>
+			<section>
+				<h2>Function EntityManager.accessor</h2>
+				<p>Get the accessor delegate assigned to a component.
+</p>
+<section></section>
+
+					<section>
+						<h3>Prototype</h3>
+						<div class="prototype">
+							<code class="lang-d">
+<span class="typ">void</span> <span class="kwd">delegate</span><span class="pun">(</span><a href="../../entitysysd/entity/Entity.html"><span class="typ">Entity</span></a> e<span class="pun">, </span><span class="pln">C</span><span class="pun">*</span> pc<span class="pun">)</span> <span class="pln">accessor<span class="pun">(</span><span class="pln">C</span><span class="pun">)</span><span class="pun">()</span><span class="pln"> </span><span class="kwd">@property</span><span class="pun">;</span>
+							</code>
+						</div>
+					</section>
+<section><h3>Parameters</h3>
+<table><col class="caption"><tr><th>Name</th><th>Description</th></tr>
+<tr><td id="C">C</td><td> Component from which the accessor delegate will be retreived.</td></tr>
+</table>
+</section>
+<section><h3>Returns</h3>
+<p>The accessor delegate; null if it has never been set, if it was cleared
+   or if the component is missing.
+</p>
 </section>
 
 			</section>
