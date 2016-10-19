@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		<title>Function EntityManager.setIterator</title>
+		<title>Function EntityManager.clearAccessor</title>
 		<link rel="stylesheet" type="text/css" href="../../styles/ddox.css"/>
 		<link rel="stylesheet" href="../../prettify/prettify.css" type="text/css"/>
 		<script type="text/javascript" src="../../scripts/jquery.js">/**/</script>
@@ -48,9 +48,9 @@ $('#symbolSearchPane').show();
 				</div>
 		</nav>
 		<div id="main-contents">
-			<h1>Function EntityManager.setIterator</h1>
+			<h1>Function EntityManager.clearAccessor</h1>
 			<section>
-				<p>Set an iterator delegate for a component.
+				<p>Clears an accessor delegate for a component.
 </p>
 <section></section>
 
@@ -58,18 +58,13 @@ $('#symbolSearchPane').show();
 						<h3>Prototype</h3>
 						<div class="prototype">
 							<code class="lang-d">
-<span class="typ">void</span> <span class="pln">setIterator</span><span class="pun">(</span><span class="pln">C</span><span class="pun">)</span><span class="pun">(</span>
-								<br/>
-&nbsp;&nbsp;<span class="typ">void</span> <span class="kwd">delegate</span><span class="pun">(</span><a href="../../entitysysd/entity/Entity.html"><span class="typ">Entity</span></a> e<span class="pun">, </span><span class="pln">C</span><span class="pun">*</span> pc<span class="pun">)</span> <span class="pln">dg</span>
-								<br/>
-<span class="pun">)</span><span class="pun">;</span>
+<span class="typ">void</span> <span class="pln">clearAccessor<span class="pun">(</span><span class="pln">C</span><span class="pun">)</span><span class="pun">()</span><span class="pun">;</span>
 							</code>
 						</div>
 					</section>
 <section><h3>Parameters</h3>
 <table><col class="caption"><tr><th>Name</th><th>Description</th></tr>
-<tr><td id="C">C</td><td> Component to which the iterator delegate will be set.</td></tr>
-<tr><td id="dg">dg</td><td> Delegate that will be called when using <code class="lang-d"><a href="../../entitysysd/entity/Entity.iterate.html"><span class="typ">Entity<wbr/></span><span class="pun">.</span><span class="pln">iterate</span></a></code>.</td></tr>
+<tr><td id="C">C</td><td> Component to which the accessor delegate will be cleared.</td></tr>
 </table>
 </section>
 
