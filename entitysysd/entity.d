@@ -905,14 +905,8 @@ unittest
         output ~= a.i.to!string;
     }
 
-    void accessorForB(Entity e, B* b)
-    {
-        assert(e == e2 || e == e3);
-        output ~= b.str;
-    }
-
     em.setAccessor!A(&accessorForA);
-    em.setAccessor!B(&accessorForB);
+    em.setAccessor!B((e, b) { output ~= b.str; }); // use lambda
 
     e1.iterate();
     assert(output == "1");
