@@ -122,6 +122,14 @@ foreach (entity, pos, render; ecs.entities.entitiesWith!(Position, Renderable))
 }
 ```
 
+Browsing through the components of an entity.
+```
+ecs.entities.setAccessor!Position( (e, p) { write("Entity:%s Xpos=%d", entity.toString, p.x); } );
+auto entity = ecs.entities.create();
+entity.register!Position(2.0, 3.0);
+entity.iterate(); // call accessor delegates of the components registered to entity
+```
+
 ### Systems
 
 Create a class inheriting from the `System` interface, registering it to the
