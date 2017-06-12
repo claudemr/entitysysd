@@ -356,7 +356,7 @@ public:
      * A delegate $(D dg) can be given, the $(D rate) at which it will be called
      * to provide significant stat's.
      */
-    deprecated("Please, use `subscribe` with `StatEvent` to enable stat "
+    deprecated("Please, use `subscribe` with `StatEvent` to enable stat " ~
                "notifications. And use `statRate` to control the rate.")
     void enableStat(Duration rate = seconds(0), void delegate() dg = null)
     {
@@ -369,7 +369,7 @@ public:
      * Disable statistics profiling on the system-manager and all its
      * registered systems.
      */
-    deprecated("Please, use `unsubscribe` with `StatEvent` to disable stat "
+    deprecated("Please, use `unsubscribe` with `StatEvent` to disable stat " ~
                "notifications.")
     void disableStat()
     {
