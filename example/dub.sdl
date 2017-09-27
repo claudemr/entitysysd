@@ -1,0 +1,8 @@
+name        "entitysys-example"
+description "An example showcasing EntitySysD"
+homepage    "https://github.com/claudemr/entitysysd"
+copyright   "Copyright © 2015-2018, Claude Merle"
+license     "GPL3"
+authors     "Claude Merle"
+dependency  "entitysysd"    path=".."
+dependency  "derelict-sdl2" version="~>1.9"

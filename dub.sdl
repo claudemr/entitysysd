@@ -1,0 +1,6 @@
+name        "entitysysd"
+description "Entity/Component System engine"
+homepage    "https://github.com/claudemr/entitysysd"
+copyright   "Copyright © 2015-2018, Claude Merle"
+license     "LGPL3"
+authors     "Claude Merle"
