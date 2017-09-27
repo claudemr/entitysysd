@@ -27,14 +27,6 @@ To build the **EntitySysD** library, simply run in the top-level directory
 dub
 ```
 
-To use this project as a dependency, add the version you want (see Releases) to
-your dub.json:
-```
-"dependencies": {
-    "entitysysd": "~>2.0"
-}
-```
-
 To build and run all the unit-tests:
 ```
 dub test
@@ -188,19 +180,6 @@ evtManager.emit(e);
 evtManager.emit!MyEvent(42);
 ```
 
-
-## Example
-
-A small application using SDL2 implements **EntitySysD**. It shows some colored
-squares bouncing around in a window and exploding when colliding into each
-other.
-
-Understanding the code should be pretty straightforward.
-
-Use dub to build and run it:
-```
-dub --config=example
-```
 
 ## Thread-safety
 
